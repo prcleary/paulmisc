@@ -1,10 +1,10 @@
-library(shiny)
-library(bslib)
-library(clipr)
+# library(shiny)
+# library(bslib)
+# library(clipr)
 
 # Function definitions
 randomtasks2 <- rat2 <- function() {
-  tasks <- read_clip(allow_non_interactive = TRUE)
+  tasks <- clipr::read_clip(allow_non_interactive = TRUE)
   tasks <- gsub("^\\s*☐", "- [ ]", tasks)
   probs <- 1 / seq_along(tasks)
   probs <- probs / sum(probs)
@@ -48,75 +48,81 @@ daynote <- dn <- function(minutes_available = 16 * 60,
   paste(output, collapse = "\n")
 }
 
-ui <- page_navbar(
-  theme = bs_theme(version = 5, bootswatch = "darkly"),
+ui <- bslib::page_navbar(
+  theme = bslib::bs_theme(bg = "#101010",
+                          fg = "#FFF",
+                          primary = "#E69F00",
+                          secondary = "#0072B2",
+                          success = "#009E73",
+                          base_font = bslib::font_google("Inter"),
+                          code_font = bslib::font_google("JetBrains Mono")),
   title = "Task and Day Note Generator",
 
 
-  nav_panel("Day Note", layout_sidebar(
-    sidebar = sidebar(
-      numericInput(
+  bslib::nav_panel("Day Note", bslib::layout_sidebar(
+    sidebar = bslib::sidebar(
+      shiny::numericInput(
         "minutesAvailable",
         "Minutes Available",
         value = 16 * 60,
         min = 1
       ),
-      textInput("workStart", "Work Start Time", value = "06:00"),
-      numericInput(
+      shiny::textInput("workStart", "Work Start Time", value = "06:00"),
+      shiny::numericInput(
         "workLength",
         "Work Length (minutes)",
         value = 25,
         min = 1
       ),
-      numericInput(
+      shiny::numericInput(
         "restLength",
         "Rest Length (minutes)",
         value = 5,
         min = 1
       ),
-      numericInput(
+      shiny::numericInput(
         "breaksEvery",
         "Breaks Every (pomodoros)",
         value = 5,
         min = 1
       ),
-      actionButton("generateDayNote", "Generate Day Note")
+      shiny::actionButton("generateDayNote", "Generate Day Note")
     ),
-    card(
-      card_header("Day Note Output"),
-      card_body(
-        verbatimTextOutput("dayNoteOutput"),
-        actionButton("copyDayNote", "Copy to Clipboard")
+    bslib::card(
+      bslib::card_header("Day Note Output"),
+      bslib::card_body(
+        shiny::verbatimTextOutput("dayNoteOutput"),
+        shiny::actionButton("copyDayNote", "Copy to Clipboard")
       )
     )
   )),
 
-  nav_panel("Random Tasks", layout_sidebar(
-    sidebar = sidebar(actionButton(
+  bslib::nav_panel("Random Tasks", bslib::layout_sidebar(
+    sidebar = bslib::sidebar(actionButton(
       "generateRandomTasks", "Generate Random Tasks"
-    )), card(
-      card_header("Random Tasks Output"),
-      card_body(
-        uiOutput("randomTasksOutput"),
-        actionButton("copyRandomTasks", "Copy to Clipboard")
+    )), bslib::card(
+      bslib::card_header("Random Tasks Output"),
+      bslib::card_body(
+        shiny::uiOutput("randomTasksOutput"),
+        shiny::actionButton("copyRandomTasks", "Copy to Clipboard")
       )
     )
   )),
 )
 
 server <- function(input, output, session) {
-  randomTasksResult <- reactiveVal("")
-  dayNoteResult <- reactiveVal("")
+  randomTasksResult <- shiny::reactiveVal("")
+  dayNoteResult <- shiny::reactiveVal("")
 
-  observeEvent(input$generateRandomTasks, {
+  shiny::observeEvent(input$generateRandomTasks, {
     result <- randomtasks2()
     randomTasksResult(result)
-    output$randomTasksOutput <- renderUI({
-      HTML(markdown::markdownToHTML(text = result, fragment.only = TRUE))
+    output$randomTasksOutput <- shiny::renderUI({
+      shiny::HTML(markdown::markdownToHTML(text = result, fragment.only = TRUE))
     })
   })
 
-  observeEvent(input$generateDayNote, {
+  shiny::observeEvent(input$generateDayNote, {
 
     result <- daynote(
       minutes_available = input$minutesAvailable,
@@ -126,20 +132,20 @@ server <- function(input, output, session) {
       breaks_every = input$breaksEvery
     )
     dayNoteResult(result)
-    output$dayNoteOutput <- renderText({
+    output$dayNoteOutput <- shiny::renderText({
       result
     })
   })
 
-  observeEvent(input$copyRandomTasks, {
-    write_clip(randomTasksResult(), allow_non_interactive = TRUE)
-    showNotification("Random Tasks copied to clipboard!", type = "message")
+  shiny::observeEvent(input$copyRandomTasks, {
+    clipr::write_clip(randomTasksResult(), allow_non_interactive = TRUE)
+    shiny::showNotification("Random Tasks copied to clipboard!", type = "message")
   })
 
-  observeEvent(input$copyDayNote, {
-    write_clip(dayNoteResult(), allow_non_interactive = TRUE)
-    showNotification("Day Note copied to clipboard!", type = "message")
+  shiny::observeEvent(input$copyDayNote, {
+    clipr::write_clip(dayNoteResult(), allow_non_interactive = TRUE)
+    shiny::showNotification("Day Note copied to clipboard!", type = "message")
   })
 }
 
-shinyApp(ui, server)
+shiny::shinyApp(ui, server)
