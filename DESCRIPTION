@@ -12,5 +12,9 @@ Imports:
     bslib,
     clipr,
     data.table,
+    dplyr,
     ggplot2,
-    shiny
+    httr,
+    shiny,
+    utils,
+    xml2
