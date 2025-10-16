@@ -40,7 +40,7 @@ pause_min = 1
   if (is.null(response) || httr::status_code(response) != 207) {
     return(data.frame())
   }
-  content <- content(response, as = "text", encoding = "UTF-8")
+  content <- httr::content(response, as = "text", encoding = "UTF-8")
   doc <- xml2::read_xml(content)
   ns <- c(d = "DAV:",
           cal = "urn:ietf:params:xml:ns:caldav")
