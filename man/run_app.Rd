@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_app.R
 \name{run_app}
 \alias{run_app}
-\title{Run a Shiny app from the package}
+\title{Run A Shiny App From The Package}
 \usage{
 run_app(app_name)
 }
@@ -10,5 +10,5 @@ run_app(app_name)
 \item{app_name}{The name of the app folder in inst/apps/}
 }
 \description{
-Run a Shiny app from the package
+Runs a Shiny app from the package.
 }

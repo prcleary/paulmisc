@@ -3,14 +3,6 @@
 # library(clipr)
 
 # Function definitions
-randomtasks2 <- rat2 <- function() {
-  tasks <- clipr::read_clip(allow_non_interactive = TRUE)
-  tasks <- gsub("^\\s*☐", "- [ ]", tasks)
-  probs <- 1 / seq_along(tasks)
-  probs <- probs / sum(probs)
-  chosen <- sample(tasks, prob = probs)
-  paste(chosen, collapse = "\n")
-}
 
 daynote <- dn <- function(minutes_available = 16 * 60,
                           work_start = '06:00',
@@ -115,7 +107,7 @@ server <- function(input, output, session) {
   dayNoteResult <- shiny::reactiveVal("")
 
   shiny::observeEvent(input$generateRandomTasks, {
-    result <- randomtasks2()
+    result <- rand_cb_tasks()
     randomTasksResult(result)
     output$randomTasksOutput <- shiny::renderUI({
       shiny::HTML(markdown::markdownToHTML(text = result, fragment.only = TRUE))

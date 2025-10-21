@@ -1,4 +1,6 @@
-#' Run a Shiny app from the package
+#' Run A Shiny App From The Package
+#'
+#' @description Runs a Shiny app from the package.
 #'
 #' @param app_name The name of the app folder in inst/apps/
 #' @export
