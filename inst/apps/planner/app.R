@@ -107,7 +107,7 @@ server <- function(input, output, session) {
   dayNoteResult <- shiny::reactiveVal("")
 
   shiny::observeEvent(input$generateRandomTasks, {
-    result <- rand_cb_tasks()
+    result <- paulmisc::rand_cb_tasks()
     randomTasksResult(result)
     output$randomTasksOutput <- shiny::renderUI({
       shiny::HTML(markdown::markdownToHTML(text = result, fragment.only = TRUE))
