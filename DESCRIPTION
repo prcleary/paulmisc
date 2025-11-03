@@ -15,8 +15,6 @@ Imports:
     dplyr,
     ggplot2,
     httr,
-    RDCOMClient,
     shiny,
     utils,
     xml2
-Additional_repositories: http://www.omegahat.net/R
