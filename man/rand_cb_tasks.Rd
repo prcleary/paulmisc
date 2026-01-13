@@ -4,7 +4,10 @@
 \alias{rand_cb_tasks}
 \title{Title Randomise Clipboard Tasks}
 \usage{
-rand_cb_tasks()
+rand_cb_tasks(additional_tasks = NULL)
+}
+\arguments{
+\item{additional_tasks}{Optional character string of additional tasks (one per line) to combine with clipboard tasks before randomisation}
 }
 \value{
 Vector of randomised tasks in Markdown format

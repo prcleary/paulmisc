@@ -1,9 +1,3 @@
-# library(shiny)
-# library(bslib)
-# library(clipr)
-
-# Function definitions
-
 daynote <- dn <- function(minutes_available = 16 * 60,
                           work_start = '06:00',
                           time_format = '%H:%M',
@@ -90,7 +84,17 @@ ui <- bslib::page_navbar(
   )),
 
   bslib::nav_panel("Random Tasks", bslib::layout_sidebar(
-    sidebar = bslib::sidebar(actionButton(
+    sidebar = bslib::sidebar(
+      # NEW: Added textarea widget for entering additional email tasks
+      # Each line in this textarea will be combined with clipboard tasks
+      shiny::textAreaInput(
+        "emailTasks",
+        "Emails",
+        value = "",
+        rows = 6,
+        placeholder = "Enter additional tasks (one per line)"
+      ),
+      actionButton(
       "generateRandomTasks", "Generate Random Tasks"
     )), bslib::card(
       bslib::card_header("Random Tasks Output"),
@@ -107,7 +111,9 @@ server <- function(input, output, session) {
   dayNoteResult <- shiny::reactiveVal("")
 
   shiny::observeEvent(input$generateRandomTasks, {
-    result <- paulmisc::rand_cb_tasks()
+    # NEW: Pass the email tasks from the textarea to rand_cb_tasks
+    # The textarea content is split by newlines to create a vector of additional tasks
+    result <- rand_cb_tasks(additional_tasks = input$emailTasks)
     randomTasksResult(result)
     output$randomTasksOutput <- shiny::renderUI({
       shiny::HTML(markdown::markdownToHTML(text = result, fragment.only = TRUE))
