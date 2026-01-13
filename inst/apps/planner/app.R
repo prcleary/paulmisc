@@ -113,7 +113,7 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$generateRandomTasks, {
     # NEW: Pass the email tasks from the textarea to rand_cb_tasks
     # The textarea content is split by newlines to create a vector of additional tasks
-    result <- rand_cb_tasks(additional_tasks = input$emailTasks)
+    result <- paulmisc::rand_cb_tasks(additional_tasks = input$emailTasks)
     randomTasksResult(result)
     output$randomTasksOutput <- shiny::renderUI({
       shiny::HTML(markdown::markdownToHTML(text = result, fragment.only = TRUE))
