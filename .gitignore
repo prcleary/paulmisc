@@ -1,2 +1,10 @@
 .Rproj.user
 docs
+# Vim swap / backup / undo files
+*.swp
+*.swo
+*.swn
+*.swm
+*~
+*.un~
+.Rhistory
