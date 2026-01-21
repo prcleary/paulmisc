@@ -19,7 +19,12 @@ rand_cb_tasks <- function(additional_tasks = NULL) {
     # Remove empty lines from the additional tasks
     extra_tasks <- extra_tasks[nzchar(trimws(extra_tasks))]
     # Combine clipboard tasks with additional tasks
-    tasks <- c(extra_tasks, tasks)
+    n <- min(length(tasks), length(extra_tasks))
+    tasks <- c(
+      as.vector(rbind(tasks[seq_len(n)], extra_tasks[seq_len(n)])),
+      tasks[-seq_len(n)],
+      extra_tasks[-seq_len(n)]
+    )
   }
   
   tasks <- gsub("^\\s*\u2610\\s*", "", tasks)
