@@ -40,7 +40,7 @@ fetch_calendar_tasks <- function(calendar_url, username, password) {
     warning("HTTP request failed: ", e$message)
     return(NULL)
   })
-  if (is.null(response) || httr::status_code(response) >= 400) {
+  if (is.null(response) || httr::status_code(response) != 207) {
     return(data.frame())
   }
   content <- httr::content(response, as = "text", encoding = "UTF-8")
@@ -53,7 +53,7 @@ fetch_calendar_tasks <- function(calendar_url, username, password) {
     href <- xml2::xml_text(xml2::xml_find_first(resp, ".//d:href", ns = ns))
     calendar_data_node <-
       xml2::xml_find_first(resp, ".//cal:calendar-data", ns = ns)
-    if (is.null(calendar_data_node))
+    if (is.na(calendar_data_node))
       next
     calendar_data <- xml2::xml_text(calendar_data_node)
     if (!is.na(calendar_data) &&
