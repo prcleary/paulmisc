@@ -94,7 +94,8 @@ ui <- bslib::page_navbar(
         rows = 6,
         placeholder = "Enter additional tasks (one per line)"
       ),
-      actionButton(
+      shiny::actionButton("getNextcloudTasks", "Get Nextcloud Tasks"),
+      shiny::actionButton(
       "generateRandomTasks", "Generate Random Tasks"
     )), bslib::card(
       bslib::card_header("Random Tasks Output"),
@@ -110,7 +111,32 @@ server <- function(input, output, session) {
   randomTasksResult <- shiny::reactiveVal("")
   dayNoteResult <- shiny::reactiveVal("")
 
-  shiny::observeEvent(input$generateRandomTasks, {
+  shiny::observeEvent(input$getNextcloudTasks, {
+    base_url <- Sys.getenv("NEXTCLOUD_BASE_URL")
+    username <- Sys.getenv("NEXTCLOUD_USERNAME")
+    password <- Sys.getenv("NEXTCLOUD_PASSWORD")
+    
+    if (base_url == "" || username == "" || password == "") {
+      shiny::showNotification("Nextcloud credentials are not set in environment variables.", type = "error")
+      return()
+    }
+    
+    tasks <- tryCatch({
+      get_nextcloud_tasks(base_url, username, password)
+    }, error = function(e) {
+      shiny::showNotification(paste("Failed to get Nextcloud tasks:", e$message), type = "error")
+      return(data.frame())
+    })
+    
+    if (nrow(tasks) > 0) {
+      randomTasksResult(paste("Nextcloud Tasks:\n", paste(tasks$summary, collapse = "\n")))
+      output$randomTasksOutput <- shiny::renderUI({
+        shiny::HTML(markdown::markdownToHTML(text = randomTasksResult(), fragment.only = TRUE))
+      })
+    } else {
+      shiny::showNotification("No tasks found in Nextcloud.", type = "message")
+    }
+  })
     # NEW: Pass the email tasks from the textarea to rand_cb_tasks
     # The textarea content is split by newlines to create a vector of additional tasks
     result <- paulmisc::rand_cb_tasks(additional_tasks = input$emailTasks)
