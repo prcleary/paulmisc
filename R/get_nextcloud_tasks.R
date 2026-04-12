@@ -14,6 +14,9 @@ get_nextcloud_tasks <- function(calendar_url, username, password) {
     stop("Calendar URL must start with http:// or https://")
   }
   
+  # Construct the full URL to the calendar endpoint
+  calendar_url <- paste0(calendar_url, "/calendars/", username, "/")
+
   tasks <- tryCatch({
     fetch_calendar_tasks(calendar_url, username, password)
   }, error = function(e) {
