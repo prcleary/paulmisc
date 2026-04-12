@@ -64,6 +64,10 @@ fetch_calendar_tasks <- function(calendar_url, username, password) {
   ns <- c(d = "DAV:",
           cal = "urn:ietf:params:xml:ns:caldav")
   responses <- xml2::xml_find_all(doc, ".//d:response", ns = ns)
+  if (length(responses) == 0) {
+    warning("No calendars found at the specified URL.")
+    return(data.frame())
+  }
   tasks <- list()
   for (resp in responses) {
     href <- xml2::xml_text(xml2::xml_find_first(resp, ".//d:href", ns = ns))
