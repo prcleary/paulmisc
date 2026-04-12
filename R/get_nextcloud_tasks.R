@@ -45,7 +45,7 @@ get_nextcloud_tasks <- function(calendar_url = Sys.getenv("NEXTCLOUD_BASE_URL"),
   # Filter tasks based on status and priority
   filtered_tasks_df <- all_tasks_df %>%
     dplyr::filter(!(status %in% exclude_status)) %>%
-    dplyr::filter(!is.na(priority) & !priority %in% exclude_priority)
+    dplyr::filter(!is.na(priority) & !is.na(exclude_priority))
   
   return(filtered_tasks_df)
 }
