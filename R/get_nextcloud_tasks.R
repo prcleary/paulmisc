@@ -17,7 +17,7 @@ get_nextcloud_tasks <- function(calendar_url = Sys.getenv("NEXTCLOUD_BASE_URL"),
   }
   
   # Construct the full URL to the calendar endpoint
-  calendar_url <- paste0(calendar_url, "/calendars/", username, "/tasks/")
+  calendar_url <- paste0(calendar_url, "/calendars/", username, "/")
 
   tasks <- tryCatch({
     fetch_calendar_tasks(calendar_url, username, password)
