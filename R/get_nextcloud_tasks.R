@@ -2,13 +2,15 @@
 #'
 #' @description Gets Nextcloud tasks from a specified calendar.
 #'
-#' @param calendar_url URL of the specific Nextcloud calendar DAV endpoint e.g. 'https://nextcloud.domain.tld/remote.php/dav/calendars/admin'
-#' @param username Nextcloud user name
-#' @param password Nextcloud password
+#' @param calendar_url URL of the specific Nextcloud calendar DAV endpoint e.g. 'https://nextcloud.domain.tld/remote.php/dav/calendars/admin'. Defaults to environment variable 'NEXTCLOUD_BASE_URL'.
+#' @param username Nextcloud user name. Defaults to environment variable 'NEXTCLOUD_USERNAME'.
+#' @param password Nextcloud password. Defaults to environment variable 'NEXTCLOUD_PASSWORD'.
 #' @return Data frame of tasks
 #'
 #' @export
-get_nextcloud_tasks <- function(calendar_url, username, password) {
+get_nextcloud_tasks <- function(calendar_url = Sys.getenv("NEXTCLOUD_BASE_URL"),
+                                username = Sys.getenv("NEXTCLOUD_USERNAME"),
+                                password = Sys.getenv("NEXTCLOUD_PASSWORD")) {
   calendar_url <- gsub("/+$", "", calendar_url)
   if (!grepl("^https?://", calendar_url)) {
     stop("Calendar URL must start with http:// or https://")
