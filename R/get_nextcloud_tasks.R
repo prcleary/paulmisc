@@ -5,12 +5,16 @@
 #' @param calendar_url URL of the specific Nextcloud calendar DAV endpoint e.g. 'https://nextcloud.domain.tld/remote.php/dav/calendars/admin'. Defaults to environment variable 'NEXTCLOUD_BASE_URL'.
 #' @param username Nextcloud user name. Defaults to environment variable 'NEXTCLOUD_USERNAME'.
 #' @param password Nextcloud password. Defaults to environment variable 'NEXTCLOUD_PASSWORD'.
+#' @param exclude_status Status values to exclude (default is "COMPLETED")
+#' @param exclude_priority Priority values to exclude (default is NA)
 #' @return Data frame of tasks
 #'
 #' @export
 get_nextcloud_tasks <- function(calendar_url = Sys.getenv("NEXTCLOUD_BASE_URL"),
                                 username = Sys.getenv("NEXTCLOUD_USERNAME"),
-                                password = Sys.getenv("NEXTCLOUD_PASSWORD")) {
+                                password = Sys.getenv("NEXTCLOUD_PASSWORD"),
+                                exclude_status = "COMPLETED",
+                                exclude_priority = NA) {
   calendar_url <- gsub("/+$", "", calendar_url)
   if (!grepl("^https?://", calendar_url)) {
     stop("Calendar URL must start with http:// or https://")
@@ -38,5 +42,10 @@ get_nextcloud_tasks <- function(calendar_url = Sys.getenv("NEXTCLOUD_BASE_URL"),
     all_tasks_df$calendar <- task_calendars$displayname[match(all_tasks_df$url, task_calendars$url)]
   }
   
-  return(all_tasks_df)
+  # Filter tasks based on status and priority
+  filtered_tasks_df <- all_tasks_df %>%
+    dplyr::filter(!(status %in% exclude_status)) %>%
+    dplyr::filter(!is.na(priority) | !is.na(exclude_priority))
+  
+  return(filtered_tasks_df)
 }
