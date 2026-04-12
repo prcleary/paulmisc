@@ -136,9 +136,11 @@ server <- function(input, output, session) {
     } else {
       shiny::showNotification("No tasks found in Nextcloud.", type = "message")
     }
-    })
-    # NEW: Pass the email tasks from the textarea to rand_cb_tasks
-    # The textarea content is split by newlines to create a vector of additional tasks
+  })
+
+  # NEW: Pass the email tasks from the textarea to rand_cb_tasks
+  # The textarea content is split by newlines to create a vector of additional tasks
+  shiny::observeEvent(input$generateRandomTasks, {
     result <- paulmisc::rand_cb_tasks(additional_tasks = input$emailTasks)
     randomTasksResult(result)
     output$randomTasksOutput <- shiny::renderUI({
