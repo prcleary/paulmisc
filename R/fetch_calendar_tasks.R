@@ -15,9 +15,11 @@ fetch_calendar_tasks <- function(calendar_url, username, password) {
     httr::RETRY(
       "REPORT",
       url = calendar_url,
-      httr::authenticate(username, password),
-      httr::add_headers("Depth" = "1",
-                  "Content-Type" = "application/xml; charset=utf-8"),
+      httr::authenticate(username, password, type = "basic"),
+      httr::add_headers(
+        "Depth" = "1",
+        "Content-Type" = "application/xml; charset=utf-8"
+      ),
       body = '<?xml version="1.0" encoding="utf-8" ?>
 <C:calendar-query xmlns:C="urn:ietf:params:xml:ns:caldav">
   <D:prop xmlns:D="DAV:">
@@ -30,8 +32,9 @@ fetch_calendar_tasks <- function(calendar_url, username, password) {
     </C:comp-filter>
   </C:filter>
 </C:calendar-query>',
-times = 2,
-pause_min = 1
+      encode = "raw",
+      times = 2,
+      pause_min = 1
     )
   }, error = function(e) {
     warning("HTTP request failed: ", e$message)
