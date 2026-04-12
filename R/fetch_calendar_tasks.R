@@ -11,6 +11,7 @@
 fetch_calendar_tasks <- function(calendar_url, username, password) {
   calendar_url <- utils::URLencode(calendar_url)
   calendar_url <- gsub(" ", "%20", calendar_url)
+  message("Fetching tasks from URL: ", calendar_url)
   response <- tryCatch({
     httr::RETRY(
       "REPORT",
@@ -38,13 +39,28 @@ fetch_calendar_tasks <- function(calendar_url, username, password) {
     )
   }, error = function(e) {
     warning("HTTP request failed: ", e$message)
+    message("Error details: ", e)
     return(NULL)
   })
-  if (is.null(response) || httr::status_code(response) >= 400) {
+  if (is.null(response)) {
+    message("No response received.")
+    return(data.frame())
+  }
+  if (httr::status_code(response) >= 400) {
+    message("Received error status code: ", httr::status_code(response))
     return(data.frame())
   }
   content <- httr::content(response, as = "text", encoding = "UTF-8")
-  doc <- xml2::read_xml(content)
+  message("Response content: ", substr(content, 1, 200))  # Log the first 200 characters of the response
+  doc <- tryCatch({
+    xml2::read_xml(content)
+  }, error = function(e) {
+    warning("Failed to parse XML: ", e$message)
+    return(NULL)
+  })
+  if (is.null(doc)) {
+    return(data.frame())
+  }
   ns <- c(d = "DAV:",
           cal = "urn:ietf:params:xml:ns:caldav")
   responses <- xml2::xml_find_all(doc, "//d:response", ns = ns)
