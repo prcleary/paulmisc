@@ -11,7 +11,7 @@
 discover_calendars <- function(base_url, username, password) {
   base_url <- gsub("/+$", "", base_url)
   cal_url <- paste0(base_url, "/calendars/", username, "/")
-  cat("Discovering from:", cal_url, "\n")
+  message("Discovering calendars from: ", cal_url)
   response <- httr::RETRY(
     "PROPFIND",
     url = cal_url,
