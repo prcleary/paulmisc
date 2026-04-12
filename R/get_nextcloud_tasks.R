@@ -18,23 +18,25 @@ get_nextcloud_tasks <- function(calendar_url = Sys.getenv("NEXTCLOUD_BASE_URL"),
   
   # Discover the correct calendar URL
   calendars <- discover_calendars(calendar_url, username, password)
-  task_calendar <- calendars[calendars$type == "tasks", ]
-  if (nrow(task_calendar) == 0) {
+  task_calendars <- calendars[calendars$type == "tasks", ]
+  if (nrow(task_calendars) == 0) {
     warning("No task calendar found.")
     return(data.frame())
   }
-  calendar_url <- task_calendar$url[1]
-
-  tasks <- tryCatch({
-    fetch_calendar_tasks(calendar_url, username, password)
-  }, error = function(e) {
-    warning("Failed to fetch tasks: ", e$message)
-    return(data.frame())
+  all_tasks <- lapply(task_calendars$url, function(url) {
+    tryCatch({
+      fetch_calendar_tasks(url, username, password)
+    }, error = function(e) {
+      warning("Failed to fetch tasks from ", url, ": ", e$message)
+      return(data.frame())
+    })
   })
   
-  if (nrow(tasks) > 0) {
-    tasks$calendar <- "Nextcloud Calendar"
+  all_tasks_df <- do.call(rbind, all_tasks)
+  
+  if (nrow(all_tasks_df) > 0) {
+    all_tasks_df$calendar <- task_calendars$displayname[match(all_tasks_df$url, task_calendars$url)]
   }
   
-  return(tasks)
+  return(all_tasks_df)
 }
