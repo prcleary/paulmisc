@@ -1,41 +1,29 @@
 #' Get Nextcloud Tasks
 #'
-#' @description Gets Nextcloud tasks.
+#' @description Gets Nextcloud tasks from a specified calendar.
 #'
-#' @param base_url URL of Nextcloud instance DAV endpoint e.g. 'https://nextcloud.domain.tld/remote.php/dav'
+#' @param calendar_url URL of the specific Nextcloud calendar DAV endpoint e.g. 'https://nextcloud.domain.tld/remote.php/dav/calendars/admin'
 #' @param username Nextcloud user name
 #' @param password Nextcloud password
 #' @return Data frame of tasks
 #'
 #' @export
-get_nextcloud_tasks <- function(base_url, username, password) {
-  base_url <- gsub("/+$", "", base_url)
-  if (!grepl("^https?://", base_url)) {
-    stop("Base URL must start with http:// or https://")
+get_nextcloud_tasks <- function(calendar_url, username, password) {
+  calendar_url <- gsub("/+$", "", calendar_url)
+  if (!grepl("^https?://", calendar_url)) {
+    stop("Calendar URL must start with http:// or https://")
   }
-  calendars <- tryCatch({
-    discover_calendars(base_url, username, password)
+  
+  tasks <- tryCatch({
+    fetch_calendar_tasks(calendar_url, username, password)
   }, error = function(e) {
-    warning("Calendar discovery failed: ", e$message)
+    warning("Failed to fetch tasks: ", e$message)
     return(data.frame())
   })
-  if (nrow(calendars) == 0) {
-    return(data.frame())
+  
+  if (nrow(tasks) > 0) {
+    tasks$calendar <- "Nextcloud Calendar"
   }
-  all_tasks <- data.frame()
-  for (i in 1:nrow(calendars)) {
-    calendar <- calendars[i,]
-    cat("Processing calendar:", calendar$displayname, "\n")
-    tasks <- tryCatch({
-      fetch_calendar_tasks(calendar$url, username, password)
-    }, error = function(e) {
-      warning("Failed to fetch tasks: ", e$message)
-      data.frame()
-    })
-    if (nrow(tasks) > 0) {
-      tasks$calendar <- calendar$displayname
-      all_tasks <- dplyr::bind_rows(all_tasks, tasks)
-    }
-  }
-  return(all_tasks)
+  
+  return(tasks)
 }
