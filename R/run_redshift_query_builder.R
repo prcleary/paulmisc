@@ -35,7 +35,10 @@
 #' @importFrom shiny shinyApp
 #' @export
 run_redshift_query_builder <- function(...) {
-  app_dir <- system.file("apps", "redshift-sql-query-builder", package = "paulmisc")
+  app_dir <- system.file(
+    "apps", "redshift-sql-query-builder",
+    package = "paulmisc"
+  )
   
   if (app_dir == "") {
     stop(
