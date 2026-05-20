@@ -18,7 +18,7 @@ MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.or
 
 > Collection of miscellaneous R functions of interest only to Paul
 
-This package provides tools for epidemiological visualization, data
+This package provides tools for epidemiological visualisation, data
 simulation, and an interactive Shiny app for building SQL queries for
 Amazon Redshift.
 
@@ -58,7 +58,7 @@ remotes::install_github('prcleary/paulmisc')
 
 ## Usage
 
-### Epidemiological Visualization
+### Epidemiological Visualisation
 
 ``` r
 library(paulmisc)
@@ -86,12 +86,12 @@ ggplot(cases, aes(x = onset_date)) +
 
 <img src="man/figures/README-basic-epicurve-1.png" alt="" width="100%" />
 
-### Colored by Category
+### Coloured by Category
 
-Visualize cases by demographic or clinical characteristics:
+Visualise cases by demographic or clinical characteristics:
 
 ``` r
-# Color by age group
+# Colour by age group
 ggplot(cases, aes(x = onset_date, fill = age_group)) +
   geom_epicurve(colour = "grey20") +
   scale_fill_brewer(palette = "Set2") +
@@ -111,7 +111,7 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
 Compare outbreaks across different settings or groups:
 
 ``` r
-# Facet by setting and color by outcome
+# Facet by setting and colour by outcome
 ggplot(cases, aes(x = onset_date, fill = outcome)) +
   geom_epicurve(height = 0.85) +
   facet_wrap(~ setting, ncol = 1, scales = "free_y") +
@@ -170,7 +170,7 @@ p1 / p2
 
 <img src="man/figures/README-incubation-comparison-1.png" alt="" width="100%" />
 
-### Advanced Customization
+### Advanced Customisation
 
 Fine-tune the appearance of individual case squares:
 
