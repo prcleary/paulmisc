@@ -119,10 +119,10 @@ Convert to interactive plotly plots using
 [`plotly::ggplotly()`](https://rdrr.io/pkg/plotly/man/ggplotly.html):
 
     library(plotly)
-    p <- ggplot(cases, aes(x = onset_date, fill = age_group)) +
-      geom_epicurve() +
+    p <- ggplot(cases, aes(x = onset_date)) +
+      geom_epicurve(fill = "steelblue") +
       theme_minimal()
-    ggplotly(p)
+    ggplotly(p, tooltip = c("x", "y"))
 
 For custom tooltips, add a `text` aesthetic and use the `tooltip`
 parameter:
@@ -146,7 +146,7 @@ cases <- simulate_outbreak()
 
 # Minimal epicurve
 ggplot(cases, aes(x = onset_date)) +
-  geom_epicurve() +
+  geom_epicurve(fill = "steelblue") +
   theme_minimal()
 
 

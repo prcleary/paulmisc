@@ -99,7 +99,7 @@ cases <- simulate_outbreak(n = 50, seed = 42)
 
 # Create basic epicurve
 ggplot(cases, aes(x = onset_date)) +
-  geom_epicurve() +
+  geom_epicurve(fill = "steelblue") +
   labs(
     title = "Outbreak Epicurve",
     x = "Date of Onset",

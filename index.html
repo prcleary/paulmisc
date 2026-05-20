@@ -153,7 +153,7 @@
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Create basic epicurve</span></span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="fu">ggplot</span>(cases, <span class="fu">aes</span>(<span class="at">x =</span> onset_date)) <span class="sc">+</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="fu">geom_epicurve</span>() <span class="sc">+</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="fu">geom_epicurve</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
 <span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Outbreak Epicurve"</span>,</span>
 <span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date of Onset"</span>,</span>
