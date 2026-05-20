@@ -8,6 +8,8 @@ Description: Provides miscellaneous R functions that Paul uses, including
     simulating outbreak data, plus an interactive Shiny app for building
     Amazon Redshift SQL queries.
 License: MIT + file LICENSE
+URL: https://prcleary.github.io/paulmisc/, https://github.com/prcleary/paulmisc
+BugReports: https://github.com/prcleary/paulmisc/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
