@@ -156,6 +156,5 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
   facet_wrap(~ setting, ncol = 1) +
   scale_fill_brewer(palette = "Set2") +
   theme_bw()
-#> Warning: Duplicated aesthetics after name standardisation: colour
 
 ```

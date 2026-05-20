@@ -38,20 +38,19 @@ First, let’s create a basic interactive epidemic curve:
 
 # Create ggplot
 p <- ggplot(cases, aes(x = onset_date)) +
-  geom_epicurve(fill = "steelblue") +
+  geom_epicurve() +
   labs(
     title = "Interactive Epidemic Curve",
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
   theme_minimal()
-#> Warning: Duplicated aesthetics after name standardisation: fill
 
 # Convert to interactive plotly plot
-ggplotly(p)
+ggplotly(p, tooltip = c("x", "y"))
 ```
 
-Hover over any square to see details!
+Hover over any square to see the date and count!
 
 ## Interactive by Age Group
 
@@ -59,13 +58,13 @@ Now let’s colour by age group and add custom tooltips:
 
 ``` r
 
-# Add custom tooltip text
+# Add custom tooltip text (plain text format)
 cases$tooltip <- paste0(
-  "<b>Case ", cases$case_id, "</b><br>",
-  "Date: ", format(cases$onset_date, "%d %B %Y"), "<br>",
-  "Age Group: ", cases$age_group, "<br>",
-  "Sex: ", cases$sex, "<br>",
-  "Setting: ", cases$setting, "<br>",
+  "Case ", cases$case_id, "\n",
+  "Date: ", format(cases$onset_date, "%d %B %Y"), "\n",
+  "Age Group: ", cases$age_group, "\n",
+  "Sex: ", cases$sex, "\n",
+  "Setting: ", cases$setting, "\n",
   "Outcome: ", cases$outcome
 )
 
@@ -93,7 +92,7 @@ Interactive plots work with faceting too:
 p <- ggplot(cases, aes(x = onset_date, fill = sex, text = tooltip)) +
   geom_epicurve() +
   scale_fill_manual(
-    values = c("Male" = "#0072B2", "Female" = "#D55E00"),
+    values = c("Female" = "#D55E00", "Male" = "#0072B2"),
     name = "Sex"
   ) +
   facet_wrap(~ setting, ncol = 1, scales = "free_y") +
@@ -105,8 +104,6 @@ p <- ggplot(cases, aes(x = onset_date, fill = sex, text = tooltip)) +
   theme_minimal()
 
 ggplotly(p, tooltip = "text")
-#> Warning: No shared levels found between `names(values)` of the manual scale and the
-#> data's fill values.
 ```
 
 ## Customising Tooltip Content
@@ -116,14 +113,14 @@ rich tooltips:
 
 ``` r
 
-# Create highly customised tooltips with HTML formatting
+# Create formatted tooltips (using line breaks for structure)
 cases$tooltip <- with(cases, paste0(
-  "<b style='font-size:14px'>Case ", case_id, "</b><br>",
-  "<hr style='margin:2px'>",
-  "<i>Date:</i> ", format(onset_date, "%d %B %Y"), "<br>",
-  "<i>Demographics:</i> ", age_group, ", ", sex, "<br>",
-  "<i>Setting:</i> ", setting, "<br>",
-  "<i>Outcome:</i> ", outcome
+  "Case ", case_id, "\n",
+  "-------------------\n",
+  "Date: ", format(onset_date, "%d %B %Y"), "\n",
+  "Demographics: ", age_group, ", ", sex, "\n",
+  "Setting: ", setting, "\n",
+  "Outcome: ", outcome
 ))
 
 p <- ggplot(cases, aes(x = onset_date, fill = outcome, text = tooltip)) +
@@ -146,13 +143,15 @@ ggplotly(p, tooltip = "text")
   interactivity
 - **Custom tooltips**: Add a `text` aesthetic and use
   `ggplotly(p, tooltip = "text")` to show only your custom tooltip
-- **Tooltip formatting**: Use HTML tags (`<br>`, `<b>`, `<i>`, `<hr>`)
-  for rich formatting
+- **Tooltip formatting**: Use `\n` for line breaks and simple text
+  formatting (HTML is not rendered in ggplotly tooltips)
 - **Performance**: Interactive plots with many cases (\>500) may be
   slow. Consider filtering for large datasets
 - **Mobile devices**: Interactive features work on touch devices - tap
   to see tooltips
 - **Export**: Use plotly’s built-in export button to save static images
+- **Styling**: Default plot aesthetics work best - avoid overriding
+  fill/colour in geom parameters when using aesthetics
 
 ## More Information
 
