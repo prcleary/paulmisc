@@ -151,11 +151,13 @@ library(patchwork)
 
 p1 <- ggplot(short_incubation, aes(x = onset_date)) +
   geom_epicurve(fill = "coral") +
+  scale_x_date(expand = expansion(add = 0.5)) +
   labs(title = "Short Incubation", x = NULL, y = "Cases") +
   theme_minimal()
 
 p2 <- ggplot(long_incubation, aes(x = onset_date)) +
   geom_epicurve(fill = "skyblue") +
+  scale_x_date(expand = expansion(add = 0.5)) +
   labs(title = "Long Incubation", x = "Date of Onset", y = "Cases") +
   theme_minimal()
 
