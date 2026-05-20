@@ -32,7 +32,8 @@ If `background = FALSE`, invisibly returns the result of
 [`shiny::runApp()`](https://rdrr.io/pkg/shiny/man/runApp.html). If
 `background = TRUE` (default), returns a process handle from
 [`callr::r_bg()`](https://callr.r-lib.org/reference/r_bg.html) which can
-be used to monitor or terminate the background process.
+be used to monitor or terminate the background process. The process is
+returned visibly so you can easily assign it to a variable.
 
 ## Details
 
@@ -65,9 +66,13 @@ background mode (default) requires the `callr` package.
 
 ``` r
 if (interactive()) {
-  # Run in background (default, frees console, requires callr)
-  app_process <- run_redshift_query_builder()
-  # To stop: app_process$kill()
+  # Run in background (default) - IMPORTANT: assign to variable
+  app <- run_redshift_query_builder()
+  
+  # Continue using console for other work...
+  
+  # Stop the app when done
+  app$kill()
   
   # Run in foreground (blocks console)
   # run_redshift_query_builder(background = FALSE)

@@ -74,7 +74,8 @@ stopped.</p></dd>
     <p>If <code>background = FALSE</code>, invisibly returns the result of
 <code><a href="https://rdrr.io/pkg/shiny/man/runApp.html" class="external-link">shiny::runApp()</a></code>. If <code>background = TRUE</code> (default), returns a process
 handle from <code><a href="https://callr.r-lib.org/reference/r_bg.html" class="external-link">callr::r_bg()</a></code> which can be used to monitor or terminate
-the background process.</p>
+the background process. The process is returned visibly so you can
+easily assign it to a variable.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -98,9 +99,13 @@ background mode (default) requires the <code>callr</code> package.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="co"># Run in background (default, frees console, requires callr)</span></span></span>
-<span class="r-in"><span>  <span class="va">app_process</span> <span class="op">&lt;-</span> <span class="fu">run_redshift_query_builder</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="co"># To stop: app_process$kill()</span></span></span>
+<span class="r-in"><span>  <span class="co"># Run in background (default) - IMPORTANT: assign to variable</span></span></span>
+<span class="r-in"><span>  <span class="va">app</span> <span class="op">&lt;-</span> <span class="fu">run_redshift_query_builder</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Continue using console for other work...</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Stop the app when done</span></span></span>
+<span class="r-in"><span>  <span class="va">app</span><span class="op">$</span><span class="fu">kill</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># Run in foreground (blocks console)</span></span></span>
 <span class="r-in"><span>  <span class="co"># run_redshift_query_builder(background = FALSE)</span></span></span>
