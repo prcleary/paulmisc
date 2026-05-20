@@ -162,13 +162,13 @@ ggplot(cases, aes(x = onset_date, fill = outcome)) +
 
 Simulate outbreaks with different epidemiological characteristics by
 adjusting the incubation period parameters. The `meanlog` parameter
-controls the median incubation period (median = exp(meanlog) days),
-while `sdlog` controls the spread:
+controls the median incubation period (median = `exp(meanlog)` days),
+while `sdlog` controls the spread around that median:
 
 ``` r
 
 # Short incubation period (e.g., Salmonella, norovirus)
-# meanlog = 0.5 gives median of exp(0.5) = 1.6 days
+# Median incubation: exp(0.5) ≈ 1.6 days
 short_incubation <- simulate_outbreak(
   n = 100,
   exposure = as.Date("2024-08-15"),
@@ -178,7 +178,7 @@ short_incubation <- simulate_outbreak(
 )
 
 # Long incubation period (e.g., Hepatitis A)
-# meanlog = 3 gives median of exp(3) = 20 days
+# Median incubation: exp(3) ≈ 20 days
 long_incubation <- simulate_outbreak(
   n = 100,
   exposure = as.Date("2024-08-15"),
@@ -225,7 +225,7 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
-  theme_dark()
+  theme_minimal()
 ```
 
 ![](reference/figures/README-advanced-styling-1.png)

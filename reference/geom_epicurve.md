@@ -112,6 +112,8 @@ ggplot2 scale, theme, facet, or coordinate system.
 
 - `fill`, `colour`, `alpha`, `linewidth`, `linetype`, `group`.
 
+- `text` — tooltip text for interactive plotly conversion.
+
 ## See also
 
 [`simulate_outbreak()`](https://prcleary.github.io/paulmisc/reference/simulate_outbreak.md)
