@@ -49,14 +49,12 @@
 #' # Minimal epicurve
 #' ggplot(cases, aes(x = onset_date)) +
 #'   geom_epicurve() +
-#'   scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
 #'   theme_minimal()
 #'
 #' # Coloured by age group, faceted by setting
 #' ggplot(cases, aes(x = onset_date, fill = age_group)) +
 #'   geom_epicurve(colour = "grey20") +
 #'   facet_wrap(~ setting, ncol = 1) +
-#'   scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
 #'   scale_fill_brewer(palette = "Set2") +
 #'   theme_bw()
 #'
@@ -162,9 +160,15 @@ GeomEpicurve <- ggplot2::ggproto(
   draw_key = ggplot2::draw_key_polygon,
 
   setup_data = function(data, params) {
-    # Ensure y-axis includes space for the bottom of the lowest rectangles
-    # The lowest rectangle starts at y=1, with ymin at y - 1 + (1 - height)/2
-    # We want to make sure the y range includes from 0
+    # Add a dummy row to ensure y-axis includes 0
+    # This prevents bottom blocks from being truncated
+    if (nrow(data) > 0) {
+      dummy <- data[1, , drop = FALSE]
+      dummy$y <- 0
+      dummy$x <- NA_real_
+      
+      data <- rbind(data, dummy)
+    }
     data
   },
 
@@ -173,6 +177,9 @@ GeomEpicurve <- ggplot2::ggproto(
                         coord,
                         width = 0.9,
                         height = 0.9) {
+    # Remove dummy rows (those with NA x values)
+    data <- data[!is.na(data$x), , drop = FALSE]
+    
     data$xmin <- data$x - width  / 2
     data$xmax <- data$x + width  / 2
     data$ymin <- data$y - 1 + (1 - height) / 2

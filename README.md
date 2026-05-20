@@ -73,13 +73,14 @@ cases <- simulate_outbreak(n = 50, seed = 42)
 # Create basic epicurve
 ggplot(cases, aes(x = onset_date)) +
   geom_epicurve() +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   labs(
     title = "Outbreak Epicurve",
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
   theme_minimal()
+#> Warning: Removed 1 row containing missing values or values outside the scale range
+#> (`geom_epicurve()`).
 ```
 
 <img src="man/figures/README-basic-epicurve-1.png" alt="" width="100%" />
@@ -92,7 +93,6 @@ Visualize cases by demographic or clinical characteristics:
 # Color by age group
 ggplot(cases, aes(x = onset_date, fill = age_group)) +
   geom_epicurve(colour = "grey20") +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   scale_fill_brewer(palette = "Set2") +
   labs(
     title = "Cases by Age Group",
@@ -101,6 +101,8 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
     fill = "Age Group"
   ) +
   theme_bw()
+#> Warning: Removed 1 row containing missing values or values outside the scale range
+#> (`geom_epicurve()`).
 ```
 
 <img src="man/figures/README-colored-epicurve-1.png" alt="" width="100%" />
@@ -114,7 +116,6 @@ Compare outbreaks across different settings or groups:
 ggplot(cases, aes(x = onset_date, fill = outcome)) +
   geom_epicurve(height = 0.85) +
   facet_wrap(~ setting, ncol = 1, scales = "free_y") +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   scale_fill_manual(
     values = c("Recovered" = "steelblue", "Hospitalised" = "tomato")
   ) +
@@ -126,6 +127,8 @@ ggplot(cases, aes(x = onset_date, fill = outcome)) +
   ) +
   theme_minimal() +
   theme(panel.spacing = unit(1, "lines"))
+#> Warning: Removed 1 row containing missing values or values outside the scale range
+#> (`geom_epicurve()`).
 ```
 
 <img src="man/figures/README-faceted-epicurve-1.png" alt="" width="100%" />
@@ -158,17 +161,19 @@ library(patchwork)
 
 p1 <- ggplot(short_incubation, aes(x = onset_date)) +
   geom_epicurve(fill = "coral") +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   labs(title = "Short Incubation", x = NULL, y = "Cases") +
   theme_minimal()
 
 p2 <- ggplot(long_incubation, aes(x = onset_date)) +
   geom_epicurve(fill = "skyblue") +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   labs(title = "Long Incubation", x = "Date of Onset", y = "Cases") +
   theme_minimal()
 
 p1 / p2
+#> Warning: Removed 1 row containing missing values or values outside the scale range
+#> (`geom_epicurve()`).
+#> Removed 1 row containing missing values or values outside the scale range
+#> (`geom_epicurve()`).
 ```
 
 <img src="man/figures/README-incubation-comparison-1.png" alt="" width="100%" />
@@ -186,7 +191,6 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
     colour = "white",
     linewidth = 0.2
   ) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   scale_fill_viridis_d(option = "plasma", begin = 0.2, end = 0.8) +
   labs(
     title = "Cases by Sex with Custom Styling",
@@ -194,6 +198,8 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
     y = "Number of Cases"
   ) +
   theme_dark()
+#> Warning: Removed 1 row containing missing values or values outside the scale range
+#> (`geom_epicurve()`).
 ```
 
 <img src="man/figures/README-advanced-styling-1.png" alt="" width="100%" />
