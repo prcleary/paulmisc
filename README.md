@@ -104,7 +104,7 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
   theme_bw()
 ```
 
-<img src="man/figures/README-colored-epicurve-1.png" alt="" width="100%" />
+<img src="man/figures/README-coloured-epicurve-1.png" alt="" width="100%" />
 
 ### Faceted Analysis
 
@@ -183,7 +183,7 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
     colour = "white",
     linewidth = 0.2
   ) +
-  scale_fill_viridis_d(option = "plasma", begin = 0.2, end = 0.8) +
+  scale_fill_manual(values = c("Male" = "#0072B2", "Female" = "#D55E00")) +
   labs(
     title = "Cases by Sex with Custom Styling",
     x = "Date of Onset",
