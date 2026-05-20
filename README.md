@@ -2,32 +2,231 @@
 
 > Collection of miscellaneous R functions of interest only to Paul
 
-Currently just contains a few things used to manage my workload. 
+This package provides tools for epidemiological visualization and data simulation, with a focus on outbreak analysis and epidemic curves.
 
 ## Installation 
 
+Install the development version from GitHub:
+
 ```r
+# Install remotes if you don't have it
+# install.packages("remotes")
+
 remotes::install_github('prcleary/paulmisc')
 ```
 
+## Features
+
+- **`geom_epicurve()`** - A ggplot2 geom for creating classical epidemic curves where each case is represented as a small square
+- **`simulate_outbreak()`** - Generate realistic outbreak data for testing and examples
+
 ## Usage
 
-Run app with one of the following:
+### Basic Epidemic Curve
 
-- for testing daily planner Shiny app without installation:
-
-```r
-shiny::runGitHub('prcleary/paulmisc', subdir = 'inst/apps/planner')
-```
-
-- for testing the daily planner Shiny app following installation:  
+Create a simple epidemic curve from simulated outbreak data:
 
 ```r
-paulmisc::run_app('planner')
+library(paulmisc)
+library(ggplot2)
+
+# Simulate a point-source outbreak
+cases <- simulate_outbreak(n = 50, seed = 42)
+
+# Create basic epicurve
+ggplot(cases, aes(x = onset_date)) +
+  geom_epicurve() +
+  labs(
+    title = "Outbreak Epicurve",
+    x = "Date of Onset",
+    y = "Number of Cases"
+  ) +
+  theme_minimal()
 ```
 
-- for reading tasks from Nextcloud Tasks:
+### Colored by Category
+
+Visualize cases by demographic or clinical characteristics:
 
 ```r
-tasks <- paulmisc::get_nextcloud_tasks('https://nextcloud.domain.tld/remote.php/dav', 'yourusername', 'yourpassword')
+# Color by age group
+ggplot(cases, aes(x = onset_date, fill = age_group)) +
+  geom_epicurve(colour = "grey20") +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Cases by Age Group",
+    x = "Date of Onset",
+    y = "Number of Cases",
+    fill = "Age Group"
+  ) +
+  theme_bw()
 ```
+
+### Faceted Analysis
+
+Compare outbreaks across different settings or groups:
+
+```r
+# Facet by setting and color by outcome
+ggplot(cases, aes(x = onset_date, fill = outcome)) +
+  geom_epicurve(height = 0.85) +
+  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
+  scale_fill_manual(
+    values = c("Recovered" = "steelblue", "Hospitalised" = "tomato")
+  ) +
+  labs(
+    title = "Outbreak Comparison by Setting",
+    x = "Date of Onset",
+    y = "Number of Cases",
+    fill = "Outcome"
+  ) +
+  theme_minimal() +
+  theme(panel.spacing = unit(1, "lines"))
+```
+
+### Custom Incubation Periods
+
+Simulate outbreaks with different epidemiological characteristics:
+
+```r
+# Short incubation period (e.g., food poisoning)
+short_incubation <- simulate_outbreak(
+  n = 100,
+  exposure = as.Date("2024-08-15"),
+  meanlog = 0.5,   # ~1.6 day median
+  sdlog = 0.3,
+  seed = 123
+)
+
+# Long incubation period (e.g., viral hepatitis)
+long_incubation <- simulate_outbreak(
+  n = 100,
+  exposure = as.Date("2024-08-15"),
+  meanlog = 3,     # ~20 day median
+  sdlog = 0.5,
+  seed = 123
+)
+
+# Compare side by side
+library(patchwork)
+
+p1 <- ggplot(short_incubation, aes(x = onset_date)) +
+  geom_epicurve(fill = "coral") +
+  labs(title = "Short Incubation", x = NULL, y = "Cases") +
+  theme_minimal()
+
+p2 <- ggplot(long_incubation, aes(x = onset_date)) +
+  geom_epicurve(fill = "skyblue") +
+  labs(title = "Long Incubation", x = "Date of Onset", y = "Cases") +
+  theme_minimal()
+
+p1 / p2
+```
+
+### Advanced Customization
+
+Fine-tune the appearance of individual case squares:
+
+```r
+# Adjust spacing and size
+ggplot(cases, aes(x = onset_date, fill = sex)) +
+  geom_epicurve(
+    width = 0.8,   # Horizontal spacing (0-1)
+    height = 0.95, # Vertical spacing (0-1, higher = less gap)
+    colour = "white",
+    linewidth = 0.2
+  ) +
+  scale_fill_viridis_d(option = "plasma", begin = 0.2, end = 0.8) +
+  labs(
+    title = "Cases by Sex with Custom Styling",
+    x = "Date of Onset",
+    y = "Number of Cases"
+  ) +
+  theme_dark()
+```
+
+## Development
+
+### Setup
+
+Clone the repository and install development dependencies:
+
+```r
+# Install development packages
+install.packages(c("devtools", "testthat", "roxygen2", "pkgdown"))
+
+# Load the package for development
+devtools::load_all()
+```
+
+### Testing
+
+Run the test suite to ensure everything works correctly:
+
+```r
+# Run all tests
+devtools::test()
+
+# Run tests with coverage report
+covr::package_coverage()
+```
+
+### Documentation
+
+Update documentation after modifying roxygen comments:
+
+```r
+# Generate documentation from roxygen comments
+devtools::document()
+
+# Preview documentation for a function
+?geom_epicurve
+```
+
+### Package Checks
+
+Run R CMD check to ensure the package meets CRAN standards:
+
+```r
+# Run comprehensive package checks
+devtools::check()
+
+# Check for common issues
+goodpractice::gp()
+```
+
+### Building the Package
+
+Build and install the package locally:
+
+```r
+# Build source package
+devtools::build()
+
+# Install from local source
+devtools::install()
+
+# Build and reload in current session
+devtools::load_all()
+```
+
+### Website
+
+This package uses pkgdown for documentation website generation:
+
+```r
+# Build the website
+pkgdown::build_site()
+
+# Preview locally
+pkgdown::preview_site()
+```
+
+## Contributing
+
+This is a personal utility package, but suggestions and contributions are welcome through GitHub issues and pull requests.
+
+## License
+
+MIT + file LICENSE
+
