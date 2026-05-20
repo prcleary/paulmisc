@@ -238,6 +238,41 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
 
 <img src="man/figures/README-advanced-styling-1.png" alt="" width="100%" />
 
+### Interactive Plotly Visualisation
+
+Create interactive epidemic curves with custom tooltips using `plotly`:
+
+``` r
+library(plotly)
+
+# Add custom tooltip text to the data
+cases$tooltip <- paste0(
+  "Case ID: ", cases$case_id, "\n",
+  "Date: ", cases$onset_date, "\n",
+  "Age: ", cases$age_group, "\n",
+  "Sex: ", cases$sex, "\n",
+  "Setting: ", cases$setting
+)
+
+# Create plot with text aesthetic for tooltips
+p <- ggplot(cases, aes(x = onset_date, fill = age_group, text = tooltip)) +
+  geom_epicurve() +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Interactive Epidemic Curve",
+    x = "Date of Onset",
+    y = "Number of Cases"
+  ) +
+  theme_minimal()
+
+# Convert to interactive plotly plot
+ggplotly(p, tooltip = "text")
+```
+
+Users can hover over individual case squares to see detailed
+information. The `text` aesthetic allows complete control over tooltip
+content and formatting.
+
 ### Redshift SQL Query Builder
 
 Launch the interactive Shiny app for building SQL queries:
