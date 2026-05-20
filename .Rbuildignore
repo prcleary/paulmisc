@@ -6,3 +6,5 @@
 ^pkgdown$
 ^\.positai$
 ^\.claude$
+^README\.Rmd$
+^\.github$

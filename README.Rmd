@@ -1,23 +1,33 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # paulmisc
 
 <!-- badges: start -->
-
 [![R-CMD-check](https://github.com/prcleary/paulmisc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/prcleary/paulmisc/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 > Collection of miscellaneous R functions of interest only to Paul
 
-This package provides tools for epidemiological visualization and data
-simulation, with a focus on outbreak analysis and epidemic curves.
+This package provides tools for epidemiological visualization and data simulation, with a focus on outbreak analysis and epidemic curves.
 
-## Installation
+## Installation 
 
 Install the development version from GitHub:
 
-``` r
+```{r eval=FALSE}
 # Install remotes if you don't have it
 # install.packages("remotes")
 
@@ -26,14 +36,12 @@ remotes::install_github('prcleary/paulmisc')
 
 ## Features
 
-- **`geom_epicurve()`** - A ggplot2 geom for creating classical epidemic
-  curves where each case is represented as a small square
-- **`simulate_outbreak()`** - Generate realistic outbreak data for
-  testing and examples
+- **`geom_epicurve()`** - A ggplot2 geom for creating classical epidemic curves where each case is represented as a small square
+- **`simulate_outbreak()`** - Generate realistic outbreak data for testing and examples
 
 ## Usage
 
-``` r
+```{r setup, message=FALSE, warning=FALSE}
 # Load package from source for rendering
 devtools::load_all()
 library(ggplot2)
@@ -43,7 +51,7 @@ library(ggplot2)
 
 Create a simple epidemic curve from simulated outbreak data:
 
-``` r
+```{r basic-epicurve, fig.height=4, fig.width=7}
 # Simulate a point-source outbreak
 cases <- simulate_outbreak(n = 50, seed = 42)
 
@@ -58,13 +66,11 @@ ggplot(cases, aes(x = onset_date)) +
   theme_minimal()
 ```
 
-<img src="man/figures/README-basic-epicurve-1.png" alt="" width="100%" />
-
 ### Colored by Category
 
 Visualize cases by demographic or clinical characteristics:
 
-``` r
+```{r colored-epicurve, fig.height=4, fig.width=7}
 # Color by age group
 ggplot(cases, aes(x = onset_date, fill = age_group)) +
   geom_epicurve(colour = "grey20") +
@@ -78,13 +84,11 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
   theme_bw()
 ```
 
-<img src="man/figures/README-colored-epicurve-1.png" alt="" width="100%" />
-
 ### Faceted Analysis
 
 Compare outbreaks across different settings or groups:
 
-``` r
+```{r faceted-epicurve, fig.height=6, fig.width=7}
 # Facet by setting and color by outcome
 ggplot(cases, aes(x = onset_date, fill = outcome)) +
   geom_epicurve(height = 0.85) +
@@ -102,13 +106,11 @@ ggplot(cases, aes(x = onset_date, fill = outcome)) +
   theme(panel.spacing = unit(1, "lines"))
 ```
 
-<img src="man/figures/README-faceted-epicurve-1.png" alt="" width="100%" />
-
 ### Custom Incubation Periods
 
 Simulate outbreaks with different epidemiological characteristics:
 
-``` r
+```{r incubation-comparison, fig.height=6, fig.width=7}
 # Short incubation period (e.g., food poisoning)
 short_incubation <- simulate_outbreak(
   n = 100,
@@ -143,13 +145,11 @@ p2 <- ggplot(long_incubation, aes(x = onset_date)) +
 p1 / p2
 ```
 
-<img src="man/figures/README-incubation-comparison-1.png" alt="" width="100%" />
-
 ### Advanced Customization
 
 Fine-tune the appearance of individual case squares:
 
-``` r
+```{r advanced-styling, fig.height=4, fig.width=7}
 # Adjust spacing and size
 ggplot(cases, aes(x = onset_date, fill = sex)) +
   geom_epicurve(
@@ -167,15 +167,13 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
   theme_dark()
 ```
 
-<img src="man/figures/README-advanced-styling-1.png" alt="" width="100%" />
-
 ## Development
 
 ### Setup
 
 Clone the repository and install development dependencies:
 
-``` r
+```{r eval=FALSE}
 # Install development packages
 install.packages(c("devtools", "testthat", "roxygen2", "pkgdown"))
 
@@ -187,7 +185,7 @@ devtools::load_all()
 
 Run the test suite to ensure everything works correctly:
 
-``` r
+```{r eval=FALSE}
 # Run all tests
 devtools::test()
 
@@ -199,7 +197,7 @@ covr::package_coverage()
 
 Update documentation after modifying roxygen comments:
 
-``` r
+```{r eval=FALSE}
 # Generate documentation from roxygen comments
 devtools::document()
 
@@ -211,7 +209,7 @@ devtools::document()
 
 Run R CMD check to ensure the package meets CRAN standards:
 
-``` r
+```{r eval=FALSE}
 # Run comprehensive package checks
 devtools::check()
 
@@ -223,7 +221,7 @@ goodpractice::gp()
 
 Build and install the package locally:
 
-``` r
+```{r eval=FALSE}
 # Build source package
 devtools::build()
 
@@ -238,7 +236,7 @@ devtools::load_all()
 
 This package uses pkgdown for documentation website generation:
 
-``` r
+```{r eval=FALSE}
 # Build the website
 pkgdown::build_site()
 
@@ -248,8 +246,7 @@ pkgdown::preview_site()
 
 ## Contributing
 
-This is a personal utility package, but suggestions and contributions
-are welcome through GitHub issues and pull requests.
+This is a personal utility package, but suggestions and contributions are welcome through GitHub issues and pull requests.
 
 ## License
 
