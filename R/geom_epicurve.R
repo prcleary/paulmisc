@@ -101,9 +101,6 @@ geom_epicurve <- function(mapping = NULL,
       width = width,
       height = height,
       na.rm = na.rm,
-      colour = "white",
-      fill = "steelblue",
-      linewidth = 0.4,
       ...
     )
   )
@@ -133,9 +130,6 @@ stat_epicurve <- function(mapping = NULL,
       width = width,
       height = height,
       na.rm = na.rm,
-      colour = "white",
-      fill = "steelblue",
-      linewidth = 0.4,
       ...
     )
   )
