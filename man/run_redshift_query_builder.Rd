@@ -4,12 +4,12 @@
 \alias{run_redshift_query_builder}
 \title{Run Redshift SQL Query Builder Shiny App}
 \usage{
-run_redshift_query_builder(background = FALSE, ...)
+run_redshift_query_builder(background = TRUE, ...)
 }
 \arguments{
-\item{background}{Logical. If \code{TRUE}, runs the app in a background R
-process (requires the \code{callr} package), allowing continued use of the
-console. If \code{FALSE} (default), blocks the console until the app is
+\item{background}{Logical. If \code{TRUE} (default), runs the app in a
+background R process (requires the \code{callr} package), allowing continued
+use of the console. If \code{FALSE}, blocks the console until the app is
 stopped.}
 
 \item{...}{Additional arguments passed to \code{\link[shiny:runApp]{shiny::runApp()}} when
@@ -17,9 +17,9 @@ stopped.}
 }
 \value{
 If \code{background = FALSE}, invisibly returns the result of
-\code{\link[shiny:runApp]{shiny::runApp()}}. If \code{background = TRUE}, returns a process handle
-from \code{\link[callr:r_bg]{callr::r_bg()}} which can be used to monitor or terminate the
-background process.
+\code{\link[shiny:runApp]{shiny::runApp()}}. If \code{background = TRUE} (default), returns a process
+handle from \code{\link[callr:r_bg]{callr::r_bg()}} which can be used to monitor or terminate
+the background process.
 }
 \description{
 Launches an interactive Shiny application for building Amazon Redshift SQL
@@ -45,16 +45,16 @@ month/year, or specific dates using Redshift functions
 }
 \note{
 This app requires the \code{shiny} and \code{bslib} packages. Running in
-background mode requires the \code{callr} package.
+background mode (default) requires the \code{callr} package.
 }
 \examples{
 if (interactive()) {
-  # Run in foreground (blocks console)
-  run_redshift_query_builder()
-  
-  # Run in background (requires callr)
-  # app_process <- run_redshift_query_builder(background = TRUE)
+  # Run in background (default, frees console, requires callr)
+  app_process <- run_redshift_query_builder()
   # To stop: app_process$kill()
+  
+  # Run in foreground (blocks console)
+  # run_redshift_query_builder(background = FALSE)
 }
 
 }
