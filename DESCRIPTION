@@ -12,7 +12,9 @@ Imports:
     ggplot2 (>= 3.4.0),
     stats
 Suggests: 
+    covr,
     devtools,
+    lifecycle,
     patchwork,
     rmarkdown,
     testthat (>= 3.0.0)
