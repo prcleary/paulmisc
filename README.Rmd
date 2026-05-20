@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 
 > Collection of miscellaneous R functions of interest only to Paul
 
-This package provides tools for epidemiological visualization, data simulation, and an interactive Shiny app for building SQL queries for Amazon Redshift.
+This package provides tools for epidemiological visualisation, data simulation, and an interactive Shiny app for building SQL queries for Amazon Redshift.
 
 **Documentation:** https://prcleary.github.io/paulmisc/
 
@@ -58,7 +58,7 @@ remotes::install_github('prcleary/paulmisc')
 
 ## Usage
 
-### Epidemiological Visualization
+### Epidemiological Visualisation
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(paulmisc)
@@ -84,12 +84,12 @@ ggplot(cases, aes(x = onset_date)) +
   theme_minimal()
 ```
 
-### Colored by Category
+### Coloured by Category
 
-Visualize cases by demographic or clinical characteristics:
+Visualise cases by demographic or clinical characteristics:
 
-```{r colored-epicurve, fig.height=4, fig.width=7}
-# Color by age group
+```{r coloured-epicurve, fig.height=4, fig.width=7}
+# Colour by age group
 ggplot(cases, aes(x = onset_date, fill = age_group)) +
   geom_epicurve(colour = "grey20") +
   scale_fill_brewer(palette = "Set2") +
@@ -107,7 +107,7 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
 Compare outbreaks across different settings or groups:
 
 ```{r faceted-epicurve, fig.height=6, fig.width=7}
-# Facet by setting and color by outcome
+# Facet by setting and colour by outcome
 ggplot(cases, aes(x = onset_date, fill = outcome)) +
   geom_epicurve(height = 0.85) +
   facet_wrap(~ setting, ncol = 1, scales = "free_y") +
@@ -162,7 +162,7 @@ p2 <- ggplot(long_incubation, aes(x = onset_date)) +
 p1 / p2
 ```
 
-### Advanced Customization
+### Advanced Customisation
 
 Fine-tune the appearance of individual case squares:
 

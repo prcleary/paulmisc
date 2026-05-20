@@ -24,6 +24,7 @@ stat_epicurve(
   geom = "epicurve",
   position = "identity",
   ...,
+  width = 0.9,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE

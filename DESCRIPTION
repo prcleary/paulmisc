@@ -4,7 +4,7 @@ Version: 0.0.1
 Authors@R: 
     person("Paul", "Cleary", , "paulmisc@paulcleary.net", role = c("aut", "cre"))
 Description: Provides miscellaneous R functions that Paul uses, including
-    epidemiological visualization tools for creating epidemic curves and
+    epidemiological visualisation tools for creating epidemic curves and
     simulating outbreak data, plus an interactive Shiny app for building
     Amazon Redshift SQL queries.
 License: MIT + file LICENSE
