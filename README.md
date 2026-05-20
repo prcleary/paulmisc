@@ -1,6 +1,4 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
 <!-- Test: workflow should regenerate this -->
 
 # paulmisc
@@ -33,46 +31,40 @@ and other dependencies:
 
 **Debian/Ubuntu:**
 
-``` bash
-sudo apt-get install -y \
-  libcurl4-openssl-dev \
-  libssl-dev \
-  libxml2-dev \
-  libfontconfig1-dev \
-  libharfbuzz-dev \
-  libfribidi-dev \
-  libfreetype6-dev \
-  libpng-dev \
-  libtiff5-dev \
-  libjpeg-dev
-```
+    sudo apt-get install -y \
+      libcurl4-openssl-dev \
+      libssl-dev \
+      libxml2-dev \
+      libfontconfig1-dev \
+      libharfbuzz-dev \
+      libfribidi-dev \
+      libfreetype6-dev \
+      libpng-dev \
+      libtiff5-dev \
+      libjpeg-dev
 
 **RHEL/Fedora/Rocky Linux:**
 
-``` bash
-sudo dnf install -y \
-  libcurl-devel \
-  openssl-devel \
-  libxml2-devel \
-  fontconfig-devel \
-  harfbuzz-devel \
-  fribidi-devel \
-  freetype-devel \
-  libpng-devel \
-  libtiff-devel \
-  libjpeg-turbo-devel
-```
+    sudo dnf install -y \
+      libcurl-devel \
+      openssl-devel \
+      libxml2-devel \
+      fontconfig-devel \
+      harfbuzz-devel \
+      fribidi-devel \
+      freetype-devel \
+      libpng-devel \
+      libtiff-devel \
+      libjpeg-turbo-devel
 
 ### R Package Installation
 
 Install the development version from GitHub:
 
-``` r
-# Install remotes if you don't have it
-# install.packages("remotes")
+    # Install remotes if you don't have it
+    # install.packages("remotes")
 
-remotes::install_github('prcleary/paulmisc')
-```
+    remotes::install_github('prcleary/paulmisc')
 
 ## Features
 
@@ -99,29 +91,25 @@ remotes::install_github('prcleary/paulmisc')
 
 ### Epidemiological Visualisation
 
-``` r
-library(paulmisc)
-library(ggplot2)
-```
+    library(paulmisc)
+    library(ggplot2)
 
 ### Basic Epidemic Curve
 
 Create a simple epidemic curve from simulated outbreak data:
 
-``` r
-# Simulate a point-source outbreak
-cases <- simulate_outbreak(n = 50, seed = 42)
+    # Simulate a point-source outbreak
+    cases <- simulate_outbreak(n = 50, seed = 42)
 
-# Create basic epicurve
-ggplot(cases, aes(x = onset_date)) +
-  geom_epicurve() +
-  labs(
-    title = "Outbreak Epicurve",
-    x = "Date of Onset",
-    y = "Number of Cases"
-  ) +
-  theme_minimal()
-```
+    # Create basic epicurve
+    ggplot(cases, aes(x = onset_date)) +
+      geom_epicurve() +
+      labs(
+        title = "Outbreak Epicurve",
+        x = "Date of Onset",
+        y = "Number of Cases"
+      ) +
+      theme_minimal()
 
 <img src="man/figures/README-basic-epicurve-1.png" alt="" width="100%" />
 
@@ -129,19 +117,17 @@ ggplot(cases, aes(x = onset_date)) +
 
 Visualise cases by demographic or clinical characteristics:
 
-``` r
-# Colour by age group
-ggplot(cases, aes(x = onset_date, fill = age_group)) +
-  geom_epicurve(colour = "grey20") +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
-    title = "Cases by Age Group",
-    x = "Date of Onset",
-    y = "Number of Cases",
-    fill = "Age Group"
-  ) +
-  theme_bw()
-```
+    # Colour by age group
+    ggplot(cases, aes(x = onset_date, fill = age_group)) +
+      geom_epicurve(colour = "grey20") +
+      scale_fill_brewer(palette = "Set2") +
+      labs(
+        title = "Cases by Age Group",
+        x = "Date of Onset",
+        y = "Number of Cases",
+        fill = "Age Group"
+      ) +
+      theme_bw()
 
 <img src="man/figures/README-coloured-epicurve-1.png" alt="" width="100%" />
 
@@ -149,22 +135,20 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
 
 Compare outbreaks across different settings or groups:
 
-``` r
-# Facet by setting and colour by outcome
-ggplot(cases, aes(x = onset_date, fill = outcome)) +
-  geom_epicurve(height = 0.85) +
-  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
-  scale_fill_manual(
-    values = c("Recovered" = "steelblue", "Hospitalised" = "tomato")
-  ) +
-  labs(
-    title = "Outbreak Comparison by Setting",
-    x = "Date of Onset",
-    y = "Number of Cases",
-    fill = "Outcome"
-  ) +
-  theme_minimal()
-```
+    # Facet by setting and colour by outcome
+    ggplot(cases, aes(x = onset_date, fill = outcome)) +
+      geom_epicurve(height = 0.85) +
+      facet_wrap(~ setting, ncol = 1, scales = "free_y") +
+      scale_fill_manual(
+        values = c("Recovered" = "steelblue", "Hospitalised" = "tomato")
+      ) +
+      labs(
+        title = "Outbreak Comparison by Setting",
+        x = "Date of Onset",
+        y = "Number of Cases",
+        fill = "Outcome"
+      ) +
+      theme_minimal()
 
 <img src="man/figures/README-faceted-epicurve-1.png" alt="" width="100%" />
 
@@ -175,42 +159,40 @@ adjusting the incubation period parameters. The `meanlog` parameter
 controls the median incubation period (median = `exp(meanlog)` days),
 while `sdlog` controls the spread around that median:
 
-``` r
-# Short incubation period (e.g., Salmonella, norovirus)
-# Median incubation: exp(0.5) ≈ 1.6 days
-short_incubation <- simulate_outbreak(
-  n = 100,
-  exposure = as.Date("2024-08-15"),
-  meanlog = 0.5,
-  sdlog = 0.3,
-  seed = 123
-)
+    # Short incubation period (e.g., Salmonella, norovirus)
+    # Median incubation: exp(0.5) ≈ 1.6 days
+    short_incubation <- simulate_outbreak(
+      n = 100,
+      exposure = as.Date("2024-08-15"),
+      meanlog = 0.5,
+      sdlog = 0.3,
+      seed = 123
+    )
 
-# Long incubation period (e.g., Hepatitis A)
-# Median incubation: exp(3) ≈ 20 days
-long_incubation <- simulate_outbreak(
-  n = 100,
-  exposure = as.Date("2024-08-15"),
-  meanlog = 3,
-  sdlog = 0.5,
-  seed = 123
-)
+    # Long incubation period (e.g., Hepatitis A)
+    # Median incubation: exp(3) ≈ 20 days
+    long_incubation <- simulate_outbreak(
+      n = 100,
+      exposure = as.Date("2024-08-15"),
+      meanlog = 3,
+      sdlog = 0.5,
+      seed = 123
+    )
 
-# Compare side by side
-library(patchwork)
+    # Compare side by side
+    library(patchwork)
 
-p1 <- ggplot(short_incubation, aes(x = onset_date)) +
-  geom_epicurve(fill = "coral") +
-  labs(title = "Short Incubation", x = NULL, y = "Cases") +
-  theme_minimal()
+    p1 <- ggplot(short_incubation, aes(x = onset_date)) +
+      geom_epicurve(fill = "coral") +
+      labs(title = "Short Incubation", x = NULL, y = "Cases") +
+      theme_minimal()
 
-p2 <- ggplot(long_incubation, aes(x = onset_date)) +
-  geom_epicurve(fill = "skyblue") +
-  labs(title = "Long Incubation", x = "Date of Onset", y = "Cases") +
-  theme_minimal()
+    p2 <- ggplot(long_incubation, aes(x = onset_date)) +
+      geom_epicurve(fill = "skyblue") +
+      labs(title = "Long Incubation", x = "Date of Onset", y = "Cases") +
+      theme_minimal()
 
-p1 / p2
-```
+    p1 / p2
 
 <img src="man/figures/README-incubation-comparison-1.png" alt="" width="100%" />
 
@@ -218,70 +200,53 @@ p1 / p2
 
 Fine-tune the appearance of individual case squares:
 
-``` r
-# Adjust spacing and size
-ggplot(cases, aes(x = onset_date, fill = sex)) +
-  geom_epicurve(
-    width = 0.8,   # Horizontal spacing (0-1)
-    height = 0.95, # Vertical spacing (0-1, higher = less gap)
-    colour = "white",
-    linewidth = 0.2
-  ) +
-  scale_fill_manual(values = c("Male" = "#0072B2", "Female" = "#D55E00")) +
-  labs(
-    title = "Cases by Sex with Custom Styling",
-    x = "Date of Onset",
-    y = "Number of Cases"
-  ) +
-  theme_minimal()
-```
+    # Adjust spacing and size
+    ggplot(cases, aes(x = onset_date, fill = sex)) +
+      geom_epicurve(
+        width = 0.8,   # Horizontal spacing (0-1)
+        height = 0.95, # Vertical spacing (0-1, higher = less gap)
+        colour = "white",
+        linewidth = 0.2
+      ) +
+      scale_fill_manual(values = c("Male" = "#0072B2", "Female" = "#D55E00")) +
+      labs(
+        title = "Cases by Sex with Custom Styling",
+        x = "Date of Onset",
+        y = "Number of Cases"
+      ) +
+      theme_minimal()
 
 <img src="man/figures/README-advanced-styling-1.png" alt="" width="100%" />
 
 ### Interactive Plotly Visualisation
 
-Create interactive epidemic curves with custom tooltips using `plotly`.
-Note that custom ggplot2 geoms are not compatible with `ggplotly()`
-conversion, so we use plotly’s native functions:
+Create interactive epidemic curves with custom tooltips using
+`plotly::ggplotly()`:
 
-``` r
-library(plotly)
+    library(plotly)
 
-# Compute stacking positions
-cases <- cases[order(cases$onset_date), ]
-cases$y <- ave(seq_len(nrow(cases)), cases$onset_date, FUN = seq_along)
+    # Add custom tooltip text to the data
+    cases$tooltip <- paste0(
+      "Case ID: ", cases$case_id, "<br>",
+      "Date: ", cases$onset_date, "<br>",
+      "Age: ", cases$age_group, "<br>",
+      "Sex: ", cases$sex, "<br>",
+      "Setting: ", cases$setting
+    )
 
-# Add custom tooltip text
-cases$tooltip <- paste0(
-  "Case ID: ", cases$case_id, "<br>",
-  "Date: ", cases$onset_date, "<br>",
-  "Age: ", cases$age_group, "<br>",
-  "Sex: ", cases$sex, "<br>",
-  "Setting: ", cases$setting
-)
+    # Create plot with text aesthetic for tooltips
+    p <- ggplot(cases, aes(x = onset_date, fill = age_group, text = tooltip)) +
+      geom_epicurve() +
+      scale_fill_brewer(palette = "Set2") +
+      labs(
+        title = "Interactive Epidemic Curve",
+        x = "Date of Onset",
+        y = "Number of Cases"
+      ) +
+      theme_minimal()
 
-# Create interactive plotly plot
-plot_ly(cases) %>%
-  add_trace(
-    type = "scatter",
-    mode = "markers",
-    x = ~onset_date,
-    y = ~y,
-    color = ~age_group,
-    marker = list(
-      symbol = "square",
-      size = 20,
-      line = list(color = "white", width = 1)
-    ),
-    text = ~tooltip,
-    hovertemplate = "%{text}<extra></extra>"
-  ) %>%
-  layout(
-    title = "Interactive Epidemic Curve",
-    xaxis = list(title = "Date of Onset"),
-    yaxis = list(title = "Number of Cases")
-  )
-```
+    # Convert to interactive plotly plot
+    ggplotly(p, tooltip = "text")
 
 Users can hover over individual case squares to see detailed
 information.
@@ -294,10 +259,8 @@ article for live interactive examples you can try in your browser!**
 
 Launch the interactive Shiny app for building SQL queries:
 
-``` r
-# Launch the Redshift SQL Query Builder Shiny app
-run_redshift_query_builder()
-```
+    # Launch the Redshift SQL Query Builder Shiny app
+    run_redshift_query_builder()
 
 The app provides a user-friendly interface for:
 
@@ -306,8 +269,8 @@ The app provides a user-friendly interface for:
   DISTINCT, or aggregate functions (COUNT, SUM, AVG, MIN, MAX, COUNT
   DISTINCT)
 - **WHERE Conditions**: Add up to 3 conditions with AND/OR logic using
-  various operators (=, !=, \>, \<, \>=, \<=, LIKE, ILIKE, IN, NOT IN,
-  IS NULL, IS NOT NULL, BETWEEN)
+  various operators (=, !=, &gt;, &lt;, &gt;=, &lt;=, LIKE, ILIKE, IN,
+  NOT IN, IS NULL, IS NOT NULL, BETWEEN)
 - **Date Filters**: Filter by date ranges, last N days, current
   month/year, or specific dates using Redshift-specific functions like
   DATEADD and TRUNC
@@ -326,76 +289,64 @@ tips for common functions and patterns.
 
 Clone the repository and install development dependencies:
 
-``` r
-# Install development packages
-install.packages(c("devtools", "testthat", "roxygen2", "pkgdown"))
+    # Install development packages
+    install.packages(c("devtools", "testthat", "roxygen2", "pkgdown"))
 
-# Load the package
-library(paulmisc)
-```
+    # Load the package
+    library(paulmisc)
 
 ### Testing
 
 Run the test suite to ensure everything works correctly:
 
-``` r
-# Run all tests
-devtools::test()
+    # Run all tests
+    devtools::test()
 
-# Run tests with coverage report
-covr::package_coverage()
-```
+    # Run tests with coverage report
+    covr::package_coverage()
 
 ### Documentation
 
 Update documentation after modifying roxygen comments:
 
-``` r
-# Generate documentation from roxygen comments
-devtools::document()
+    # Generate documentation from roxygen comments
+    devtools::document()
 
-# Preview documentation for a function
-?geom_epicurve
-```
+    # Preview documentation for a function
+    ?geom_epicurve
 
 ### Package Checks
 
 Run R CMD check to ensure the package meets CRAN standards:
 
-``` r
-# Run comprehensive package checks
-devtools::check()
+    # Run comprehensive package checks
+    devtools::check()
 
-# Check for common issues
-goodpractice::gp()
-```
+    # Check for common issues
+    goodpractice::gp()
 
 ### Building the Package
 
 Build and install the package locally:
 
-``` r
-# Build source package
-devtools::build()
+    # Build source package
+    devtools::build()
 
-# Install from local source
-devtools::install()
+    # Install from local source
+    devtools::install()
 
-# Or load with library
-library(paulmisc)
-```
+    # Or load with library
+    library(paulmisc)
 
 ### Website
 
 This package uses pkgdown for documentation website generation:
 
-``` r
-# Build the website
-pkgdown::build_site()
+    # Build the website
+    pkgdown::build_site()
 
-# Preview locally
-pkgdown::preview_site()
-```
+    # Preview locally
+    pkgdown::preview_site()
 
 ## Contributing
 
