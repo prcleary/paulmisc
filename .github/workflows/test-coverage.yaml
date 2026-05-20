@@ -38,9 +38,9 @@ jobs:
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v3
         with:
-          fail_ci_if_error: ${{ github.event_name != 'pull_request' && true || false }}
+          fail_ci_if_error: false
           file: ./cobertura.xml
           plugin: noop
           disable_search: true
@@ -58,4 +58,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-test-failures
+          path: ${{ runner.temp }}/package
           path: ${{ runner.temp }}/package
