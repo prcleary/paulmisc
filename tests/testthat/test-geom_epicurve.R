@@ -25,7 +25,7 @@ test_that("geom_epicurve uses StatEpicurve by default", {
   expect_s3_class(p$layers[[1]]$stat, "StatEpicurve")
 })
 
-test_that("geom_epicurve uses GeomEpicurve", {
+test_that("geom_epicurve uses GeomRect", {
   library(ggplot2)
   
   cases <- simulate_outbreak(n = 20, seed = 789)
@@ -33,8 +33,8 @@ test_that("geom_epicurve uses GeomEpicurve", {
   p <- ggplot(cases, aes(x = onset_date)) +
     geom_epicurve()
   
-  # Check the geom class
-  expect_s3_class(p$layers[[1]]$geom, "GeomEpicurve")
+  # Check the geom class - now uses standard GeomRect for plotly compatibility
+  expect_s3_class(p$layers[[1]]$geom, "GeomRect")
 })
 
 test_that("stat_epicurve creates a ggplot layer", {
@@ -52,7 +52,7 @@ test_that("stat_epicurve creates a ggplot layer", {
   expect_equal(length(p$layers), 1)
 })
 
-test_that("stat_epicurve uses GeomEpicurve by default", {
+test_that("stat_epicurve uses GeomRect by default", {
   library(ggplot2)
   
   cases <- simulate_outbreak(n = 20, seed = 222)
@@ -60,8 +60,8 @@ test_that("stat_epicurve uses GeomEpicurve by default", {
   p <- ggplot(cases, aes(x = onset_date)) +
     stat_epicurve()
   
-  # Check the geom class
-  expect_s3_class(p$layers[[1]]$geom, "GeomEpicurve")
+  # Check the geom class - now uses standard GeomRect for plotly compatibility
+  expect_s3_class(p$layers[[1]]$geom, "GeomRect")
 })
 
 test_that("StatEpicurve computes stacking positions correctly", {
@@ -74,11 +74,14 @@ test_that("StatEpicurve computes stacking positions correctly", {
   )
   
   # Compute panel
-  result <- StatEpicurve$compute_panel(test_data, width = 0.9)
+  result <- StatEpicurve$compute_panel(test_data, width = 0.9, height = 0.9)
   
   # Check y values (stacking index)
-  # Note: Includes left edge padding (y=0), center anchor (y=0), actual data, right edge padding (y=0)
-  expect_equal(result$y, c(0, 0, 1, 2, 3, 1, 2, 1, 0))
+  # Padding rows with y=0 are filtered out in compute_panel
+  expect_equal(result$y, c(1, 2, 3, 1, 2, 1))
+  
+  # Check that xmin, xmax, ymin, ymax are computed for geom_rect
+  expect_true(all(c("xmin", "xmax", "ymin", "ymax") %in% names(result)))
 })
 
 test_that("StatEpicurve handles single observation per x", {
@@ -89,10 +92,11 @@ test_that("StatEpicurve handles single observation per x", {
     group = 1
   )
   
-  result <- StatEpicurve$compute_panel(test_data, width = 0.9)
+  result <- StatEpicurve$compute_panel(test_data, width = 0.9, height = 0.9)
   
-  # Includes edge padding and center anchor (all y=0), then all y values should be 1
-  expect_equal(result$y, c(0, 0, 1, 1, 1, 1, 0))
+  # Each date has only one case, so all y values should be 1
+  # Padding rows with y=0 are filtered out
+  expect_equal(result$y, c(1, 1, 1, 1))
 })
 
 test_that("StatEpicurve respects grouping", {
@@ -107,10 +111,11 @@ test_that("StatEpicurve respects grouping", {
   # Sort by x and group as the stat does
   test_data <- test_data[order(test_data$x, test_data$group), , drop = FALSE]
   
-  result <- StatEpicurve$compute_panel(test_data, width = 0.9)
+  result <- StatEpicurve$compute_panel(test_data, width = 0.9, height = 0.9)
   
-  # Includes edge padding and center anchor (all y=0), then should stack within each x value
-  expect_equal(result$y, c(0, 0, 1, 2, 3, 4, 0))
+  # Should stack within each x value
+  # Padding rows with y=0 are filtered out
+  expect_equal(result$y, c(1, 2, 3, 4))
 })
 
 test_that("geom_epicurve accepts width parameter", {

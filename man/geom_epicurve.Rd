@@ -21,10 +21,11 @@ geom_epicurve(
 stat_epicurve(
   mapping = NULL,
   data = NULL,
-  geom = "epicurve",
+  geom = "rect",
   position = "identity",
   ...,
   width = 0.9,
+  height = 0.9,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -89,10 +90,22 @@ scale, theme, facet, or coordinate system.
 
 \section{Interactive Visualisation}{
 
-This custom geom is not compatible with \code{plotly::ggplotly()} conversion.
-For interactive epidemic curves with tooltips, see the
-"Interactive Epidemic Curves with Plotly" vignette:
-\code{vignette("interactive-epicurves", package = "paulmisc")}.
+Convert to interactive plotly plots using \code{plotly::ggplotly()}:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{library(plotly)
+p <- ggplot(cases, aes(x = onset_date, fill = age_group)) +
+  geom_epicurve() +
+  theme_minimal()
+ggplotly(p)
+}\if{html}{\out{</div>}}
+
+For custom tooltips, add a \code{text} aesthetic and use the \code{tooltip} parameter:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{cases$tooltip <- paste("Case ID:", cases$case_id)
+p <- ggplot(cases, aes(x = onset_date, fill = age_group, text = tooltip)) +
+  geom_epicurve()
+ggplotly(p, tooltip = "text")
+}\if{html}{\out{</div>}}
 }
 
 \examples{

@@ -21,10 +21,21 @@
 #' }
 #'
 #' @section Interactive Visualisation:
-#' This custom geom is not compatible with `plotly::ggplotly()` conversion.
-#' For interactive epidemic curves with tooltips, see the
-#' "Interactive Epidemic Curves with Plotly" vignette:
-#' `vignette("interactive-epicurves", package = "paulmisc")`.
+#' Convert to interactive plotly plots using `plotly::ggplotly()`:
+#' ```r
+#' library(plotly)
+#' p <- ggplot(cases, aes(x = onset_date, fill = age_group)) +
+#'   geom_epicurve() +
+#'   theme_minimal()
+#' ggplotly(p)
+#' ```
+#' For custom tooltips, add a `text` aesthetic and use the `tooltip` parameter:
+#' ```r
+#' cases$tooltip <- paste("Case ID:", cases$case_id)
+#' p <- ggplot(cases, aes(x = onset_date, fill = age_group, text = tooltip)) +
+#'   geom_epicurve()
+#' ggplotly(p, tooltip = "text")
+#' ```
 #'
 #' @param mapping Set of aesthetic mappings created by [ggplot2::aes()].
 #' @param data The data to be displayed in this layer.
@@ -66,7 +77,7 @@
 #'
 #' @seealso [simulate_outbreak()] for generating example data.
 #'
-#' @importFrom ggplot2 layer ggproto Stat Geom GeomRect aes draw_key_polygon
+#' @importFrom ggplot2 layer ggproto Stat aes
 #' @export
 geom_epicurve <- function(mapping = NULL,
                           data = NULL,
@@ -79,7 +90,7 @@ geom_epicurve <- function(mapping = NULL,
                           show.legend = NA,
                           inherit.aes = TRUE) {
   ggplot2::layer(
-    geom        = GeomEpicurve,
+    geom        = "rect",
     mapping     = mapping,
     data        = data,
     stat        = stat,
@@ -90,6 +101,9 @@ geom_epicurve <- function(mapping = NULL,
       width = width,
       height = height,
       na.rm = na.rm,
+      colour = "white",
+      fill = "steelblue",
+      linewidth = 0.4,
       ...
     )
   )
@@ -99,10 +113,11 @@ geom_epicurve <- function(mapping = NULL,
 #' @export
 stat_epicurve <- function(mapping = NULL,
                           data = NULL,
-                          geom = "epicurve",
+                          geom = "rect",
                           position = "identity",
                           ...,
                           width = 0.9,
+                          height = 0.9,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
@@ -114,7 +129,15 @@ stat_epicurve <- function(mapping = NULL,
     position    = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    params      = list(width = width, na.rm = na.rm, ...)
+    params      = list(
+      width = width,
+      height = height,
+      na.rm = na.rm,
+      colour = "white",
+      fill = "steelblue",
+      linewidth = 0.4,
+      ...
+    )
   )
 }
 
@@ -131,26 +154,43 @@ StatEpicurve <- ggplot2::ggproto(
   ggplot2::Stat,
   required_aes = "x",
 
-  compute_panel = function(self, data, scales, na.rm = FALSE, width = 0.9) {
+  compute_panel = function(self, data, scales, na.rm = FALSE, width = 0.9, height = 0.9) {
     data <- data[order(data$x, data$group), , drop = FALSE]
     data$y <- stats::ave(seq_len(nrow(data)), data$x, FUN = seq_along)
+    
+    # Compute rectangle boundaries for geom_rect
+    # (This allows plotly to recognize and convert the geom)
+    data$xmin <- data$x - width / 2
+    data$xmax <- data$x + width / 2
+    data$ymin <- pmax(0, data$y - 1 + (1 - height) / 2)
+    data$ymax <- data$y - (1 - height) / 2
     
     # Add padding points to ensure x-axis includes full width of edge rectangles
     # and a point at y=0 to ensure y-axis includes 0 for proper display
     if (nrow(data) > 0) {
       zero_row <- data[1, , drop = FALSE]
       zero_row$y <- 0
+      zero_row$ymin <- 0
+      zero_row$ymax <- 0
       
       # Add left edge padding (extends width/2 to the left of min x)
       left_pad <- zero_row
       left_pad$x <- min(data$x, na.rm = TRUE) - width / 2
+      left_pad$xmin <- left_pad$x
+      left_pad$xmax <- left_pad$x
       
       # Add right edge padding (extends width/2 to the right of max x)
       right_pad <- zero_row
       right_pad$x <- max(data$x, na.rm = TRUE) + width / 2
+      right_pad$xmin <- right_pad$x
+      right_pad$xmax <- right_pad$x
       
       data <- rbind(left_pad, zero_row, data, right_pad)
     }
+    
+    # Filter out anchor/padding rows (y=0) - they served their purpose for scales
+    data <- data[data$y > 0, , drop = FALSE]
+    
     data
   }
 )
