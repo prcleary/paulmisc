@@ -81,8 +81,12 @@ common point-source exposure date. Defaults to <code>"2024-06-01"</code>.</p></d
 <dt id="arg-meanlog-sdlog">meanlog, sdlog<a class="anchor" aria-label="anchor" href="#arg-meanlog-sdlog"></a></dt>
 <dd><p>Numeric. Parameters of the log-normal incubation
 period distribution on the log scale, passed to <code><a href="https://rdrr.io/r/stats/Lognormal.html" class="external-link">stats::rlnorm()</a></code>.
-Defaults (<code>meanlog = 1.6</code>, <code>sdlog = 0.45</code>) give a median incubation
-period of roughly five days.</p></dd>
+The median incubation period is <code>exp(meanlog)</code> days, and <code>sdlog</code>
+controls the spread. Defaults (<code>meanlog = 1.6</code>, <code>sdlog = 0.45</code>) give
+a median of ~5 days with moderate spread, typical of many foodborne
+pathogens. For quick-onset diseases like norovirus, try
+<code>meanlog = 0.5</code> (median ~1.6 days). For slow-onset diseases like
+hepatitis A, try <code>meanlog = 3</code> (median ~20 days).</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -112,6 +116,14 @@ for reproducibility. Use <code>NULL</code> to leave the RNG state untouched.</p>
 <span class="r-in"><span><span class="va">big</span> <span class="op">&lt;-</span> <span class="fu">simulate_outbreak</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, exposure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2025-03-15"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">big</span><span class="op">$</span><span class="va">onset_date</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2025-03-16" "2025-03-29"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Short incubation period (e.g., Salmonella)</span></span></span>
+<span class="r-in"><span><span class="co"># meanlog = 0.5 gives median of exp(0.5) = 1.6 days</span></span></span>
+<span class="r-in"><span><span class="va">fast</span> <span class="op">&lt;-</span> <span class="fu">simulate_outbreak</span><span class="op">(</span>meanlog <span class="op">=</span> <span class="fl">0.5</span>, sdlog <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Long incubation period (e.g., Hepatitis A)</span></span></span>
+<span class="r-in"><span><span class="co"># meanlog = 3 gives median of exp(3) = 20 days</span></span></span>
+<span class="r-in"><span><span class="va">slow</span> <span class="op">&lt;-</span> <span class="fu">simulate_outbreak</span><span class="op">(</span>meanlog <span class="op">=</span> <span class="fl">3</span>, sdlog <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

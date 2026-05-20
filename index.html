@@ -201,22 +201,24 @@
 <div class="section level3">
 <h3 id="custom-incubation-periods">Custom Incubation Periods<a class="anchor" aria-label="anchor" href="#custom-incubation-periods"></a>
 </h3>
-<p>Simulate outbreaks with different epidemiological characteristics:</p>
+<p>Simulate outbreaks with different epidemiological characteristics by adjusting the incubation period parameters. The <code>meanlog</code> parameter controls the median incubation period (median = exp(meanlog) days), while <code>sdlog</code> controls the spread:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Short incubation period (e.g., food poisoning)</span></span>
+<code class="sourceCode R"><span><span class="co"># Short incubation period (e.g., Salmonella, norovirus)</span></span>
+<span><span class="co"># meanlog = 0.5 gives median of exp(0.5) = 1.6 days</span></span>
 <span><span class="va">short_incubation</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span></span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  exposure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2024-08-15"</span><span class="op">)</span>,</span>
-<span>  meanlog <span class="op">=</span> <span class="fl">0.5</span>,   <span class="co"># ~1.6 day median</span></span>
+<span>  meanlog <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  sdlog <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">123</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Long incubation period (e.g., viral hepatitis)</span></span>
+<span><span class="co"># Long incubation period (e.g., Hepatitis A)</span></span>
+<span><span class="co"># meanlog = 3 gives median of exp(3) = 20 days</span></span>
 <span><span class="va">long_incubation</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span></span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  exposure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2024-08-15"</span><span class="op">)</span>,</span>
-<span>  meanlog <span class="op">=</span> <span class="fl">3</span>,     <span class="co"># ~20 day median</span></span>
+<span>  meanlog <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  sdlog <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">123</span></span>
 <span><span class="op">)</span></span>
