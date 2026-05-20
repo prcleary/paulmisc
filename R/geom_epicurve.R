@@ -18,8 +18,13 @@
 #'   \item **`x`** — typically a `Date` representing the date of onset.
 #'   \item `y` — supplied automatically by [stat_epicurve()].
 #'   \item `fill`, `colour`, `alpha`, `linewidth`, `linetype`, `group`.
-#'   \item `text` — tooltip text for interactive plotly conversion.
 #' }
+#'
+#' @section Interactive Visualisation:
+#' This custom geom is not compatible with `plotly::ggplotly()` conversion.
+#' For interactive epidemic curves with tooltips, see the
+#' "Interactive Epidemic Curves with Plotly" vignette:
+#' `vignette("interactive-epicurves", package = "paulmisc")`.
 #'
 #' @param mapping Set of aesthetic mappings created by [ggplot2::aes()].
 #' @param data The data to be displayed in this layer.
@@ -135,8 +140,6 @@ StatEpicurve <- ggplot2::ggproto(
     if (nrow(data) > 0) {
       zero_row <- data[1, , drop = FALSE]
       zero_row$y <- 0
-      # Ensure padding rows don't show tooltips in plotly
-      if ("text" %in% names(zero_row)) zero_row$text <- NA
       
       # Add left edge padding (extends width/2 to the left of min x)
       left_pad <- zero_row
@@ -170,8 +173,7 @@ GeomEpicurve <- ggplot2::ggproto(
     fill      = "steelblue",
     linewidth = 0.4,
     linetype  = 1,
-    alpha     = NA,
-    text      = NULL
+    alpha     = NA
   ),
 
   draw_key = ggplot2::draw_key_polygon,

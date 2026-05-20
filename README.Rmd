@@ -235,37 +235,48 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
 
 ### Interactive Plotly Visualisation
 
-Create interactive epidemic curves with custom tooltips using `plotly`:
+Create interactive epidemic curves with custom tooltips using `plotly`. Note that custom ggplot2 geoms are not compatible with `ggplotly()` conversion, so we use plotly's native functions:
 
 ```{r eval=FALSE}
 library(plotly)
 
-# Add custom tooltip text to the data
+# Compute stacking positions
+cases <- cases[order(cases$onset_date), ]
+cases$y <- ave(seq_len(nrow(cases)), cases$onset_date, FUN = seq_along)
+
+# Add custom tooltip text
 cases$tooltip <- paste0(
-  "Case ID: ", cases$case_id, "\n",
-  "Date: ", cases$onset_date, "\n",
-  "Age: ", cases$age_group, "\n",
-  "Sex: ", cases$sex, "\n",
+  "Case ID: ", cases$case_id, "<br>",
+  "Date: ", cases$onset_date, "<br>",
+  "Age: ", cases$age_group, "<br>",
+  "Sex: ", cases$sex, "<br>",
   "Setting: ", cases$setting
 )
 
-# Create plot with text aesthetic for tooltips
-p <- ggplot(cases, aes(x = onset_date, fill = age_group, text = tooltip)) +
-  geom_epicurve() +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
+# Create interactive plotly plot
+plot_ly(cases) %>%
+  add_trace(
+    type = "scatter",
+    mode = "markers",
+    x = ~onset_date,
+    y = ~y,
+    color = ~age_group,
+    marker = list(
+      symbol = "square",
+      size = 20,
+      line = list(color = "white", width = 1)
+    ),
+    text = ~tooltip,
+    hovertemplate = "%{text}<extra></extra>"
+  ) %>%
+  layout(
     title = "Interactive Epidemic Curve",
-    x = "Date of Onset",
-    y = "Number of Cases"
-  ) +
-  theme_minimal()
-
-# Convert to interactive plotly plot
-ggplotly(p, tooltip = "text")
+    xaxis = list(title = "Date of Onset"),
+    yaxis = list(title = "Number of Cases")
+  )
 ```
 
-Users can hover over individual case squares to see detailed information. The
-`text` aesthetic allows complete control over tooltip content and formatting.
+Users can hover over individual case squares to see detailed information.
 
 **See the [Interactive Epidemic Curves with Plotly](https://prcleary.github.io/paulmisc/articles/interactive-epicurves.html) article for live interactive examples you can try in your browser!**
 

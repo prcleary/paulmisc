@@ -84,8 +84,15 @@ scale, theme, facet, or coordinate system.
 \item \strong{\code{x}} — typically a \code{Date} representing the date of onset.
 \item \code{y} — supplied automatically by \code{\link[=stat_epicurve]{stat_epicurve()}}.
 \item \code{fill}, \code{colour}, \code{alpha}, \code{linewidth}, \code{linetype}, \code{group}.
-\item \code{text} — tooltip text for interactive plotly conversion.
 }
+}
+
+\section{Interactive Visualisation}{
+
+This custom geom is not compatible with \code{plotly::ggplotly()} conversion.
+For interactive epidemic curves with tooltips, see the
+"Interactive Epidemic Curves with Plotly" vignette:
+\code{vignette("interactive-epicurves", package = "paulmisc")}.
 }
 
 \examples{
