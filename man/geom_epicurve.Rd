@@ -84,6 +84,7 @@ scale, theme, facet, or coordinate system.
 \item \strong{\code{x}} — typically a \code{Date} representing the date of onset.
 \item \code{y} — supplied automatically by \code{\link[=stat_epicurve]{stat_epicurve()}}.
 \item \code{fill}, \code{colour}, \code{alpha}, \code{linewidth}, \code{linetype}, \code{group}.
+\item \code{text} — tooltip text for interactive plotly conversion.
 }
 }
 
