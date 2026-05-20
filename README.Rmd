@@ -118,8 +118,7 @@ ggplot(cases, aes(x = onset_date, fill = outcome)) +
     y = "Number of Cases",
     fill = "Outcome"
   ) +
-  theme_minimal() +
-  theme(panel.spacing = unit(1, "lines"))
+  theme_minimal()
 ```
 
 ### Custom Incubation Periods
