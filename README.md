@@ -1,6 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+<!-- Test: workflow should regenerate this -->
+
 # paulmisc
 
 <!-- badges: start -->
@@ -19,6 +21,8 @@ MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.or
 This package provides tools for epidemiological visualization, data
 simulation, and an interactive Shiny app for building SQL queries for
 Amazon Redshift.
+
+**Documentation:** <https://prcleary.github.io/paulmisc/>
 
 ## Installation
 
@@ -120,8 +124,7 @@ ggplot(cases, aes(x = onset_date, fill = outcome)) +
     y = "Number of Cases",
     fill = "Outcome"
   ) +
-  theme_minimal() +
-  theme(panel.spacing = unit(1, "lines"))
+  theme_minimal()
 ```
 
 <img src="man/figures/README-faceted-epicurve-1.png" alt="" width="100%" />
