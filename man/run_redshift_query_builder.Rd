@@ -19,7 +19,8 @@ stopped.}
 If \code{background = FALSE}, invisibly returns the result of
 \code{\link[shiny:runApp]{shiny::runApp()}}. If \code{background = TRUE} (default), returns a process
 handle from \code{\link[callr:r_bg]{callr::r_bg()}} which can be used to monitor or terminate
-the background process.
+the background process. The process is returned visibly so you can
+easily assign it to a variable.
 }
 \description{
 Launches an interactive Shiny application for building Amazon Redshift SQL
@@ -49,9 +50,13 @@ background mode (default) requires the \code{callr} package.
 }
 \examples{
 if (interactive()) {
-  # Run in background (default, frees console, requires callr)
-  app_process <- run_redshift_query_builder()
-  # To stop: app_process$kill()
+  # Run in background (default) - IMPORTANT: assign to variable
+  app <- run_redshift_query_builder()
+  
+  # Continue using console for other work...
+  
+  # Stop the app when done
+  app$kill()
   
   # Run in foreground (blocks console)
   # run_redshift_query_builder(background = FALSE)

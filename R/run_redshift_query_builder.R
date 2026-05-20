@@ -16,7 +16,8 @@
 #' @return If `background = FALSE`, invisibly returns the result of
 #'   [shiny::runApp()]. If `background = TRUE` (default), returns a process
 #'   handle from [callr::r_bg()] which can be used to monitor or terminate
-#'   the background process.
+#'   the background process. The process is returned visibly so you can
+#'   easily assign it to a variable.
 #'
 #' @details
 #' The Redshift SQL Query Builder includes:
@@ -38,9 +39,13 @@
 #'
 #' @examples
 #' if (interactive()) {
-#'   # Run in background (default, frees console, requires callr)
-#'   app_process <- run_redshift_query_builder()
-#'   # To stop: app_process$kill()
+#'   # Run in background (default) - IMPORTANT: assign to variable
+#'   app <- run_redshift_query_builder()
+#'   
+#'   # Continue using console for other work...
+#'   
+#'   # Stop the app when done
+#'   app$kill()
 #'   
 #'   # Run in foreground (blocks console)
 #'   # run_redshift_query_builder(background = FALSE)
@@ -80,7 +85,9 @@ run_redshift_query_builder <- function(background = TRUE, ...) {
     message(
       "Starting Redshift SQL Query Builder in background process...\n",
       "URL: ", url, "\n",
-      "To stop the app, use: app_process$kill()"
+      "Assign to a variable to stop later:\n",
+      "  app <- run_redshift_query_builder()\n",
+      "  app$kill()"
     )
     
     # Start app in background
@@ -95,7 +102,7 @@ run_redshift_query_builder <- function(background = TRUE, ...) {
     Sys.sleep(1)
     utils::browseURL(url)
     
-    return(invisible(process))
+    return(process)
   }
   
   # Default to opening in browser for foreground mode too
