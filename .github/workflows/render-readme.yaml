@@ -31,6 +31,8 @@ jobs:
             any::devtools
             any::rmarkdown
             any::patchwork
+            local::.
+          needs: website
 
       - name: Render README
         run: |
