@@ -3,6 +3,7 @@ output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- Test: workflow should regenerate this -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
