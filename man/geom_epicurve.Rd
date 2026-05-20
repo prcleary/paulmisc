@@ -93,10 +93,10 @@ scale, theme, facet, or coordinate system.
 Convert to interactive plotly plots using \code{plotly::ggplotly()}:
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{library(plotly)
-p <- ggplot(cases, aes(x = onset_date, fill = age_group)) +
-  geom_epicurve() +
+p <- ggplot(cases, aes(x = onset_date)) +
+  geom_epicurve(fill = "steelblue") +
   theme_minimal()
-ggplotly(p)
+ggplotly(p, tooltip = c("x", "y"))
 }\if{html}{\out{</div>}}
 
 For custom tooltips, add a \code{text} aesthetic and use the \code{tooltip} parameter:
@@ -115,7 +115,7 @@ cases <- simulate_outbreak()
 
 # Minimal epicurve
 ggplot(cases, aes(x = onset_date)) +
-  geom_epicurve() +
+  geom_epicurve(fill = "steelblue") +
   theme_minimal()
 
 # Coloured by age group, faceted by setting

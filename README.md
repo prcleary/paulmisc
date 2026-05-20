@@ -103,7 +103,7 @@ Create a simple epidemic curve from simulated outbreak data:
 
     # Create basic epicurve
     ggplot(cases, aes(x = onset_date)) +
-      geom_epicurve() +
+      geom_epicurve(fill = "steelblue") +
       labs(
         title = "Outbreak Epicurve",
         x = "Date of Onset",
