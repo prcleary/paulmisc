@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/prcleary/paulmisc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/prcleary/paulmisc/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/prcleary/paulmisc/branch/main/graph/badge.svg)](https://codecov.io/gh/prcleary/paulmisc?branch=main)
+[![Codecov test coverage](https://codecov.io/gh/prcleary/paulmisc/graph/badge.svg)](https://app.codecov.io/gh/prcleary/paulmisc)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
