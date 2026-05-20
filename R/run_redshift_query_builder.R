@@ -47,6 +47,8 @@
 #' }
 #'
 #' @importFrom shiny runApp
+#' @importFrom httpuv randomPort
+#' @importFrom utils browseURL
 #' @export
 run_redshift_query_builder <- function(background = TRUE, ...) {
   app_dir <- system.file(
@@ -71,19 +73,29 @@ run_redshift_query_builder <- function(background = TRUE, ...) {
       )
     }
     
+    # Find an available port
+    port <- httpuv::randomPort()
+    url <- paste0("http://127.0.0.1:", port)
+    
     message(
       "Starting Redshift SQL Query Builder in background process...\n",
+      "URL: ", url, "\n",
       "To stop the app, use: app_process$kill()"
     )
     
-    return(
-      callr::r_bg(
-        func = function(app_dir) {
-          shiny::runApp(app_dir, launch.browser = TRUE)
-        },
-        args = list(app_dir = app_dir)
-      )
+    # Start app in background
+    process <- callr::r_bg(
+      func = function(app_dir, port) {
+        shiny::runApp(app_dir, port = port, launch.browser = FALSE)
+      },
+      args = list(app_dir = app_dir, port = port)
     )
+    
+    # Give the app a moment to start, then open browser
+    Sys.sleep(1)
+    utils::browseURL(url)
+    
+    return(invisible(process))
   }
   
   # Default to opening in browser for foreground mode too

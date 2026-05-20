@@ -16,6 +16,7 @@ RoxygenNote: 7.3.3
 Imports:
     callr,
     ggplot2 (>= 3.4.0),
+    httpuv,
     shiny,
     stats
 Suggests: 
