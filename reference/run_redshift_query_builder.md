@@ -17,12 +17,12 @@ run_redshift_query_builder(...)
 - ...:
 
   Additional arguments passed to
-  [`shiny::shinyApp()`](https://rdrr.io/pkg/shiny/man/shinyApp.html).
+  [`shiny::runApp()`](https://rdrr.io/pkg/shiny/man/runApp.html).
 
 ## Value
 
 Invisibly returns the result of
-[`shiny::shinyApp()`](https://rdrr.io/pkg/shiny/man/shinyApp.html).
+[`shiny::runApp()`](https://rdrr.io/pkg/shiny/man/runApp.html).
 
 ## Details
 
