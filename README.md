@@ -26,6 +26,45 @@ Amazon Redshift.
 
 ## Installation
 
+### System Dependencies (Linux)
+
+On Linux, you may need to install system libraries required by ggplot2
+and other dependencies:
+
+**Debian/Ubuntu:**
+
+``` bash
+sudo apt-get install -y \
+  libcurl4-openssl-dev \
+  libssl-dev \
+  libxml2-dev \
+  libfontconfig1-dev \
+  libharfbuzz-dev \
+  libfribidi-dev \
+  libfreetype6-dev \
+  libpng-dev \
+  libtiff5-dev \
+  libjpeg-dev
+```
+
+**RHEL/Fedora/Rocky Linux:**
+
+``` bash
+sudo dnf install -y \
+  libcurl-devel \
+  openssl-devel \
+  libxml2-devel \
+  fontconfig-devel \
+  harfbuzz-devel \
+  fribidi-devel \
+  freetype-devel \
+  libpng-devel \
+  libtiff-devel \
+  libjpeg-turbo-devel
+```
+
+### R Package Installation
+
 Install the development version from GitHub:
 
 ``` r
