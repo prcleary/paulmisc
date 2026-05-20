@@ -58,8 +58,7 @@ remotes::install_github('prcleary/paulmisc')
 ### Epidemiological Visualization
 
 ```{r setup, message=FALSE, warning=FALSE}
-# Load package from source for rendering
-devtools::load_all()
+library(paulmisc)
 library(ggplot2)
 ```
 
