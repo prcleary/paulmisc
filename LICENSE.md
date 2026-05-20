@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2025 paulmisc authors
+Copyright (c) 2025 Paul Cleary
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the

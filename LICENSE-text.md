@@ -1,4 +1,4 @@
 # License
 
     YEAR: 2025
-    COPYRIGHT HOLDER: paulmisc authors
+    COPYRIGHT HOLDER: Paul Cleary
