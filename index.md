@@ -6,6 +6,8 @@ This package provides tools for epidemiological visualization, data
 simulation, and an interactive Shiny app for building SQL queries for
 Amazon Redshift.
 
+**Documentation:** <https://prcleary.github.io/paulmisc/>
+
 ## Installation
 
 Install the development version from GitHub:
@@ -112,8 +114,7 @@ ggplot(cases, aes(x = onset_date, fill = outcome)) +
     y = "Number of Cases",
     fill = "Outcome"
   ) +
-  theme_minimal() +
-  theme(panel.spacing = unit(1, "lines"))
+  theme_minimal()
 ```
 
 ![](reference/figures/README-faceted-epicurve-1.png)
