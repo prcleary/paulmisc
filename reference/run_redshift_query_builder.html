@@ -50,20 +50,31 @@ ORDER BY, and more.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">run_redshift_query_builder</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">run_redshift_query_builder</span><span class="op">(</span>background <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional arguments passed to <code><a href="https://rdrr.io/pkg/shiny/man/runApp.html" class="external-link">shiny::runApp()</a></code>.</p></dd>
+<dl><dt id="arg-background">background<a class="anchor" aria-label="anchor" href="#arg-background"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, runs the app in a background R
+process (requires the <code>callr</code> package), allowing continued use of the
+console. If <code>FALSE</code> (default), blocks the console until the app is
+stopped.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Additional arguments passed to <code><a href="https://rdrr.io/pkg/shiny/man/runApp.html" class="external-link">shiny::runApp()</a></code> when
+<code>background = FALSE</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Invisibly returns the result of <code><a href="https://rdrr.io/pkg/shiny/man/runApp.html" class="external-link">shiny::runApp()</a></code>.</p>
+    <p>If <code>background = FALSE</code>, invisibly returns the result of
+<code><a href="https://rdrr.io/pkg/shiny/man/runApp.html" class="external-link">shiny::runApp()</a></code>. If <code>background = TRUE</code>, returns a process handle
+from <code><a href="https://callr.r-lib.org/reference/r_bg.html" class="external-link">callr::r_bg()</a></code> which can be used to monitor or terminate the
+background process.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -80,13 +91,19 @@ month/year, or specific dates using Redshift functions</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>This app requires the <code>shiny</code> and <code>bslib</code> packages.</p>
+    <p>This app requires the <code>shiny</code> and <code>bslib</code> packages. Running in
+background mode requires the <code>callr</code> package.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co"># Run in foreground (blocks console)</span></span></span>
 <span class="r-in"><span>  <span class="fu">run_redshift_query_builder</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Run in background (requires callr)</span></span></span>
+<span class="r-in"><span>  <span class="co"># app_process &lt;- run_redshift_query_builder(background = TRUE)</span></span></span>
+<span class="r-in"><span>  <span class="co"># To stop: app_process$kill()</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
