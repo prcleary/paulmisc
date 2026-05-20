@@ -6,12 +6,19 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/prcleary/paulmisc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/prcleary/paulmisc/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/prcleary/paulmisc/branch/main/graph/badge.svg)](https://codecov.io/gh/prcleary/paulmisc?branch=main)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
 > Collection of miscellaneous R functions of interest only to Paul
 
-This package provides tools for epidemiological visualization and data
-simulation, with a focus on outbreak analysis and epidemic curves.
+This package provides tools for epidemiological visualization, data
+simulation, and an interactive Shiny app for building SQL queries for
+Amazon Redshift.
 
 ## Installation
 
@@ -26,12 +33,28 @@ remotes::install_github('prcleary/paulmisc')
 
 ## Features
 
+### Epidemiological Tools
+
 - **`geom_epicurve()`** - A ggplot2 geom for creating classical epidemic
   curves where each case is represented as a small square
 - **`simulate_outbreak()`** - Generate realistic outbreak data for
   testing and examples
 
+### Shiny Applications
+
+- **`run_redshift_query_builder()`** - Interactive Shiny app for
+  building Amazon Redshift SQL queries without writing code. Features
+  include:
+  - Form-based query construction
+  - Support for WHERE conditions, date filters, aggregates, GROUP BY,
+    ORDER BY
+  - Real-time validation and error checking
+  - One-click copy to clipboard
+  - Dark-themed, modern UI
+
 ## Usage
+
+### Epidemiological Visualization
 
 ``` r
 # Load package from source for rendering
@@ -168,6 +191,36 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
 ```
 
 <img src="man/figures/README-advanced-styling-1.png" alt="" width="100%" />
+
+### Redshift SQL Query Builder
+
+Launch the interactive Shiny app for building SQL queries:
+
+``` r
+# Launch the Redshift SQL Query Builder Shiny app
+run_redshift_query_builder()
+```
+
+The app provides a user-friendly interface for:
+
+- **Table Selection**: Specify schema, table name, and optional alias
+- **Column Selection**: Choose all columns, specific columns with
+  DISTINCT, or aggregate functions (COUNT, SUM, AVG, MIN, MAX, COUNT
+  DISTINCT)
+- **WHERE Conditions**: Add up to 3 conditions with AND/OR logic using
+  various operators (=, !=, \>, \<, \>=, \<=, LIKE, ILIKE, IN, NOT IN,
+  IS NULL, IS NOT NULL, BETWEEN)
+- **Date Filters**: Filter by date ranges, last N days, current
+  month/year, or specific dates using Redshift-specific functions like
+  DATEADD and TRUNC
+- **Sorting & Grouping**: GROUP BY, HAVING, ORDER BY with LIMIT and
+  OFFSET
+- **Validation**: Real-time error checking with helpful validation
+  messages
+- **Copy to Clipboard**: One-click copy of the generated SQL query
+
+The app features a modern dark theme and includes helpful Redshift SQL
+tips for common functions and patterns.
 
 ## Development
 

@@ -1,4 +1,37 @@
-url: ~
+url: https://prcleary.github.io/paulmisc/
 template:
   bootstrap: 5
+  bootswatch: darkly
+  bslib:
+    primary: "#4fc3f7"
+    
+home:
+  title: "paulmisc: Epidemiological Visualization & SQL Tools"
+  description: >
+    R package for epidemic curve visualization, outbreak simulation, 
+    and interactive Redshift SQL query building.
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, github]
+  components:
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/prcleary/paulmisc
+      aria-label: GitHub
+
+reference:
+  - title: "Epidemiological Visualization"
+    desc: "Functions for creating epidemic curves and simulating outbreak data"
+    contents:
+      - geom_epicurve
+      - stat_epicurve
+      - GeomEpicurve
+      - StatEpicurve
+      - simulate_outbreak
+  - title: "Shiny Applications"
+    desc: "Interactive web applications"
+    contents:
+      - run_redshift_query_builder
 
