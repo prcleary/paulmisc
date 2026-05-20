@@ -49,12 +49,14 @@
 #' # Minimal epicurve
 #' ggplot(cases, aes(x = onset_date)) +
 #'   geom_epicurve() +
+#'   scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
 #'   theme_minimal()
 #'
 #' # Coloured by age group, faceted by setting
 #' ggplot(cases, aes(x = onset_date, fill = age_group)) +
 #'   geom_epicurve(colour = "grey20") +
 #'   facet_wrap(~ setting, ncol = 1) +
+#'   scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
 #'   scale_fill_brewer(palette = "Set2") +
 #'   theme_bw()
 #'
@@ -128,6 +130,11 @@ StatEpicurve <- ggplot2::ggproto(
     data <- data[order(data$x, data$group), , drop = FALSE]
     data$y <- stats::ave(seq_len(nrow(data)), data$x, FUN = seq_along)
     data
+  },
+  
+  setup_params = function(data, params) {
+    params$flipped_aes <- ggplot2::has_flipped_aes(data, params, ambiguous = TRUE)
+    params
   }
 )
 
@@ -153,6 +160,13 @@ GeomEpicurve <- ggplot2::ggproto(
   ),
 
   draw_key = ggplot2::draw_key_polygon,
+
+  setup_data = function(data, params) {
+    # Ensure y-axis includes space for the bottom of the lowest rectangles
+    # The lowest rectangle starts at y=1, with ymin at y - 1 + (1 - height)/2
+    # We want to make sure the y range includes from 0
+    data
+  },
 
   draw_panel = function(data,
                         panel_params,

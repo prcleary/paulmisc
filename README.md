@@ -7,7 +7,7 @@
 
 [![R-CMD-check](https://github.com/prcleary/paulmisc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/prcleary/paulmisc/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/prcleary/paulmisc/branch/main/graph/badge.svg)](https://codecov.io/gh/prcleary/paulmisc?branch=main)
+coverage](https://codecov.io/gh/prcleary/paulmisc/graph/badge.svg)](https://app.codecov.io/gh/prcleary/paulmisc)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![License:
@@ -73,6 +73,7 @@ cases <- simulate_outbreak(n = 50, seed = 42)
 # Create basic epicurve
 ggplot(cases, aes(x = onset_date)) +
   geom_epicurve() +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   labs(
     title = "Outbreak Epicurve",
     x = "Date of Onset",
@@ -91,6 +92,7 @@ Visualize cases by demographic or clinical characteristics:
 # Color by age group
 ggplot(cases, aes(x = onset_date, fill = age_group)) +
   geom_epicurve(colour = "grey20") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   scale_fill_brewer(palette = "Set2") +
   labs(
     title = "Cases by Age Group",
@@ -112,6 +114,7 @@ Compare outbreaks across different settings or groups:
 ggplot(cases, aes(x = onset_date, fill = outcome)) +
   geom_epicurve(height = 0.85) +
   facet_wrap(~ setting, ncol = 1, scales = "free_y") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   scale_fill_manual(
     values = c("Recovered" = "steelblue", "Hospitalised" = "tomato")
   ) +
@@ -155,11 +158,13 @@ library(patchwork)
 
 p1 <- ggplot(short_incubation, aes(x = onset_date)) +
   geom_epicurve(fill = "coral") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   labs(title = "Short Incubation", x = NULL, y = "Cases") +
   theme_minimal()
 
 p2 <- ggplot(long_incubation, aes(x = onset_date)) +
   geom_epicurve(fill = "skyblue") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   labs(title = "Long Incubation", x = "Date of Onset", y = "Cases") +
   theme_minimal()
 
@@ -181,6 +186,7 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
     colour = "white",
     linewidth = 0.2
   ) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   scale_fill_viridis_d(option = "plasma", begin = 0.2, end = 0.8) +
   labs(
     title = "Cases by Sex with Custom Styling",
