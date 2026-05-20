@@ -6,9 +6,17 @@
 #' selection, column specifications, WHERE conditions, date filters, GROUP BY,
 #' ORDER BY, and more.
 #'
-#' @param ... Additional arguments passed to [shiny::runApp()].
+#' @param background Logical. If `TRUE`, runs the app in a background R
+#'   process (requires the `callr` package), allowing continued use of the
+#'   console. If `FALSE` (default), blocks the console until the app is
+#'   stopped.
+#' @param ... Additional arguments passed to [shiny::runApp()] when
+#'   `background = FALSE`.
 #'
-#' @return Invisibly returns the result of [shiny::runApp()].
+#' @return If `background = FALSE`, invisibly returns the result of
+#'   [shiny::runApp()]. If `background = TRUE`, returns a process handle
+#'   from [callr::r_bg()] which can be used to monitor or terminate the
+#'   background process.
 #'
 #' @details
 #' The Redshift SQL Query Builder includes:
@@ -25,16 +33,22 @@
 #'   \item **Copy to Clipboard**: One-click copy of generated SQL
 #' }
 #'
-#' @note This app requires the `shiny` and `bslib` packages.
+#' @note This app requires the `shiny` and `bslib` packages. Running in
+#'   background mode requires the `callr` package.
 #'
 #' @examples
 #' if (interactive()) {
+#'   # Run in foreground (blocks console)
 #'   run_redshift_query_builder()
+#'   
+#'   # Run in background (requires callr)
+#'   # app_process <- run_redshift_query_builder(background = TRUE)
+#'   # To stop: app_process$kill()
 #' }
 #'
 #' @importFrom shiny runApp
 #' @export
-run_redshift_query_builder <- function(...) {
+run_redshift_query_builder <- function(background = FALSE, ...) {
   app_dir <- system.file(
     "apps", "redshift-sql-query-builder",
     package = "paulmisc"
@@ -45,6 +59,30 @@ run_redshift_query_builder <- function(...) {
       "Could not find Redshift SQL Query Builder app directory. ",
       "Try re-installing `paulmisc`.",
       call. = FALSE
+    )
+  }
+  
+  if (background) {
+    if (!requireNamespace("callr", quietly = TRUE)) {
+      stop(
+        "Package 'callr' is required for background mode. ",
+        "Install it with: install.packages('callr')",
+        call. = FALSE
+      )
+    }
+    
+    message(
+      "Starting Redshift SQL Query Builder in background process...\n",
+      "To stop the app, use: app_process$kill()"
+    )
+    
+    return(
+      callr::r_bg(
+        func = function(app_dir) {
+          shiny::runApp(app_dir, launch.browser = TRUE)
+        },
+        args = list(app_dir = app_dir)
+      )
     )
   }
   

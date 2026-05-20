@@ -19,6 +19,7 @@ Imports:
     stats
 Suggests: 
     bslib,
+    callr,
     covr,
     devtools,
     lifecycle,
