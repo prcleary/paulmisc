@@ -230,7 +230,7 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
-  theme_dark()
+  theme_minimal()
 ```
 
 ### Redshift SQL Query Builder
