@@ -127,12 +127,14 @@ StatEpicurve <- ggplot2::ggproto(
   compute_panel = function(self, data, scales, na.rm = FALSE) {
     data <- data[order(data$x, data$group), , drop = FALSE]
     data$y <- stats::ave(seq_len(nrow(data)), data$x, FUN = seq_along)
+    # Add a point at y=0 to ensure y-axis includes 0 for proper display
+    # This prevents bottom rectangles from being truncated
+    if (nrow(data) > 0) {
+      zero_row <- data[1, , drop = FALSE]
+      zero_row$y <- 0
+      data <- rbind(zero_row, data)
+    }
     data
-  },
-  
-  setup_params = function(data, params) {
-    params$flipped_aes <- ggplot2::has_flipped_aes(data, params, ambiguous = TRUE)
-    params
   }
 )
 
@@ -159,30 +161,18 @@ GeomEpicurve <- ggplot2::ggproto(
 
   draw_key = ggplot2::draw_key_polygon,
 
-  setup_data = function(data, params) {
-    # Add a dummy row to ensure y-axis includes 0
-    # This prevents bottom blocks from being truncated
-    if (nrow(data) > 0) {
-      dummy <- data[1, , drop = FALSE]
-      dummy$y <- 0
-      dummy$x <- NA_real_
-      
-      data <- rbind(data, dummy)
-    }
-    data
-  },
-
   draw_panel = function(data,
                         panel_params,
                         coord,
                         width = 0.9,
                         height = 0.9) {
-    # Remove dummy rows (those with NA x values)
-    data <- data[!is.na(data$x), , drop = FALSE]
+    # Filter out anchor point (y=0) used for scale range
+    data <- data[data$y > 0, , drop = FALSE]
     
     data$xmin <- data$x - width  / 2
     data$xmax <- data$x + width  / 2
-    data$ymin <- data$y - 1 + (1 - height) / 2
+    # Ensure ymin is never below 0 to prevent truncation at bottom
+    data$ymin <- pmax(0, data$y - 1 + (1 - height) / 2)
     data$ymax <- data$y     - (1 - height) / 2
 
     ggplot2::GeomRect$draw_panel(data, panel_params, coord)
