@@ -96,6 +96,7 @@ stat_epicurve <- function(mapping = NULL,
                           geom = "epicurve",
                           position = "identity",
                           ...,
+                          width = 0.9,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
@@ -107,7 +108,7 @@ stat_epicurve <- function(mapping = NULL,
     position    = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    params      = list(na.rm = na.rm, ...)
+    params      = list(width = width, na.rm = na.rm, ...)
   )
 }
 
@@ -124,15 +125,25 @@ StatEpicurve <- ggplot2::ggproto(
   ggplot2::Stat,
   required_aes = "x",
 
-  compute_panel = function(self, data, scales, na.rm = FALSE) {
+  compute_panel = function(self, data, scales, na.rm = FALSE, width = 0.9) {
     data <- data[order(data$x, data$group), , drop = FALSE]
     data$y <- stats::ave(seq_len(nrow(data)), data$x, FUN = seq_along)
-    # Add a point at y=0 to ensure y-axis includes 0 for proper display
-    # This prevents bottom rectangles from being truncated
+    
+    # Add padding points to ensure x-axis includes full width of edge rectangles
+    # and a point at y=0 to ensure y-axis includes 0 for proper display
     if (nrow(data) > 0) {
       zero_row <- data[1, , drop = FALSE]
       zero_row$y <- 0
-      data <- rbind(zero_row, data)
+      
+      # Add left edge padding (extends width/2 to the left of min x)
+      left_pad <- zero_row
+      left_pad$x <- min(data$x, na.rm = TRUE) - width / 2
+      
+      # Add right edge padding (extends width/2 to the right of max x)
+      right_pad <- zero_row
+      right_pad$x <- max(data$x, na.rm = TRUE) + width / 2
+      
+      data <- rbind(left_pad, zero_row, data, right_pad)
     }
     data
   }

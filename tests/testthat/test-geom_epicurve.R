@@ -74,11 +74,11 @@ test_that("StatEpicurve computes stacking positions correctly", {
   )
   
   # Compute panel
-  result <- StatEpicurve$compute_panel(test_data)
+  result <- StatEpicurve$compute_panel(test_data, width = 0.9)
   
   # Check y values (stacking index)
-  # Note: First row is y=0 anchor point, then actual stacked data
-  expect_equal(result$y, c(0, 1, 2, 3, 1, 2, 1))
+  # Note: Includes left edge padding (y=0), center anchor (y=0), actual data, right edge padding (y=0)
+  expect_equal(result$y, c(0, 0, 1, 2, 3, 1, 2, 1, 0))
 })
 
 test_that("StatEpicurve handles single observation per x", {
@@ -89,10 +89,10 @@ test_that("StatEpicurve handles single observation per x", {
     group = 1
   )
   
-  result <- StatEpicurve$compute_panel(test_data)
+  result <- StatEpicurve$compute_panel(test_data, width = 0.9)
   
-  # First row is y=0 anchor, then all y values should be 1
-  expect_equal(result$y, c(0, 1, 1, 1, 1))
+  # Includes edge padding and center anchor (all y=0), then all y values should be 1
+  expect_equal(result$y, c(0, 0, 1, 1, 1, 1, 0))
 })
 
 test_that("StatEpicurve respects grouping", {
@@ -107,10 +107,10 @@ test_that("StatEpicurve respects grouping", {
   # Sort by x and group as the stat does
   test_data <- test_data[order(test_data$x, test_data$group), , drop = FALSE]
   
-  result <- StatEpicurve$compute_panel(test_data)
+  result <- StatEpicurve$compute_panel(test_data, width = 0.9)
   
-  # First row is y=0 anchor, then should stack within each x value
-  expect_equal(result$y, c(0, 1, 2, 3, 4))
+  # Includes edge padding and center anchor (all y=0), then should stack within each x value
+  expect_equal(result$y, c(0, 0, 1, 2, 3, 4, 0))
 })
 
 test_that("geom_epicurve accepts width parameter", {
