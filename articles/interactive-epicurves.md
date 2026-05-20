@@ -2,11 +2,13 @@
 
 ## Overview
 
-The
+Custom ggplot2 geoms like
 [`geom_epicurve()`](https://prcleary.github.io/paulmisc/reference/geom_epicurve.md)
-function can be combined with [plotly](https://plotly.com/r/) to create
-interactive epidemic curves with custom tooltips. This allows users to
-hover over individual case squares to see detailed information.
+are not directly compatible with
+[`ggplotly()`](https://rdrr.io/pkg/plotly/man/ggplotly.html) conversion.
+Instead, we can create interactive epidemic curves using plotly’s native
+functions. This vignette shows how to build interactive epidemic curves
+with custom tooltips using plotly directly.
 
 ## Basic Interactive Example
 
@@ -31,34 +33,45 @@ library(plotly)
 cases <- simulate_outbreak(n = 50, seed = 123)
 ```
 
-First, let’s create a basic interactive epidemic curve:
+First, let’s compute the stacking positions and create a basic
+interactive epidemic curve:
 
 ``` r
 
-# Add custom tooltip text to the data
+# Compute stacking positions (y values) for each case
+cases <- cases[order(cases$onset_date), ]
+cases$y <- ave(seq_len(nrow(cases)), cases$onset_date, FUN = seq_along)
+
+# Add custom tooltip text
 cases$tooltip <- paste0(
-  "Case ID: ", cases$case_id, "\n",
-  "Date: ", cases$onset_date, "\n",
-  "Age: ", cases$age_group, "\n",
+  "Case ID: ", cases$case_id, "<br>",
+  "Date: ", cases$onset_date, "<br>",
+  "Age: ", cases$age_group, "<br>",
   "Sex: ", cases$sex
 )
 
-# Create plot with text aesthetic for tooltips
-p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
-  geom_epicurve(fill = "steelblue") +
-  labs(
+# Create interactive plotly plot with rectangles
+plot_ly(cases) %>%
+  add_trace(
+    type = "scatter",
+    mode = "markers",
+    x = ~onset_date,
+    y = ~y,
+    marker = list(
+      symbol = "square",
+      size = 20,
+      color = "steelblue",
+      line = list(color = "white", width = 1)
+    ),
+    text = ~tooltip,
+    hovertemplate = "%{text}<extra></extra>"
+  ) %>%
+  layout(
     title = "Interactive Epidemic Curve",
-    x = "Date of Onset",
-    y = "Number of Cases"
-  ) +
-  theme_minimal()
-
-# Convert to interactive plotly plot
-ggplotly(p, tooltip = "text")
-#> Warning in geom2trace.default(dots[[1L]][[1L]], dots[[2L]][[1L]], dots[[3L]][[1L]]): geom_GeomEpicurve() has yet to be implemented in plotly.
-#>   If you'd like to see this geom implemented,
-#>   Please open an issue with your example code at
-#>   https://github.com/ropensci/plotly/issues
+    xaxis = list(title = "Date of Onset"),
+    yaxis = list(title = "Number of Cases"),
+    hovermode = "closest"
+  )
 ```
 
 Hover over any square to see the details for that individual case!
@@ -71,89 +84,88 @@ Now let’s colour by age group and customise the tooltips further:
 
 # Enhanced tooltip with more detail
 cases$tooltip <- paste0(
-  "<b>Case ", cases$case_id, "</b>\n",
-  "Date: ", format(cases$onset_date, "%d %B %Y"), "\n",
-  "Age Group: ", cases$age_group, "\n",
-  "Sex: ", cases$sex, "\n",
-  "Setting: ", cases$setting, "\n",
+  "<b>Case ", cases$case_id, "</b><br>",
+  "Date: ", format(cases$onset_date, "%d %B %Y"), "<br>",
+  "Age Group: ", cases$age_group, "<br>",
+  "Sex: ", cases$sex, "<br>",
+  "Setting: ", cases$setting, "<br>",
   "Outcome: ", cases$outcome
 )
 
-# Create plot with fill by age group
-p <- ggplot(cases, aes(x = onset_date, fill = age_group, text = tooltip)) +
-  geom_epicurve() +
-  scale_fill_brewer(palette = "Set2", name = "Age Group") +
-  labs(
-    title = "Interactive Epidemic Curve by Age Group",
-    x = "Date of Onset",
-    y = "Number of Cases"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
+# Colour palette for age groups
+age_colors <- c(
+  "0-4" = "#66C2A5",
+  "5-17" = "#FC8D62",
+  "18-64" = "#8DA0CB",
+  "65+" = "#E78AC3"
+)
 
-# Convert to interactive
-ggplotly(p, tooltip = "text")
-#> Warning in geom2trace.default(dots[[1L]][[3L]], dots[[2L]][[1L]], dots[[3L]][[1L]]): geom_GeomEpicurve() has yet to be implemented in plotly.
-#>   If you'd like to see this geom implemented,
-#>   Please open an issue with your example code at
-#>   https://github.com/ropensci/plotly/issues
-#> Warning in geom2trace.default(dots[[1L]][[3L]], dots[[2L]][[1L]], dots[[3L]][[1L]]): geom_GeomEpicurve() has yet to be implemented in plotly.
-#>   If you'd like to see this geom implemented,
-#>   Please open an issue with your example code at
-#>   https://github.com/ropensci/plotly/issues
-#> Warning in geom2trace.default(dots[[1L]][[3L]], dots[[2L]][[1L]], dots[[3L]][[1L]]): geom_GeomEpicurve() has yet to be implemented in plotly.
-#>   If you'd like to see this geom implemented,
-#>   Please open an issue with your example code at
-#>   https://github.com/ropensci/plotly/issues
+# Create interactive plotly plot coloured by age group
+plot_ly(cases) %>%
+  add_trace(
+    type = "scatter",
+    mode = "markers",
+    x = ~onset_date,
+    y = ~y,
+    color = ~age_group,
+    colors = age_colors,
+    marker = list(
+      symbol = "square",
+      size = 20,
+      line = list(color = "white", width = 1)
+    ),
+    text = ~tooltip,
+    hovertemplate = "%{text}<extra></extra>"
+  ) %>%
+  layout(
+    title = "Interactive Epidemic Curve by Age Group",
+    xaxis = list(title = "Date of Onset"),
+    yaxis = list(title = "Number of Cases"),
+    hovermode = "closest"
+  )
+#> Warning: Some values were outside the color scale and will be treated as NA
+#> Some values were outside the color scale and will be treated as NA
+#> Some values were outside the color scale and will be treated as NA
+#> Some values were outside the color scale and will be treated as NA
+#> Some values were outside the color scale and will be treated as NA
+#> Some values were outside the color scale and will be treated as NA
 ```
 
-## Interactive Faceted Plot
+## Interactive by Sex
 
-Interactive plots work with faceting too:
+Let’s colour by sex with custom colours:
 
 ``` r
 
-# Create faceted plot
-p <- ggplot(cases, aes(x = onset_date, fill = sex, text = tooltip)) +
-  geom_epicurve() +
-  scale_fill_manual(
-    values = c("Male" = "#0072B2", "Female" = "#D55E00"),
-    name = "Sex"
-  ) +
-  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
-  labs(
-    title = "Interactive Epidemic Curves by Setting",
-    x = "Date of Onset",
-    y = "Number of Cases"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
-# Convert to interactive
-ggplotly(p, tooltip = "text")
-#> Warning in geom2trace.default(dots[[1L]][[4L]], dots[[2L]][[1L]], dots[[3L]][[1L]]): geom_GeomEpicurve() has yet to be implemented in plotly.
-#>   If you'd like to see this geom implemented,
-#>   Please open an issue with your example code at
-#>   https://github.com/ropensci/plotly/issues
-#> Warning in geom2trace.default(dots[[1L]][[4L]], dots[[2L]][[1L]], dots[[3L]][[1L]]): geom_GeomEpicurve() has yet to be implemented in plotly.
-#>   If you'd like to see this geom implemented,
-#>   Please open an issue with your example code at
-#>   https://github.com/ropensci/plotly/issues
-#> Warning in geom2trace.default(dots[[1L]][[4L]], dots[[2L]][[1L]], dots[[3L]][[1L]]): geom_GeomEpicurve() has yet to be implemented in plotly.
-#>   If you'd like to see this geom implemented,
-#>   Please open an issue with your example code at
-#>   https://github.com/ropensci/plotly/issues
-#> Warning in geom2trace.default(dots[[1L]][[4L]], dots[[2L]][[1L]], dots[[3L]][[1L]]): geom_GeomEpicurve() has yet to be implemented in plotly.
-#>   If you'd like to see this geom implemented,
-#>   Please open an issue with your example code at
-#>   https://github.com/ropensci/plotly/issues
+# Create interactive plotly plot coloured by sex
+plot_ly(cases) %>%
+  add_trace(
+    type = "scatter",
+    mode = "markers",
+    x = ~onset_date,
+    y = ~y,
+    color = ~sex,
+    colors = c("Male" = "#0072B2", "Female" = "#D55E00"),
+    marker = list(
+      symbol = "square",
+      size = 20,
+      line = list(color = "white", width = 1)
+    ),
+    text = ~tooltip,
+    hovertemplate = "%{text}<extra></extra>"
+  ) %>%
+  layout(
+    title = "Interactive Epidemic Curve by Sex",
+    xaxis = list(title = "Date of Onset"),
+    yaxis = list(title = "Number of Cases"),
+    hovermode = "closest"
+  )
 ```
 
 ## Customising Tooltip Content
 
-The `text` aesthetic gives you complete control over tooltip content.
-You can include any information from your data and format it however you
-like:
+You have complete control over tooltip content. Here’s an example with
+rich HTML formatting:
 
 ``` r
 
@@ -167,38 +179,78 @@ cases$tooltip <- with(cases, paste0(
   "<i>Outcome:</i> ", outcome
 ))
 
-p <- ggplot(cases, aes(x = onset_date, fill = outcome, text = tooltip)) +
-  geom_epicurve() +
-  scale_fill_brewer(palette = "Pastel1", name = "Outcome") +
-  labs(
-    title = "Interactive Epidemic Curve by Outcome",
-    x = "Date of Onset",
-    y = "Number of Cases"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
+# Colour palette for outcomes
+outcome_colors <- c(
+  "Recovered" = "#FBB4AE",
+  "Hospitalised" = "#B3CDE3",
+  "Fatal" = "#CCEBC5"
+)
 
-ggplotly(p, tooltip = "text")
-#> Warning in geom2trace.default(dots[[1L]][[2L]], dots[[2L]][[1L]], dots[[3L]][[1L]]): geom_GeomEpicurve() has yet to be implemented in plotly.
-#>   If you'd like to see this geom implemented,
-#>   Please open an issue with your example code at
-#>   https://github.com/ropensci/plotly/issues
-#> Warning in geom2trace.default(dots[[1L]][[2L]], dots[[2L]][[1L]], dots[[3L]][[1L]]): geom_GeomEpicurve() has yet to be implemented in plotly.
-#>   If you'd like to see this geom implemented,
-#>   Please open an issue with your example code at
-#>   https://github.com/ropensci/plotly/issues
+# Create interactive plotly plot coloured by outcome
+plot_ly(cases) %>%
+  add_trace(
+    type = "scatter",
+    mode = "markers",
+    x = ~onset_date,
+    y = ~y,
+    color = ~outcome,
+    colors = outcome_colors,
+    marker = list(
+      symbol = "square",
+      size = 20,
+      line = list(color = "white", width = 1)
+    ),
+    text = ~tooltip,
+    hovertemplate = "%{text}<extra></extra>"
+  ) %>%
+  layout(
+    title = "Interactive Epidemic Curve by Outcome",
+    xaxis = list(title = "Date of Onset"),
+    yaxis = list(title = "Number of Cases"),
+    hovermode = "closest"
+  )
 ```
 
 ## Tips for Interactive Visualisation
 
 - **Performance**: Interactive plots with many cases (\>500) may be
   slow. Consider aggregating or filtering for large datasets.
-- **Tooltip formatting**: Use `\n` for line breaks in plain text, or
-  HTML tags (`<br>`, `<b>`, `<i>`) for richer formatting.
+- **Tooltip formatting**: Use HTML tags (`<br>`, `<b>`, `<i>`, `<hr>`)
+  for rich formatting in plotly tooltips.
 - **Mobile devices**: Interactive features work on touch devices - tap
   to see tooltips.
 - **Export**: Use plotly’s built-in export button to save static images
   of your interactive plots.
+- **Static plots**: For non-interactive reports, use
+  [`geom_epicurve()`](https://prcleary.github.io/paulmisc/reference/geom_epicurve.md)
+  with ggplot2 as shown in the main package README.
+
+## Combining with ggplot2
+
+For static (non-interactive) epidemic curves with the authentic “one
+square per case” look, use the
+[`geom_epicurve()`](https://prcleary.github.io/paulmisc/reference/geom_epicurve.md)
+function:
+
+``` r
+
+ggplot(cases, aes(x = onset_date, fill = age_group)) +
+  geom_epicurve() +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Static Epidemic Curve",
+    x = "Date of Onset",
+    y = "Number of Cases"
+  ) +
+  theme_minimal()
+```
+
+![](interactive-epicurves_files/figure-html/static-plot-1.png)
+
+The static version using
+[`geom_epicurve()`](https://prcleary.github.io/paulmisc/reference/geom_epicurve.md)
+provides precise control over spacing and alignment that works perfectly
+for printed reports and publications.
 
 ## More Information
 

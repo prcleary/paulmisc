@@ -112,7 +112,13 @@ ggplot2 scale, theme, facet, or coordinate system.
 
 - `fill`, `colour`, `alpha`, `linewidth`, `linetype`, `group`.
 
-- `text` — tooltip text for interactive plotly conversion.
+## Interactive Visualisation
+
+This custom geom is not compatible with
+[`plotly::ggplotly()`](https://rdrr.io/pkg/plotly/man/ggplotly.html)
+conversion. For interactive epidemic curves with tooltips, see the
+"Interactive Epidemic Curves with Plotly" vignette:
+[`vignette("interactive-epicurves", package = "paulmisc")`](https://prcleary.github.io/paulmisc/articles/interactive-epicurves.md).
 
 ## See also
 
