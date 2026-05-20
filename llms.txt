@@ -46,8 +46,7 @@ remotes::install_github('prcleary/paulmisc')
 
 ``` r
 
-# Load package from source for rendering
-devtools::load_all()
+library(paulmisc)
 library(ggplot2)
 ```
 
@@ -228,8 +227,8 @@ Clone the repository and install development dependencies:
 # Install development packages
 install.packages(c("devtools", "testthat", "roxygen2", "pkgdown"))
 
-# Load the package for development
-devtools::load_all()
+# Load the package
+library(paulmisc)
 ```
 
 ### Testing
@@ -283,8 +282,8 @@ devtools::build()
 # Install from local source
 devtools::install()
 
-# Build and reload in current session
-devtools::load_all()
+# Or load with library
+library(paulmisc)
 ```
 
 ### Website
