@@ -60,12 +60,45 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<div class="section level3">
+<h3 id="system-dependencies-linux">System Dependencies (Linux)<a class="anchor" aria-label="anchor" href="#system-dependencies-linux"></a>
+</h3>
+<p>On Linux, you may need to install system libraries required by ggplot2 and other dependencies:</p>
+<p><strong>Debian/Ubuntu:</strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  libcurl4-openssl-dev <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  libssl-dev <span class="dt">\</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  libxml2-dev <span class="dt">\</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  libfontconfig1-dev <span class="dt">\</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  libharfbuzz-dev <span class="dt">\</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  libfribidi-dev <span class="dt">\</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  libfreetype6-dev <span class="dt">\</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  libpng-dev <span class="dt">\</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  libtiff5-dev <span class="dt">\</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  libjpeg-dev</span></code></pre></div>
+<p><strong>RHEL/Fedora/Rocky Linux:</strong></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">sudo</span> dnf install <span class="at">-y</span> <span class="dt">\</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  libcurl-devel <span class="dt">\</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  openssl-devel <span class="dt">\</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  libxml2-devel <span class="dt">\</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  fontconfig-devel <span class="dt">\</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  harfbuzz-devel <span class="dt">\</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  fribidi-devel <span class="dt">\</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  freetype-devel <span class="dt">\</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  libpng-devel <span class="dt">\</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  libtiff-devel <span class="dt">\</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  libjpeg-turbo-devel</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="r-package-installation">R Package Installation<a class="anchor" aria-label="anchor" href="#r-package-installation"></a>
+</h3>
 <p>Install the development version from GitHub:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install remotes if you don't have it</span></span>
 <span><span class="co"># install.packages("remotes")</span></span>
 <span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'prcleary/paulmisc'</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
@@ -103,7 +136,7 @@
 <div class="section level3">
 <h3 id="epidemiological-visualisation">Epidemiological Visualisation<a class="anchor" aria-label="anchor" href="#epidemiological-visualisation"></a>
 </h3>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://prcleary.github.io/paulmisc/">paulmisc</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -111,7 +144,7 @@
 <h3 id="basic-epidemic-curve">Basic Epidemic Curve<a class="anchor" aria-label="anchor" href="#basic-epidemic-curve"></a>
 </h3>
 <p>Create a simple epidemic curve from simulated outbreak data:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Simulate a point-source outbreak</span></span>
 <span><span class="va">cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span></span>
@@ -130,7 +163,7 @@
 <h3 id="coloured-by-category">Coloured by Category<a class="anchor" aria-label="anchor" href="#coloured-by-category"></a>
 </h3>
 <p>Visualise cases by demographic or clinical characteristics:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Colour by age group</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span>, fill <span class="op">=</span> <span class="va">age_group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"grey20"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -148,7 +181,7 @@
 <h3 id="faceted-analysis">Faceted Analysis<a class="anchor" aria-label="anchor" href="#faceted-analysis"></a>
 </h3>
 <p>Compare outbreaks across different settings or groups:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Facet by setting and colour by outcome</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span>, fill <span class="op">=</span> <span class="va">outcome</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>height <span class="op">=</span> <span class="fl">0.85</span><span class="op">)</span> <span class="op">+</span></span>
@@ -169,7 +202,7 @@
 <h3 id="custom-incubation-periods">Custom Incubation Periods<a class="anchor" aria-label="anchor" href="#custom-incubation-periods"></a>
 </h3>
 <p>Simulate outbreaks with different epidemiological characteristics:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Short incubation period (e.g., food poisoning)</span></span>
 <span><span class="va">short_incubation</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span></span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
@@ -208,7 +241,7 @@
 <h3 id="advanced-customisation">Advanced Customisation<a class="anchor" aria-label="anchor" href="#advanced-customisation"></a>
 </h3>
 <p>Fine-tune the appearance of individual case squares:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Adjust spacing and size</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span>, fill <span class="op">=</span> <span class="va">sex</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span></span>
@@ -230,7 +263,7 @@
 <h3 id="redshift-sql-query-builder">Redshift SQL Query Builder<a class="anchor" aria-label="anchor" href="#redshift-sql-query-builder"></a>
 </h3>
 <p>Launch the interactive Shiny app for building SQL queries:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Launch the Redshift SQL Query Builder Shiny app</span></span>
 <span><span class="fu"><a href="reference/run_redshift_query_builder.html">run_redshift_query_builder</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The app provides a user-friendly interface for:</p>
@@ -260,7 +293,7 @@
 <h3 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
 </h3>
 <p>Clone the repository and install development dependencies:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install development packages</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"devtools"</span>, <span class="st">"testthat"</span>, <span class="st">"roxygen2"</span>, <span class="st">"pkgdown"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -271,7 +304,7 @@
 <h3 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a>
 </h3>
 <p>Run the test suite to ensure everything works correctly:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run all tests</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">test</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -282,7 +315,7 @@
 <h3 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h3>
 <p>Update documentation after modifying roxygen comments:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Generate documentation from roxygen comments</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">document</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -293,7 +326,7 @@
 <h3 id="package-checks">Package Checks<a class="anchor" aria-label="anchor" href="#package-checks"></a>
 </h3>
 <p>Run R CMD check to ensure the package meets CRAN standards:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run comprehensive package checks</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">check</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -304,7 +337,7 @@
 <h3 id="building-the-package">Building the Package<a class="anchor" aria-label="anchor" href="#building-the-package"></a>
 </h3>
 <p>Build and install the package locally:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Build source package</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/build.html" class="external-link">build</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -318,7 +351,7 @@
 <h3 id="website">Website<a class="anchor" aria-label="anchor" href="#website"></a>
 </h3>
 <p>This package uses pkgdown for documentation website generation:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Build the website</span></span>
 <span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">build_site</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
