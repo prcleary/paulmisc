@@ -8,6 +8,9 @@ on:
 
 name: render-readme
 
+permissions:
+  contents: write
+
 jobs:
   render-readme:
     runs-on: ubuntu-latest
