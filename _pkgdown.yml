@@ -35,3 +35,9 @@ reference:
     contents:
       - run_redshift_query_builder
 
+articles:
+  - title: "Interactive Visualisation"
+    navbar: ~
+    contents:
+      - interactive-epicurves
+

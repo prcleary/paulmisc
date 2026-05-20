@@ -267,6 +267,9 @@ ggplotly(p, tooltip = "text")
 Users can hover over individual case squares to see detailed information. The
 `text` aesthetic allows complete control over tooltip content and formatting.
 
+**See the [Interactive Epidemic Curves with Plotly](https://prcleary.github.io/paulmisc/articles/interactive-epicurves.html) article for live interactive examples you can try in your browser!**
+
+
 ### Redshift SQL Query Builder
 
 Launch the interactive Shiny app for building SQL queries:

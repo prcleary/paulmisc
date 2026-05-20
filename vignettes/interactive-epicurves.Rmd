@@ -1,0 +1,155 @@
+---
+title: "Interactive Epidemic Curves with Plotly"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Interactive Epidemic Curves with Plotly}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+## Overview
+
+The `geom_epicurve()` function can be combined with [plotly](https://plotly.com/r/) to create interactive epidemic curves with custom tooltips. This allows users to hover over individual case squares to see detailed information.
+
+## Basic Interactive Example
+
+```{r setup}
+library(paulmisc)
+library(ggplot2)
+library(plotly)
+
+# Generate example outbreak data
+cases <- simulate_outbreak(n = 50, seed = 123)
+```
+
+First, let's create a basic interactive epidemic curve:
+
+```{r basic-interactive, message=FALSE}
+# Add custom tooltip text to the data
+cases$tooltip <- paste0(
+  "Case ID: ", cases$case_id, "\n",
+  "Date: ", cases$onset_date, "\n",
+  "Age: ", cases$age_group, "\n",
+  "Sex: ", cases$sex
+)
+
+# Create plot with text aesthetic for tooltips
+p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
+  geom_epicurve(fill = "steelblue") +
+  labs(
+    title = "Interactive Epidemic Curve",
+    x = "Date of Onset",
+    y = "Number of Cases"
+  ) +
+  theme_minimal()
+
+# Convert to interactive plotly plot
+ggplotly(p, tooltip = "text")
+```
+
+Hover over any square to see the details for that individual case!
+
+## Interactive by Age Group
+
+Now let's colour by age group and customise the tooltips further:
+
+```{r by-age-group, message=FALSE}
+# Enhanced tooltip with more detail
+cases$tooltip <- paste0(
+  "<b>Case ", cases$case_id, "</b>\n",
+  "Date: ", format(cases$onset_date, "%d %B %Y"), "\n",
+  "Age Group: ", cases$age_group, "\n",
+  "Sex: ", cases$sex, "\n",
+  "Setting: ", cases$setting, "\n",
+  "Outcome: ", cases$outcome
+)
+
+# Create plot with fill by age group
+p <- ggplot(cases, aes(x = onset_date, fill = age_group, text = tooltip)) +
+  geom_epicurve() +
+  scale_fill_brewer(palette = "Set2", name = "Age Group") +
+  labs(
+    title = "Interactive Epidemic Curve by Age Group",
+    x = "Date of Onset",
+    y = "Number of Cases"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Convert to interactive
+ggplotly(p, tooltip = "text")
+```
+
+## Interactive Faceted Plot
+
+Interactive plots work with faceting too:
+
+```{r faceted, message=FALSE, fig.height=6}
+# Create faceted plot
+p <- ggplot(cases, aes(x = onset_date, fill = sex, text = tooltip)) +
+  geom_epicurve() +
+  scale_fill_manual(
+    values = c("Male" = "#0072B2", "Female" = "#D55E00"),
+    name = "Sex"
+  ) +
+  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
+  labs(
+    title = "Interactive Epidemic Curves by Setting",
+    x = "Date of Onset",
+    y = "Number of Cases"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Convert to interactive
+ggplotly(p, tooltip = "text")
+```
+
+## Customising Tooltip Content
+
+The `text` aesthetic gives you complete control over tooltip content. You can include any information from your data and format it however you like:
+
+```{r custom-tooltips, message=FALSE}
+# Create highly customised tooltips with HTML formatting
+cases$tooltip <- with(cases, paste0(
+  "<b style='font-size:14px'>Case ", case_id, "</b><br>",
+  "<hr style='margin:2px'>",
+  "<i>Date:</i> ", format(onset_date, "%d %B %Y"), "<br>",
+  "<i>Demographics:</i> ", age_group, ", ", sex, "<br>",
+  "<i>Setting:</i> ", setting, "<br>",
+  "<i>Outcome:</i> ", outcome
+))
+
+p <- ggplot(cases, aes(x = onset_date, fill = outcome, text = tooltip)) +
+  geom_epicurve() +
+  scale_fill_brewer(palette = "Pastel1", name = "Outcome") +
+  labs(
+    title = "Interactive Epidemic Curve by Outcome",
+    x = "Date of Onset",
+    y = "Number of Cases"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+ggplotly(p, tooltip = "text")
+```
+
+## Tips for Interactive Visualisation
+
+- **Performance**: Interactive plots with many cases (>500) may be slow. Consider aggregating or filtering for large datasets.
+- **Tooltip formatting**: Use `\n` for line breaks in plain text, or HTML tags (`<br>`, `<b>`, `<i>`) for richer formatting.
+- **Mobile devices**: Interactive features work on touch devices - tap to see tooltips.
+- **Export**: Use plotly's built-in export button to save static images of your interactive plots.
+
+## More Information
+
+For more details on plotly customisation, see the [plotly for R documentation](https://plotly-r.com/).
