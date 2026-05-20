@@ -25,10 +25,11 @@ geom_epicurve(
 stat_epicurve(
   mapping = NULL,
   data = NULL,
-  geom = "epicurve",
+  geom = "rect",
   position = "identity",
   ...,
   width = 0.9,
+  height = 0.9,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -114,11 +115,22 @@ ggplot2 scale, theme, facet, or coordinate system.
 
 ## Interactive Visualisation
 
-This custom geom is not compatible with
-[`plotly::ggplotly()`](https://rdrr.io/pkg/plotly/man/ggplotly.html)
-conversion. For interactive epidemic curves with tooltips, see the
-"Interactive Epidemic Curves with Plotly" vignette:
-[`vignette("interactive-epicurves", package = "paulmisc")`](https://prcleary.github.io/paulmisc/articles/interactive-epicurves.md).
+Convert to interactive plotly plots using
+[`plotly::ggplotly()`](https://rdrr.io/pkg/plotly/man/ggplotly.html):
+
+    library(plotly)
+    p <- ggplot(cases, aes(x = onset_date, fill = age_group)) +
+      geom_epicurve() +
+      theme_minimal()
+    ggplotly(p)
+
+For custom tooltips, add a `text` aesthetic and use the `tooltip`
+parameter:
+
+    cases$tooltip <- paste("Case ID:", cases$case_id)
+    p <- ggplot(cases, aes(x = onset_date, fill = age_group, text = tooltip)) +
+      geom_epicurve()
+    ggplotly(p, tooltip = "text")
 
 ## See also
 
@@ -144,5 +156,6 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
   facet_wrap(~ setting, ncol = 1) +
   scale_fill_brewer(palette = "Set2") +
   theme_bw()
+#> Warning: Duplicated aesthetics after name standardisation: colour
 
 ```

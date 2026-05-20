@@ -17,7 +17,7 @@ and other dependencies:
 
 **Debian/Ubuntu:**
 
-``` bash
+``` R
 sudo apt-get install -y \
   libcurl4-openssl-dev \
   libssl-dev \
@@ -33,7 +33,7 @@ sudo apt-get install -y \
 
 **RHEL/Fedora/Rocky Linux:**
 
-``` bash
+``` R
 sudo dnf install -y \
   libcurl-devel \
   openssl-devel \
@@ -51,8 +51,7 @@ sudo dnf install -y \
 
 Install the development version from GitHub:
 
-``` r
-
+``` R
 # Install remotes if you don't have it
 # install.packages("remotes")
 
@@ -85,8 +84,7 @@ remotes::install_github('prcleary/paulmisc')
 
 ### Epidemiological Visualisation
 
-``` r
-
+``` R
 library(paulmisc)
 library(ggplot2)
 ```
@@ -95,8 +93,7 @@ library(ggplot2)
 
 Create a simple epidemic curve from simulated outbreak data:
 
-``` r
-
+``` R
 # Simulate a point-source outbreak
 cases <- simulate_outbreak(n = 50, seed = 42)
 
@@ -117,8 +114,7 @@ ggplot(cases, aes(x = onset_date)) +
 
 Visualise cases by demographic or clinical characteristics:
 
-``` r
-
+``` R
 # Colour by age group
 ggplot(cases, aes(x = onset_date, fill = age_group)) +
   geom_epicurve(colour = "grey20") +
@@ -138,8 +134,7 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
 
 Compare outbreaks across different settings or groups:
 
-``` r
-
+``` R
 # Facet by setting and colour by outcome
 ggplot(cases, aes(x = onset_date, fill = outcome)) +
   geom_epicurve(height = 0.85) +
@@ -165,8 +160,7 @@ adjusting the incubation period parameters. The `meanlog` parameter
 controls the median incubation period (median = `exp(meanlog)` days),
 while `sdlog` controls the spread around that median:
 
-``` r
-
+``` R
 # Short incubation period (e.g., Salmonella, norovirus)
 # Median incubation: exp(0.5) ≈ 1.6 days
 short_incubation <- simulate_outbreak(
@@ -209,8 +203,7 @@ p1 / p2
 
 Fine-tune the appearance of individual case squares:
 
-``` r
-
+``` R
 # Adjust spacing and size
 ggplot(cases, aes(x = onset_date, fill = sex)) +
   geom_epicurve(
@@ -232,18 +225,18 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
 
 ### Interactive Plotly Visualisation
 
-Create interactive epidemic curves with custom tooltips using `plotly`:
+Create interactive epidemic curves with custom tooltips using
+[`plotly::ggplotly()`](https://rdrr.io/pkg/plotly/man/ggplotly.html):
 
-``` r
-
+``` R
 library(plotly)
 
 # Add custom tooltip text to the data
 cases$tooltip <- paste0(
-  "Case ID: ", cases$case_id, "\n",
-  "Date: ", cases$onset_date, "\n",
-  "Age: ", cases$age_group, "\n",
-  "Sex: ", cases$sex, "\n",
+  "Case ID: ", cases$case_id, "<br>",
+  "Date: ", cases$onset_date, "<br>",
+  "Age: ", cases$age_group, "<br>",
+  "Sex: ", cases$sex, "<br>",
   "Setting: ", cases$setting
 )
 
@@ -263,8 +256,7 @@ ggplotly(p, tooltip = "text")
 ```
 
 Users can hover over individual case squares to see detailed
-information. The `text` aesthetic allows complete control over tooltip
-content and formatting.
+information.
 
 **See the [Interactive Epidemic Curves with
 Plotly](https://prcleary.github.io/paulmisc/articles/interactive-epicurves.html)
@@ -274,8 +266,7 @@ article for live interactive examples you can try in your browser!**
 
 Launch the interactive Shiny app for building SQL queries:
 
-``` r
-
+``` R
 # Launch the Redshift SQL Query Builder Shiny app
 run_redshift_query_builder()
 ```
@@ -307,8 +298,7 @@ tips for common functions and patterns.
 
 Clone the repository and install development dependencies:
 
-``` r
-
+``` R
 # Install development packages
 install.packages(c("devtools", "testthat", "roxygen2", "pkgdown"))
 
@@ -320,8 +310,7 @@ library(paulmisc)
 
 Run the test suite to ensure everything works correctly:
 
-``` r
-
+``` R
 # Run all tests
 devtools::test()
 
@@ -333,8 +322,7 @@ covr::package_coverage()
 
 Update documentation after modifying roxygen comments:
 
-``` r
-
+``` R
 # Generate documentation from roxygen comments
 devtools::document()
 
@@ -346,8 +334,7 @@ devtools::document()
 
 Run R CMD check to ensure the package meets CRAN standards:
 
-``` r
-
+``` R
 # Run comprehensive package checks
 devtools::check()
 
@@ -359,8 +346,7 @@ goodpractice::gp()
 
 Build and install the package locally:
 
-``` r
-
+``` R
 # Build source package
 devtools::build()
 
@@ -375,8 +361,7 @@ library(paulmisc)
 
 This package uses pkgdown for documentation website generation:
 
-``` r
-
+``` R
 # Build the website
 pkgdown::build_site()
 

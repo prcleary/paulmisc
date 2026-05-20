@@ -71,39 +71,38 @@
 </h3>
 <p>On Linux, you may need to install system libraries required by ggplot2 and other dependencies:</p>
 <p><strong>Debian/Ubuntu:</strong></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> <span class="dt">\</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  libcurl4-openssl-dev <span class="dt">\</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  libssl-dev <span class="dt">\</span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  libxml2-dev <span class="dt">\</span></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  libfontconfig1-dev <span class="dt">\</span></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  libharfbuzz-dev <span class="dt">\</span></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  libfribidi-dev <span class="dt">\</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  libfreetype6-dev <span class="dt">\</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  libpng-dev <span class="dt">\</span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  libtiff5-dev <span class="dt">\</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  libjpeg-dev</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>sudo apt<span class="sc">-</span>get install <span class="sc">-</span>y \</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  libcurl4<span class="sc">-</span>openssl<span class="sc">-</span>dev \</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  libssl<span class="sc">-</span>dev \</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  libxml2<span class="sc">-</span>dev \</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  libfontconfig1<span class="sc">-</span>dev \</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  libharfbuzz<span class="sc">-</span>dev \</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  libfribidi<span class="sc">-</span>dev \</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  libfreetype6<span class="sc">-</span>dev \</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  libpng<span class="sc">-</span>dev \</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  libtiff5<span class="sc">-</span>dev \</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  libjpeg<span class="sc">-</span>dev</span></code></pre></div>
 <p><strong>RHEL/Fedora/Rocky Linux:</strong></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">sudo</span> dnf install <span class="at">-y</span> <span class="dt">\</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  libcurl-devel <span class="dt">\</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  openssl-devel <span class="dt">\</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  libxml2-devel <span class="dt">\</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  fontconfig-devel <span class="dt">\</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  harfbuzz-devel <span class="dt">\</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  fribidi-devel <span class="dt">\</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  freetype-devel <span class="dt">\</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  libpng-devel <span class="dt">\</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  libtiff-devel <span class="dt">\</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  libjpeg-turbo-devel</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>sudo dnf install <span class="sc">-</span>y \</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  libcurl<span class="sc">-</span>devel \</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  openssl<span class="sc">-</span>devel \</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  libxml2<span class="sc">-</span>devel \</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  fontconfig<span class="sc">-</span>devel \</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  harfbuzz<span class="sc">-</span>devel \</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  fribidi<span class="sc">-</span>devel \</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  freetype<span class="sc">-</span>devel \</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  libpng<span class="sc">-</span>devel \</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  libtiff<span class="sc">-</span>devel \</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  libjpeg<span class="sc">-</span>turbo<span class="sc">-</span>devel</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="r-package-installation">R Package Installation<a class="anchor" aria-label="anchor" href="#r-package-installation"></a>
 </h3>
 <p>Install the development version from GitHub:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install remotes if you don't have it</span></span>
-<span><span class="co"># install.packages("remotes")</span></span>
-<span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'prcleary/paulmisc'</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Install remotes if you don't have it</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co"># install.packages("remotes")</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">'prcleary/paulmisc'</span>)</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -142,170 +141,162 @@
 <div class="section level3">
 <h3 id="epidemiological-visualisation">Epidemiological Visualisation<a class="anchor" aria-label="anchor" href="#epidemiological-visualisation"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://prcleary.github.io/paulmisc/">paulmisc</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">library</span>(paulmisc)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="basic-epidemic-curve">Basic Epidemic Curve<a class="anchor" aria-label="anchor" href="#basic-epidemic-curve"></a>
 </h3>
 <p>Create a simple epidemic curve from simulated outbreak data:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Simulate a point-source outbreak</span></span>
-<span><span class="va">cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create basic epicurve</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
-<span>    title <span class="op">=</span> <span class="st">"Outbreak Epicurve"</span>,</span>
-<span>    x <span class="op">=</span> <span class="st">"Date of Onset"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"Number of Cases"</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Simulate a point-source outbreak</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>cases <span class="ot">&lt;-</span> <span class="fu">simulate_outbreak</span>(<span class="at">n =</span> <span class="dv">50</span>, <span class="at">seed =</span> <span class="dv">42</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Create basic epicurve</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="fu">ggplot</span>(cases, <span class="fu">aes</span>(<span class="at">x =</span> onset_date)) <span class="sc">+</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="fu">geom_epicurve</span>() <span class="sc">+</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Outbreak Epicurve"</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date of Onset"</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Cases"</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div>
 <p><img src="reference/figures/README-basic-epicurve-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="coloured-by-category">Coloured by Category<a class="anchor" aria-label="anchor" href="#coloured-by-category"></a>
 </h3>
 <p>Visualise cases by demographic or clinical characteristics:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Colour by age group</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span>, fill <span class="op">=</span> <span class="va">age_group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"grey20"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set2"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
-<span>    title <span class="op">=</span> <span class="st">"Cases by Age Group"</span>,</span>
-<span>    x <span class="op">=</span> <span class="st">"Date of Onset"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"Number of Cases"</span>,</span>
-<span>    fill <span class="op">=</span> <span class="st">"Age Group"</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Colour by age group</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">ggplot</span>(cases, <span class="fu">aes</span>(<span class="at">x =</span> onset_date, <span class="at">fill =</span> age_group)) <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="fu">geom_epicurve</span>(<span class="at">colour =</span> <span class="st">"grey20"</span>) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Set2"</span>) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Cases by Age Group"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date of Onset"</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Cases"</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Age Group"</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code></pre></div>
 <p><img src="reference/figures/README-coloured-epicurve-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="faceted-analysis">Faceted Analysis<a class="anchor" aria-label="anchor" href="#faceted-analysis"></a>
 </h3>
 <p>Compare outbreaks across different settings or groups:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Facet by setting and colour by outcome</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span>, fill <span class="op">=</span> <span class="va">outcome</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>height <span class="op">=</span> <span class="fl">0.85</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">setting</span>, ncol <span class="op">=</span> <span class="fl">1</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span></span>
-<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Recovered"</span> <span class="op">=</span> <span class="st">"steelblue"</span>, <span class="st">"Hospitalised"</span> <span class="op">=</span> <span class="st">"tomato"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
-<span>    title <span class="op">=</span> <span class="st">"Outbreak Comparison by Setting"</span>,</span>
-<span>    x <span class="op">=</span> <span class="st">"Date of Onset"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"Number of Cases"</span>,</span>
-<span>    fill <span class="op">=</span> <span class="st">"Outcome"</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Facet by setting and colour by outcome</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">ggplot</span>(cases, <span class="fu">aes</span>(<span class="at">x =</span> onset_date, <span class="at">fill =</span> outcome)) <span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="fu">geom_epicurve</span>(<span class="at">height =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> setting, <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Recovered"</span> <span class="ot">=</span> <span class="st">"steelblue"</span>, <span class="st">"Hospitalised"</span> <span class="ot">=</span> <span class="st">"tomato"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Outbreak Comparison by Setting"</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date of Onset"</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Cases"</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Outcome"</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div>
 <p><img src="reference/figures/README-faceted-epicurve-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="custom-incubation-periods">Custom Incubation Periods<a class="anchor" aria-label="anchor" href="#custom-incubation-periods"></a>
 </h3>
 <p>Simulate outbreaks with different epidemiological characteristics by adjusting the incubation period parameters. The <code>meanlog</code> parameter controls the median incubation period (median = <code>exp(meanlog)</code> days), while <code>sdlog</code> controls the spread around that median:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Short incubation period (e.g., Salmonella, norovirus)</span></span>
-<span><span class="co"># Median incubation: exp(0.5) ≈ 1.6 days</span></span>
-<span><span class="va">short_incubation</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span></span>
-<span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  exposure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2024-08-15"</span><span class="op">)</span>,</span>
-<span>  meanlog <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  sdlog <span class="op">=</span> <span class="fl">0.3</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">123</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Long incubation period (e.g., Hepatitis A)</span></span>
-<span><span class="co"># Median incubation: exp(3) ≈ 20 days</span></span>
-<span><span class="va">long_incubation</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span></span>
-<span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  exposure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2024-08-15"</span><span class="op">)</span>,</span>
-<span>  meanlog <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>  sdlog <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">123</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Compare side by side</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">short_incubation</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"coral"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Short Incubation"</span>, x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"Cases"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">long_incubation</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"skyblue"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Long Incubation"</span>, x <span class="op">=</span> <span class="st">"Date of Onset"</span>, y <span class="op">=</span> <span class="st">"Cases"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">p1</span> <span class="op">/</span> <span class="va">p2</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Short incubation period (e.g., Salmonella, norovirus)</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co"># Median incubation: exp(0.5) ≈ 1.6 days</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>short_incubation <span class="ot">&lt;-</span> <span class="fu">simulate_outbreak</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">n =</span> <span class="dv">100</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="at">exposure =</span> <span class="fu">as.Date</span>(<span class="st">"2024-08-15"</span>),</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="at">meanlog =</span> <span class="fl">0.5</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="at">sdlog =</span> <span class="fl">0.3</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>)</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co"># Long incubation period (e.g., Hepatitis A)</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co"># Median incubation: exp(3) ≈ 20 days</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>long_incubation <span class="ot">&lt;-</span> <span class="fu">simulate_outbreak</span>(</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  <span class="at">n =</span> <span class="dv">100</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  <span class="at">exposure =</span> <span class="fu">as.Date</span>(<span class="st">"2024-08-15"</span>),</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>  <span class="at">meanlog =</span> <span class="dv">3</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>  <span class="at">sdlog =</span> <span class="fl">0.5</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>)</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="co"># Compare side by side</span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(short_incubation, <span class="fu">aes</span>(<span class="at">x =</span> onset_date)) <span class="sc">+</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a>  <span class="fu">geom_epicurve</span>(<span class="at">fill =</span> <span class="st">"coral"</span>) <span class="sc">+</span></span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Short Incubation"</span>, <span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Cases"</span>) <span class="sc">+</span></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a></span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(long_incubation, <span class="fu">aes</span>(<span class="at">x =</span> onset_date)) <span class="sc">+</span></span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a>  <span class="fu">geom_epicurve</span>(<span class="at">fill =</span> <span class="st">"skyblue"</span>) <span class="sc">+</span></span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Long Incubation"</span>, <span class="at">x =</span> <span class="st">"Date of Onset"</span>, <span class="at">y =</span> <span class="st">"Cases"</span>) <span class="sc">+</span></span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a></span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a>p1 <span class="sc">/</span> p2</span></code></pre></div>
 <p><img src="reference/figures/README-incubation-comparison-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="advanced-customisation">Advanced Customisation<a class="anchor" aria-label="anchor" href="#advanced-customisation"></a>
 </h3>
 <p>Fine-tune the appearance of individual case squares:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Adjust spacing and size</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span>, fill <span class="op">=</span> <span class="va">sex</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span></span>
-<span>    width <span class="op">=</span> <span class="fl">0.8</span>,   <span class="co"># Horizontal spacing (0-1)</span></span>
-<span>    height <span class="op">=</span> <span class="fl">0.95</span>, <span class="co"># Vertical spacing (0-1, higher = less gap)</span></span>
-<span>    colour <span class="op">=</span> <span class="st">"white"</span>,</span>
-<span>    linewidth <span class="op">=</span> <span class="fl">0.2</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Male"</span> <span class="op">=</span> <span class="st">"#0072B2"</span>, <span class="st">"Female"</span> <span class="op">=</span> <span class="st">"#D55E00"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
-<span>    title <span class="op">=</span> <span class="st">"Cases by Sex with Custom Styling"</span>,</span>
-<span>    x <span class="op">=</span> <span class="st">"Date of Onset"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"Number of Cases"</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Adjust spacing and size</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">ggplot</span>(cases, <span class="fu">aes</span>(<span class="at">x =</span> onset_date, <span class="at">fill =</span> sex)) <span class="sc">+</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">geom_epicurve</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>    <span class="at">width =</span> <span class="fl">0.8</span>,   <span class="co"># Horizontal spacing (0-1)</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>    <span class="at">height =</span> <span class="fl">0.95</span>, <span class="co"># Vertical spacing (0-1, higher = less gap)</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"white"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="fl">0.2</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Male"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>, <span class="st">"Female"</span> <span class="ot">=</span> <span class="st">"#D55E00"</span>)) <span class="sc">+</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Cases by Sex with Custom Styling"</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date of Onset"</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Cases"</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div>
 <p><img src="reference/figures/README-advanced-styling-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="interactive-plotly-visualisation">Interactive Plotly Visualisation<a class="anchor" aria-label="anchor" href="#interactive-plotly-visualisation"></a>
 </h3>
-<p>Create interactive epidemic curves with custom tooltips using <code>plotly</code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://plotly-r.com" class="external-link">plotly</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Add custom tooltip text to the data</span></span>
-<span><span class="va">cases</span><span class="op">$</span><span class="va">tooltip</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>  <span class="st">"Case ID: "</span>, <span class="va">cases</span><span class="op">$</span><span class="va">case_id</span>, <span class="st">"\n"</span>,</span>
-<span>  <span class="st">"Date: "</span>, <span class="va">cases</span><span class="op">$</span><span class="va">onset_date</span>, <span class="st">"\n"</span>,</span>
-<span>  <span class="st">"Age: "</span>, <span class="va">cases</span><span class="op">$</span><span class="va">age_group</span>, <span class="st">"\n"</span>,</span>
-<span>  <span class="st">"Sex: "</span>, <span class="va">cases</span><span class="op">$</span><span class="va">sex</span>, <span class="st">"\n"</span>,</span>
-<span>  <span class="st">"Setting: "</span>, <span class="va">cases</span><span class="op">$</span><span class="va">setting</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create plot with text aesthetic for tooltips</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span>, fill <span class="op">=</span> <span class="va">age_group</span>, text <span class="op">=</span> <span class="va">tooltip</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set2"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
-<span>    title <span class="op">=</span> <span class="st">"Interactive Epidemic Curve"</span>,</span>
-<span>    x <span class="op">=</span> <span class="st">"Date of Onset"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"Number of Cases"</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Convert to interactive plotly plot</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html" class="external-link">ggplotly</a></span><span class="op">(</span><span class="va">p</span>, tooltip <span class="op">=</span> <span class="st">"text"</span><span class="op">)</span></span></code></pre></div>
-<p>Users can hover over individual case squares to see detailed information. The <code>text</code> aesthetic allows complete control over tooltip content and formatting.</p>
+<p>Create interactive epidemic curves with custom tooltips using <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html" class="external-link">plotly::ggplotly()</a></code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">library</span>(plotly)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co"># Add custom tooltip text to the data</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>cases<span class="sc">$</span>tooltip <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="st">"Case ID: "</span>, cases<span class="sc">$</span>case_id, <span class="st">"&lt;br&gt;"</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="st">"Date: "</span>, cases<span class="sc">$</span>onset_date, <span class="st">"&lt;br&gt;"</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  <span class="st">"Age: "</span>, cases<span class="sc">$</span>age_group, <span class="st">"&lt;br&gt;"</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="st">"Sex: "</span>, cases<span class="sc">$</span>sex, <span class="st">"&lt;br&gt;"</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>  <span class="st">"Setting: "</span>, cases<span class="sc">$</span>setting</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>)</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co"># Create plot with text aesthetic for tooltips</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(cases, <span class="fu">aes</span>(<span class="at">x =</span> onset_date, <span class="at">fill =</span> age_group, <span class="at">text =</span> tooltip)) <span class="sc">+</span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>  <span class="fu">geom_epicurve</span>() <span class="sc">+</span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Set2"</span>) <span class="sc">+</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Interactive Epidemic Curve"</span>,</span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date of Onset"</span>,</span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Cases"</span></span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a></span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a><span class="co"># Convert to interactive plotly plot</span></span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a><span class="fu">ggplotly</span>(p, <span class="at">tooltip =</span> <span class="st">"text"</span>)</span></code></pre></div>
+<p>Users can hover over individual case squares to see detailed information.</p>
 <p><strong>See the <a href="https://prcleary.github.io/paulmisc/articles/interactive-epicurves.html">Interactive Epidemic Curves with Plotly</a> article for live interactive examples you can try in your browser!</strong></p>
 </div>
 <div class="section level3">
 <h3 id="redshift-sql-query-builder">Redshift SQL Query Builder<a class="anchor" aria-label="anchor" href="#redshift-sql-query-builder"></a>
 </h3>
 <p>Launch the interactive Shiny app for building SQL queries:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Launch the Redshift SQL Query Builder Shiny app</span></span>
-<span><span class="fu"><a href="reference/run_redshift_query_builder.html">run_redshift_query_builder</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># Launch the Redshift SQL Query Builder Shiny app</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="fu">run_redshift_query_builder</span>()</span></code></pre></div>
 <p>The app provides a user-friendly interface for:</p>
 <ul>
 <li>
@@ -333,70 +324,64 @@
 <h3 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
 </h3>
 <p>Clone the repository and install development dependencies:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install development packages</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"devtools"</span>, <span class="st">"testthat"</span>, <span class="st">"roxygen2"</span>, <span class="st">"pkgdown"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Load the package</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://prcleary.github.io/paulmisc/">paulmisc</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Install development packages</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">"devtools"</span>, <span class="st">"testthat"</span>, <span class="st">"roxygen2"</span>, <span class="st">"pkgdown"</span>))</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co"># Load the package</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="fu">library</span>(paulmisc)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a>
 </h3>
 <p>Run the test suite to ensure everything works correctly:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Run all tests</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">test</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Run tests with coverage report</span></span>
-<span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Run all tests</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">test</span>()</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co"># Run tests with coverage report</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>covr<span class="sc">::</span><span class="fu">package_coverage</span>()</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h3>
 <p>Update documentation after modifying roxygen comments:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Generate documentation from roxygen comments</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">document</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Preview documentation for a function</span></span>
-<span><span class="op">?</span><span class="va">geom_epicurve</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Generate documentation from roxygen comments</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">document</span>()</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co"># Preview documentation for a function</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>?geom_epicurve</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="package-checks">Package Checks<a class="anchor" aria-label="anchor" href="#package-checks"></a>
 </h3>
 <p>Run R CMD check to ensure the package meets CRAN standards:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Run comprehensive package checks</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">check</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Check for common issues</span></span>
-<span><span class="fu">goodpractice</span><span class="fu">::</span><span class="fu">gp</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Run comprehensive package checks</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">check</span>()</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co"># Check for common issues</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>goodpractice<span class="sc">::</span><span class="fu">gp</span>()</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="building-the-package">Building the Package<a class="anchor" aria-label="anchor" href="#building-the-package"></a>
 </h3>
 <p>Build and install the package locally:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Build source package</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/build.html" class="external-link">build</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Install from local source</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Or load with library</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://prcleary.github.io/paulmisc/">paulmisc</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Build source package</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build</span>()</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="co"># Install from local source</span></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install</span>()</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co"># Or load with library</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="fu">library</span>(paulmisc)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="website">Website<a class="anchor" aria-label="anchor" href="#website"></a>
 </h3>
 <p>This package uses pkgdown for documentation website generation:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Build the website</span></span>
-<span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">build_site</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Preview locally</span></span>
-<span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/preview_site.html" class="external-link">preview_site</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># Build the website</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">build_site</span>()</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a><span class="co"># Preview locally</span></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">preview_site</span>()</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
