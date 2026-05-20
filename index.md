@@ -69,8 +69,6 @@ ggplot(cases, aes(x = onset_date)) +
     y = "Number of Cases"
   ) +
   theme_minimal()
-#> Warning: Removed 1 row containing missing values or values outside the scale range
-#> (`geom_epicurve()`).
 ```
 
 ![](reference/figures/README-basic-epicurve-1.png)
@@ -92,8 +90,6 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
     fill = "Age Group"
   ) +
   theme_bw()
-#> Warning: Removed 1 row containing missing values or values outside the scale range
-#> (`geom_epicurve()`).
 ```
 
 ![](reference/figures/README-colored-epicurve-1.png)
@@ -119,8 +115,6 @@ ggplot(cases, aes(x = onset_date, fill = outcome)) +
   ) +
   theme_minimal() +
   theme(panel.spacing = unit(1, "lines"))
-#> Warning: Removed 1 row containing missing values or values outside the scale range
-#> (`geom_epicurve()`).
 ```
 
 ![](reference/figures/README-faceted-epicurve-1.png)
@@ -163,10 +157,6 @@ p2 <- ggplot(long_incubation, aes(x = onset_date)) +
   theme_minimal()
 
 p1 / p2
-#> Warning: Removed 1 row containing missing values or values outside the scale range
-#> (`geom_epicurve()`).
-#> Removed 1 row containing missing values or values outside the scale range
-#> (`geom_epicurve()`).
 ```
 
 ![](reference/figures/README-incubation-comparison-1.png)
@@ -192,8 +182,6 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
     y = "Number of Cases"
   ) +
   theme_dark()
-#> Warning: Removed 1 row containing missing values or values outside the scale range
-#> (`geom_epicurve()`).
 ```
 
 ![](reference/figures/README-advanced-styling-1.png)
