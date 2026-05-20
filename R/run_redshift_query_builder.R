@@ -6,9 +6,9 @@
 #' selection, column specifications, WHERE conditions, date filters, GROUP BY,
 #' ORDER BY, and more.
 #'
-#' @param ... Additional arguments passed to [shiny::shinyApp()].
+#' @param ... Additional arguments passed to [shiny::runApp()].
 #'
-#' @return Invisibly returns the result of [shiny::shinyApp()].
+#' @return Invisibly returns the result of [shiny::runApp()].
 #'
 #' @details
 #' The Redshift SQL Query Builder includes:
@@ -32,7 +32,7 @@
 #'   run_redshift_query_builder()
 #' }
 #'
-#' @importFrom shiny shinyApp
+#' @importFrom shiny runApp
 #' @export
 run_redshift_query_builder <- function(...) {
   app_dir <- system.file(
@@ -48,9 +48,5 @@ run_redshift_query_builder <- function(...) {
     )
   }
   
-  shiny::shinyApp(
-    ui = shiny::shinyAppDir(app_dir)$ui,
-    server = shiny::shinyAppDir(app_dir)$server,
-    ...
-  )
+  shiny::runApp(app_dir, ...)
 }

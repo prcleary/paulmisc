@@ -7,10 +7,10 @@
 run_redshift_query_builder(...)
 }
 \arguments{
-\item{...}{Additional arguments passed to \code{\link[shiny:shinyApp]{shiny::shinyApp()}}.}
+\item{...}{Additional arguments passed to \code{\link[shiny:runApp]{shiny::runApp()}}.}
 }
 \value{
-Invisibly returns the result of \code{\link[shiny:shinyApp]{shiny::shinyApp()}}.
+Invisibly returns the result of \code{\link[shiny:runApp]{shiny::runApp()}}.
 }
 \description{
 Launches an interactive Shiny application for building Amazon Redshift SQL
