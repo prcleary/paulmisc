@@ -341,6 +341,10 @@ ggplot(outbreak_cases, aes(x = onset_date)) +
 
 ![](reference/figures/README-annotated-epicurve-1.png)
 
+For interactive plotly timelines, see the [interactive epicurves
+vignette](https://prcleary.github.io/paulmisc/articles/interactive-epicurves.md)
+which shows how to combine ggplot2 layers with plotly annotations.
+
 ### Custom Symbols and Emoji
 
 Replace squares with Unicode symbols or emoji for creative
