@@ -369,24 +369,32 @@ Replace squares with Unicode symbols or emoji for creative
 visualisations:
 
 ``` r
-# Use different symbols
+# Different symbols per category by passing a named vector
 symbol_cases <- simulate_outbreak(n = 35, seed = 999)
 
+sex_symbols <- c(Female = "\u2640", Male = "\u2642")  # ♀ ♂
 p1 <- ggplot(symbol_cases, aes(x = onset_date, colour = sex)) +
-  geom_epicurve(symbol = "●", symbol_size = 6) +
+  geom_epicurve(symbol = sex_symbols, symbol_size = 6) +
   scale_colour_manual(values = c("Female" = "#D55E00", "Male" = "#0072B2")) +
-  guides(colour = guide_legend(override.aes = list(label = "●", size = 6))) +
-  labs(title = "Bullet Symbols (●)", x = NULL, y = "Cases") +
+  guides(colour = guide_legend(override.aes = list(
+    label = sex_symbols, size = 6
+  ))) +
+  labs(title = "Different symbol per sex (\u2640 / \u2642)",
+       x = NULL, y = "Cases") +
   scale_y_epicurve() +
   theme_minimal()
 
+outcome_symbols <- c(Recovered = "\u25CB", Hospitalised = "\u2716")  # ○ ✖
 p2 <- ggplot(symbol_cases, aes(x = onset_date, colour = outcome)) +
-  geom_epicurve(symbol = "■", symbol_size = 5.5) +
+  geom_epicurve(symbol = outcome_symbols, symbol_size = 6) +
   scale_colour_manual(
     values = c("Recovered" = "steelblue", "Hospitalised" = "tomato")
   ) +
-  guides(colour = guide_legend(override.aes = list(label = "■", size = 5))) +
-  labs(title = "Square Symbols (■)", x = "Date of Onset", y = "Cases") +
+  guides(colour = guide_legend(override.aes = list(
+    label = outcome_symbols, size = 6
+  ))) +
+  labs(title = "Different symbol per outcome (\u25CB / \u2716)",
+       x = "Date of Onset", y = "Cases") +
   scale_y_epicurve() +
   theme_minimal()
 
