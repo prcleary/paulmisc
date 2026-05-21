@@ -50,6 +50,11 @@
 #' @param height Numeric height of each case square in y-axis units;
 #'   defaults to `0.9`. Values below 1 produce visible gaps between
 #'   stacked cases.
+#' @param max_stack Numeric threshold for switching from individual case
+#'   squares to a column chart. If the maximum count at any x-value exceeds
+#'   this threshold, the plot automatically displays as a column chart
+#'   instead of stacked squares. Set to `NULL` to always show squares
+#'   (default: `20`).
 #' @param na.rm If `FALSE` (the default), missing values are removed with
 #'   a warning.
 #' @param show.legend Logical. Should this layer be included in the
@@ -97,6 +102,22 @@
 #'   theme_minimal() +
 #'   labs(title = "Weekly Epidemic Curve")
 #'
+#' # Automatic column chart for large outbreaks (max_stack threshold)
+#' # When any date has > 20 cases, automatically switches to column chart
+#' large_outbreak <- data.frame(
+#'   onset_date = as.Date("2024-01-01") + sample(0:10, 150, replace = TRUE)
+#' )
+#' ggplot(large_outbreak, aes(x = onset_date)) +
+#'   geom_epicurve(fill = "coral", max_stack = 20) +
+#'   theme_minimal() +
+#'   labs(title = "Large Outbreak (auto-switched to column chart)")
+#'
+#' # Force square mode even for large counts by setting max_stack = NULL
+#' ggplot(large_outbreak, aes(x = onset_date)) +
+#'   geom_epicurve(fill = "coral", max_stack = NULL) +
+#'   theme_minimal() +
+#'   labs(title = "Large Outbreak (forced square mode)")
+#'
 #' @seealso [simulate_outbreak()] for generating example data.
 #'
 #' @importFrom ggplot2 layer ggproto Stat aes
@@ -108,6 +129,7 @@ geom_epicurve <- function(mapping = NULL,
                           ...,
                           width = NULL,
                           height = 0.9,
+                          max_stack = 20,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
@@ -122,6 +144,7 @@ geom_epicurve <- function(mapping = NULL,
     params      = list(
       width = width,
       height = height,
+      max_stack = max_stack,
       na.rm = na.rm,
       ...
     )
@@ -137,6 +160,7 @@ stat_epicurve <- function(mapping = NULL,
                           ...,
                           width = NULL,
                           height = 0.9,
+                          max_stack = 20,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
@@ -151,6 +175,7 @@ stat_epicurve <- function(mapping = NULL,
     params      = list(
       width = width,
       height = height,
+      max_stack = max_stack,
       na.rm = na.rm,
       ...
     )
@@ -239,7 +264,7 @@ StatEpicurve <- ggplot2::ggproto(
   ggplot2::Stat,
   required_aes = "x",
 
-  compute_panel = function(self, data, scales, na.rm = FALSE, width = NULL, height = 0.9) {
+  compute_panel = function(self, data, scales, na.rm = FALSE, width = NULL, height = 0.9, max_stack = 20) {
     # Auto-detect appropriate width if not specified
     if (is.null(width)) {
       width <- detect_epicurve_width(data$x)
@@ -248,12 +273,58 @@ StatEpicurve <- ggplot2::ggproto(
     data <- data[order(data$x, data$group), , drop = FALSE]
     data$y <- stats::ave(seq_len(nrow(data)), data$x, FUN = seq_along)
     
-    # Compute rectangle boundaries for geom_rect
-    # (This allows plotly to recognize and convert the geom)
-    data$xmin <- data$x - width / 2
-    data$xmax <- data$x + width / 2
-    data$ymin <- pmax(0, data$y - 1 + (1 - height) / 2)
-    data$ymax <- data$y - (1 - height) / 2
+    # Check if we should switch to column chart mode
+    max_count <- max(data$y, na.rm = TRUE)
+    use_column_mode <- !is.null(max_stack) && max_count > max_stack
+    
+    if (use_column_mode) {
+      # Aggregate to counts for column chart mode
+      # Keep one row per x value with the count as y
+      # Preserve grouping aesthetics (fill, colour, etc.)
+      
+      # Identify grouping columns (x + aesthetic mappings)
+      aesthetic_cols <- intersect(names(data), c("fill", "colour", "color", "alpha", "linetype", "linewidth"))
+      group_cols <- unique(c("x", aesthetic_cols, "PANEL"))
+      group_cols <- group_cols[group_cols %in% names(data)]
+      
+      # Create a grouping key
+      if (length(group_cols) > 1) {
+        data$group_key <- interaction(data[, group_cols, drop = FALSE], drop = TRUE)
+      } else {
+        data$group_key <- data[[group_cols[1]]]
+      }
+      
+      # Aggregate counts
+      counts <- stats::aggregate(
+        y ~ group_key,
+        data = data,
+        FUN = length
+      )
+      names(counts)[names(counts) == "y"] <- "count"
+      
+      # Get first row of each group to preserve aesthetics
+      data_unique <- data[!duplicated(data$group_key), , drop = FALSE]
+      data_unique <- merge(data_unique, counts, by = "group_key", all.x = TRUE)
+      data_unique$group_key <- NULL
+      
+      # Set y to the count for column chart
+      data <- data_unique
+      data$y <- data$count
+      data$count <- NULL
+      
+      # Compute rectangle boundaries for column chart (bars from 0 to count)
+      data$xmin <- data$x - width / 2
+      data$xmax <- data$x + width / 2
+      data$ymin <- 0
+      data$ymax <- data$y
+    } else {
+      # Individual case square mode (original behavior)
+      # Compute rectangle boundaries for geom_rect
+      data$xmin <- data$x - width / 2
+      data$xmax <- data$x + width / 2
+      data$ymin <- pmax(0, data$y - 1 + (1 - height) / 2)
+      data$ymax <- data$y - (1 - height) / 2
+    }
     
     # Add padding points to ensure x-axis includes full width of edge rectangles
     # and a point at y=0 to ensure y-axis includes 0 for proper display

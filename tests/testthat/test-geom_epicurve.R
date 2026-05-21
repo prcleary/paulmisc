@@ -491,3 +491,139 @@ test_that("detect_epicurve_width handles data with NAs", {
   # Should handle NAs gracefully and detect daily pattern
   expect_true(width > 0.8 && width < 1.0)
 })
+
+# ============================================================================
+# Column Chart Switching Tests
+# ============================================================================
+
+test_that("geom_epicurve switches to column chart when max_stack exceeded", {
+  library(ggplot2)
+  
+  # Create data with 25 cases on one date (> default max_stack of 20)
+  cases <- data.frame(
+    onset_date = as.Date("2024-01-01") + c(rep(0, 25), rep(1, 15), rep(2, 10))
+  )
+  
+  p <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(max_stack = 20)
+  
+  built <- ggplot_build(p)
+  
+  # Should have 3 rows (one per date) instead of 50 (one per case)
+  expect_equal(nrow(built$data[[1]]), 3)
+  
+  # Should have ymin = 0 (column chart mode)
+  expect_true(all(built$data[[1]]$ymin == 0))
+  
+  # ymax should equal counts
+  expect_equal(built$data[[1]]$ymax, c(25, 15, 10))
+})
+
+test_that("geom_epicurve keeps squares when below max_stack threshold", {
+  library(ggplot2)
+  
+  # Create data with max 15 cases on one date (< max_stack of 20)
+  cases <- data.frame(
+    onset_date = as.Date("2024-01-01") + c(rep(0, 15), rep(1, 10), rep(2, 8))
+  )
+  
+  p <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(max_stack = 20)
+  
+  built <- ggplot_build(p)
+  
+  # Should have 33 rows (one per case)
+  expect_equal(nrow(built$data[[1]]), 33)
+  
+  # Should NOT all have ymin = 0 (square mode)
+  expect_false(all(built$data[[1]]$ymin == 0))
+  
+  # Should have varying ymin values (stacked squares)
+  expect_true(length(unique(built$data[[1]]$ymin)) > 3)
+})
+
+test_that("geom_epicurve respects max_stack = NULL to never switch", {
+  library(ggplot2)
+  
+  # Create data with many cases (would normally trigger switch)
+  cases <- data.frame(
+    onset_date = as.Date("2024-01-01") + c(rep(0, 50), rep(1, 40))
+  )
+  
+  p <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(max_stack = NULL)
+  
+  built <- ggplot_build(p)
+  
+  # Should have 90 rows (one per case) even with high counts
+  expect_equal(nrow(built$data[[1]]), 90)
+  
+  # Should be in square mode
+  expect_false(all(built$data[[1]]$ymin == 0))
+})
+
+test_that("geom_epicurve switching works with fill aesthetic", {
+  library(ggplot2)
+  
+  # Create data with groups
+  cases <- data.frame(
+    onset_date = as.Date("2024-01-01") + c(rep(0, 25), rep(1, 20)),
+    group = c(rep("A", 15), rep("B", 10), rep("A", 12), rep("B", 8))
+  )
+  
+  p <- ggplot(cases, aes(x = onset_date, fill = group)) +
+    geom_epicurve(max_stack = 20)
+  
+  built <- ggplot_build(p)
+  
+  # Should switch to column mode
+  # Should have one row per date/group combination
+  expect_true(nrow(built$data[[1]]) <= 4)  # At most 2 dates * 2 groups
+  
+  # Should be in column mode
+  expect_true(all(built$data[[1]]$ymin == 0))
+})
+
+test_that("geom_epicurve custom max_stack threshold works", {
+  library(ggplot2)
+  
+  # Test with max_stack = 10
+  cases <- data.frame(
+    onset_date = as.Date("2024-01-01") + c(rep(0, 12), rep(1, 8))
+  )
+  
+  # Should switch with max_stack = 10 (max = 12 > 10)
+  p1 <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(max_stack = 10)
+  built1 <- ggplot_build(p1)
+  expect_equal(nrow(built1$data[[1]]), 2)  # Column mode
+  
+  # Should NOT switch with max_stack = 15 (max = 12 < 15)
+  p2 <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(max_stack = 15)
+  built2 <- ggplot_build(p2)
+  expect_equal(nrow(built2$data[[1]]), 20)  # Square mode
+})
+
+test_that("column mode preserves aesthetics correctly", {
+  library(ggplot2)
+  
+  # Create data with multiple aesthetics
+  cases <- data.frame(
+    onset_date = as.Date("2024-01-01") + c(rep(0, 25), rep(1, 20)),
+    fill_var = c(rep("A", 25), rep("B", 20)),
+    colour_var = c(rep("X", 25), rep("Y", 20))
+  )
+  
+  p <- ggplot(cases, aes(x = onset_date, fill = fill_var, colour = colour_var)) +
+    geom_epicurve(max_stack = 20)
+  
+  built <- ggplot_build(p)
+  
+  # Should preserve fill and colour aesthetics in column mode
+  expect_true("fill" %in% names(built$data[[1]]))
+  expect_true("colour" %in% names(built$data[[1]]))
+  
+  # Should have correct number of rows (one per date/fill/colour combo)
+  expect_equal(nrow(built$data[[1]]), 2)
+})

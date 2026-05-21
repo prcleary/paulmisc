@@ -13,6 +13,7 @@ geom_epicurve(
   ...,
   width = NULL,
   height = 0.9,
+  max_stack = 20,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -26,6 +27,7 @@ stat_epicurve(
   ...,
   width = NULL,
   height = 0.9,
+  max_stack = 20,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -51,6 +53,12 @@ time unit: 0.9 for daily Date data, 3600 seconds for hourly POSIXct data,
 \item{height}{Numeric height of each case square in y-axis units;
 defaults to \code{0.9}. Values below 1 produce visible gaps between
 stacked cases.}
+
+\item{max_stack}{Numeric threshold for switching from individual case
+squares to a column chart. If the maximum count at any x-value exceeds
+this threshold, the plot automatically displays as a column chart
+instead of stacked squares. Set to \code{NULL} to always show squares
+(default: \code{20}).}
 
 \item{na.rm}{If \code{FALSE} (the default), missing values are removed with
 a warning.}
@@ -146,6 +154,22 @@ ggplot(weekly_cases, aes(x = epi_week)) +
   geom_epicurve(fill = "forestgreen") +
   theme_minimal() +
   labs(title = "Weekly Epidemic Curve")
+
+# Automatic column chart for large outbreaks (max_stack threshold)
+# When any date has > 20 cases, automatically switches to column chart
+large_outbreak <- data.frame(
+  onset_date = as.Date("2024-01-01") + sample(0:10, 150, replace = TRUE)
+)
+ggplot(large_outbreak, aes(x = onset_date)) +
+  geom_epicurve(fill = "coral", max_stack = 20) +
+  theme_minimal() +
+  labs(title = "Large Outbreak (auto-switched to column chart)")
+
+# Force square mode even for large counts by setting max_stack = NULL
+ggplot(large_outbreak, aes(x = onset_date)) +
+  geom_epicurve(fill = "coral", max_stack = NULL) +
+  theme_minimal() +
+  labs(title = "Large Outbreak (forced square mode)")
 
 }
 \seealso{
