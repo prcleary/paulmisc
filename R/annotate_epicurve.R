@@ -272,7 +272,7 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
   label_x <- object$date
   xr <- .epicurve_x_range(plot)
   if (!is.null(xr) && object$label_hjust >= 0 && object$label_hjust <= 0.25) {
-    nudge_units <- 0.01 * (xr[2] - xr[1])
+    nudge_units <- 0.04 * (xr[2] - xr[1])
     label_x <- if (inherits(object$date, "Date")) {
       object$date + nudge_units
     } else if (inherits(object$date, "POSIXct")) {
