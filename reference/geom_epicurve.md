@@ -18,6 +18,8 @@ geom_epicurve(
   width = NULL,
   height = 0.9,
   max_stack = 20,
+  symbol = NULL,
+  symbol_size = 3,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -32,6 +34,8 @@ stat_epicurve(
   width = NULL,
   height = 0.9,
   max_stack = 20,
+  symbol = NULL,
+  symbol_size = 3,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -83,6 +87,21 @@ stat_epicurve(
   threshold, the plot automatically displays as a column chart instead
   of stacked squares. Set to `NULL` to always show squares (default:
   `20`).
+
+- symbol:
+
+  Character string specifying a Unicode symbol or emoji to use instead
+  of squares (default: `NULL` for squares). When provided, each case is
+  rendered as the specified symbol. Examples: `"●"` (bullet), `"■"`
+  (square), `"▲"` (triangle), `"♥"` (heart), `"😷"` (face mask emoji).
+  Ignored if `max_stack` threshold is exceeded (uses column chart
+  instead). Can also be mapped as an aesthetic for different symbols per
+  group.
+
+- symbol_size:
+
+  Size of symbols when `symbol` is used (default: `3`). Adjust if
+  symbols appear too large or small relative to the plot.
 
 - na.rm:
 
@@ -215,5 +234,21 @@ ggplot(large_outbreak, aes(x = onset_date)) +
   theme_minimal() +
   labs(title = "Large Outbreak (forced square mode)")
 #> Warning: Ignoring empty aesthetic: `width`.
+
+
+# Use symbols instead of squares
+cases_symbols <- simulate_outbreak(n = 30, seed = 999)
+ggplot(cases_symbols, aes(x = onset_date)) +
+  geom_epicurve(symbol = "●", symbol_size = 4, colour = "darkblue") +
+  theme_minimal() +
+  labs(title = "Epidemic Curve with Bullet Symbols")
+
+
+# Use emoji symbols (requires font support)
+ggplot(cases_symbols, aes(x = onset_date, colour = sex)) +
+  geom_epicurve(symbol = "😷", symbol_size = 5) +
+  scale_colour_manual(values = c("Female" = "#D55E00", "Male" = "#0072B2")) +
+  theme_minimal() +
+  labs(title = "COVID-19 Cases with Face Mask Emoji")
 
 ```
