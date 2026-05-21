@@ -140,7 +140,7 @@
 #'   theme_minimal() +
 #'   labs(title = "COVID-19 Cases with Face Mask Emoji")
 #'
-#' @seealso [simulate_outbreak()] for generating example data.
+#' @seealso [simulate_outbreak()] for generating example data, [scale_y_epicurve()] for integer y-axis labels.
 #'
 #' @importFrom ggplot2 layer ggproto Stat aes
 #' @export
@@ -172,11 +172,6 @@ geom_epicurve <- function(mapping = NULL,
   )
   if (!is.null(width)) {
     params$width <- width
-  }
-  
-  # For symbol mode, default to no legend (prevents "a" showing in legend)
-  if (!is.null(symbol) && is.na(show.legend)) {
-    show.legend <- FALSE
   }
   
   ggplot2::layer(
@@ -470,3 +465,36 @@ GeomEpicurve <- ggplot2::ggproto(
     ggplot2::GeomRect$draw_panel(data, panel_params, coord)
   }
 )
+
+#' Y-axis scale with integer breaks for epidemic curves
+#'
+#' A convenience function that sets y-axis breaks to integers only,
+#' which is appropriate for count data in epidemic curves. This ensures
+#' the y-axis never shows decimal values like 2.5 cases.
+#'
+#' @param ... Additional arguments passed to [ggplot2::scale_y_continuous()].
+#'
+#' @return A ggplot2 scale layer.
+#'
+#' @examples
+#' library(ggplot2)
+#' cases <- simulate_outbreak(n = 20)
+#'
+#' ggplot(cases, aes(x = onset_date)) +
+#'   geom_epicurve(fill = "steelblue") +
+#'   scale_y_epicurve() +
+#'   theme_minimal()
+#'
+#' @importFrom ggplot2 scale_y_continuous
+#' @export
+scale_y_epicurve <- function(...) {
+  ggplot2::scale_y_continuous(
+    breaks = function(limits) {
+      # Generate pretty integer breaks
+      at_values <- pretty(limits, n = 5)
+      # Keep only integers
+      at_values[at_values == floor(at_values) & at_values >= 0]
+    },
+    ...
+  )
+}

@@ -201,5 +201,5 @@ ggplot(cases_symbols, aes(x = onset_date, colour = sex)) +
 
 }
 \seealso{
-\code{\link[=simulate_outbreak]{simulate_outbreak()}} for generating example data.
+\code{\link[=simulate_outbreak]{simulate_outbreak()}} for generating example data, \code{\link[=scale_y_epicurve]{scale_y_epicurve()}} for integer y-axis labels.
 }

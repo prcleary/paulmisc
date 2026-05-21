@@ -134,6 +134,7 @@ ggplot(cases, aes(x = onset_date)) +
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 ```
 
@@ -177,6 +178,7 @@ ggplot(cases, aes(x = onset_date, fill = outcome)) +
     y = "Number of Cases",
     fill = "Outcome"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 ```
 
@@ -216,11 +218,13 @@ library(patchwork)
 p1 <- ggplot(short_incubation, aes(x = onset_date)) +
   geom_epicurve(fill = "coral") +
   labs(title = "Short Incubation", x = NULL, y = "Cases") +
+  scale_y_epicurve() +
   theme_minimal()
 
 p2 <- ggplot(long_incubation, aes(x = onset_date)) +
   geom_epicurve(fill = "skyblue") +
   labs(title = "Long Incubation", x = "Date of Onset", y = "Cases") +
+  scale_y_epicurve() +
   theme_minimal()
 
 p1 / p2
@@ -245,6 +249,7 @@ hourly_cases <- simulate_outbreak(
 p1 <- ggplot(hourly_cases, aes(x = onset_time)) +
   geom_epicurve(fill = "darkred") +
   labs(title = "Hourly Epidemic Curve", x = "Time", y = "Cases") +
+  scale_y_epicurve() +
   theme_minimal()
 
 # Weekly aggregated data for surveillance
@@ -258,6 +263,7 @@ weekly_cases <- simulate_outbreak(
 p2 <- ggplot(weekly_cases, aes(x = onset_date)) +
   geom_epicurve(fill = "forestgreen") +
   labs(title = "Weekly Epidemic Curve", x = "Week", y = "Cases") +
+  scale_y_epicurve() +
   theme_minimal()
 
 p1 / p2
@@ -291,6 +297,7 @@ ggplot(large_outbreak, aes(x = onset_date)) +
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 ```
 
@@ -334,6 +341,7 @@ ggplot(outbreak_cases, aes(x = onset_date)) +
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 ```
 
@@ -351,7 +359,9 @@ symbol_cases <- simulate_outbreak(n = 35, seed = 999)
 p1 <- ggplot(symbol_cases, aes(x = onset_date, colour = sex)) +
   geom_epicurve(symbol = "●", symbol_size = 6) +
   scale_colour_manual(values = c("Female" = "#D55E00", "Male" = "#0072B2")) +
+  guides(colour = guide_legend(override.aes = list(label = "●", size = 6))) +
   labs(title = "Bullet Symbols (●)", x = NULL, y = "Cases") +
+  scale_y_epicurve() +
   theme_minimal()
 
 p2 <- ggplot(symbol_cases, aes(x = onset_date, colour = outcome)) +
@@ -359,7 +369,9 @@ p2 <- ggplot(symbol_cases, aes(x = onset_date, colour = outcome)) +
   scale_colour_manual(
     values = c("Recovered" = "steelblue", "Hospitalised" = "tomato")
   ) +
+  guides(colour = guide_legend(override.aes = list(label = "■", size = 5))) +
   labs(title = "Square Symbols (■)", x = "Date of Onset", y = "Cases") +
+  scale_y_epicurve() +
   theme_minimal()
 
 p1 / p2
@@ -374,7 +386,9 @@ Emoji work too (requires appropriate font support):
 ggplot(cases, aes(x = onset_date, colour = age_group)) +
   geom_epicurve(symbol = "😷", symbol_size = 6) +
   scale_colour_brewer(palette = "Set2") +
+  guides(colour = guide_legend(override.aes = list(label = "😷", size = 6))) +
   labs(title = "COVID-19 Cases", x = "Date", y = "Cases") +
+  scale_y_epicurve() +
   theme_minimal()
 ```
 
@@ -399,6 +413,7 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 ```
 
