@@ -110,8 +110,8 @@ ggplotly(p, tooltip = "text")
 
 ## Customising Tooltip Content
 
-You have complete control over tooltip content. Use HTML formatting for
-rich tooltips:
+You have complete control over tooltip content. Here’s an example with
+structured plain text:
 
 ``` r
 
@@ -145,8 +145,8 @@ ggplotly(p, tooltip = "text")
   interactivity
 - **Custom tooltips**: Add a `text` aesthetic and use
   `ggplotly(p, tooltip = "text")` to show only your custom tooltip
-- **Tooltip formatting**: Use `\n` for line breaks and simple text
-  formatting (HTML is not rendered in ggplotly tooltips)
+- **Tooltip formatting**: Use `\n` for line breaks in plain text, or use
+  HTML tags (e.g., `<br>`, `<b>`) for rich formatting
 - **Performance**: Interactive plots with many cases (\>500) may be
   slow. Consider filtering for large datasets
 - **Mobile devices**: Interactive features work on touch devices - tap
