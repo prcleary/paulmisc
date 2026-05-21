@@ -9,6 +9,9 @@ simulate_outbreak(
   exposure = as.Date("2024-06-01"),
   meanlog = 1.6,
   sdlog = 0.45,
+  time_unit = c("daily", "hourly", "weekly"),
+  pattern = c("point_source", "continuous"),
+  date_range = 10,
   seed = 42
 )
 }
@@ -27,12 +30,26 @@ pathogens. For quick-onset diseases like norovirus, try
 \code{meanlog = 0.5} (median ~1.6 days). For slow-onset diseases like
 hepatitis A, try \code{meanlog = 3} (median ~20 days).}
 
+\item{time_unit}{Character string specifying the time resolution of the
+outbreak data. Options: \code{"daily"} (default, returns Date), \code{"hourly"}
+(returns POSIXct with hour resolution), or \code{"weekly"} (returns Date
+aggregated to weeks).}
+
+\item{pattern}{Character string specifying the outbreak pattern. Options:
+\code{"point_source"} (default, log-normal incubation from single exposure)
+or \code{"continuous"} (uniform distribution over a date range for ongoing
+transmission).}
+
+\item{date_range}{Integer. For continuous pattern, the number of days/hours/weeks
+over which cases are uniformly distributed. Ignored for point_source pattern.}
+
 \item{seed}{Optional integer used to seed the random number generator
 for reproducibility. Use \code{NULL} to leave the RNG state untouched.}
 }
 \value{
-A data frame with one row per case and the columns
+A data frame with one row per case. For daily/weekly data: columns
 \code{case_id}, \code{onset_date}, \code{age_group}, \code{sex}, \code{outcome}, and \code{setting}.
+For hourly data: \code{onset_time} instead of \code{onset_date}.
 }
 \description{
 Generates a small, realistic line list for a single point-source outbreak.
@@ -58,5 +75,17 @@ fast <- simulate_outbreak(meanlog = 0.5, sdlog = 0.3)
 # Long incubation period (e.g., Hepatitis A)
 # meanlog = 3 gives median of exp(3) = 20 days
 slow <- simulate_outbreak(meanlog = 3, sdlog = 0.5)
+
+# Hourly outbreak data for rapid response
+hourly <- simulate_outbreak(n = 15, time_unit = "hourly", seed = 123)
+head(hourly)
+
+# Weekly surveillance data
+weekly <- simulate_outbreak(n = 20, time_unit = "weekly", seed = 456)
+head(weekly)
+
+# Large continuous outbreak (not point-source)
+large <- simulate_outbreak(n = 300, pattern = "continuous", date_range = 14, seed = 789)
+table(large$onset_date)
 
 }

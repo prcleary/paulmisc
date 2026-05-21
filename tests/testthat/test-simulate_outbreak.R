@@ -150,3 +150,120 @@ test_that("simulate_outbreak handles large n", {
   expect_equal(nrow(result), 1000)
   expect_equal(length(unique(result$case_id)), 1000)
 })
+
+# Tests for time_unit parameter
+test_that("simulate_outbreak with time_unit = 'hourly' returns POSIXct", {
+  result <- simulate_outbreak(n = 20, time_unit = "hourly", seed = 303)
+  
+  expect_s3_class(result, "data.frame")
+  expect_true("onset_time" %in% names(result))
+  expect_false("onset_date" %in% names(result))
+  expect_s3_class(result$onset_time, "POSIXct")
+  expect_equal(nrow(result), 20)
+})
+
+test_that("simulate_outbreak with time_unit = 'weekly' returns Date", {
+  result <- simulate_outbreak(n = 20, time_unit = "weekly", seed = 404)
+  
+  expect_s3_class(result, "data.frame")
+  expect_true("onset_date" %in% names(result))
+  expect_s3_class(result$onset_date, "Date")
+  expect_equal(nrow(result), 20)
+})
+
+test_that("simulate_outbreak with time_unit = 'daily' returns Date (default)", {
+  result <- simulate_outbreak(n = 20, time_unit = "daily", seed = 505)
+  
+  expect_s3_class(result, "data.frame")
+  expect_true("onset_date" %in% names(result))
+  expect_s3_class(result$onset_date, "Date")
+  expect_equal(nrow(result), 20)
+})
+
+test_that("simulate_outbreak hourly data includes demographic attributes", {
+  result <- simulate_outbreak(n = 15, time_unit = "hourly", seed = 606)
+  
+  # Should have all demographic columns
+  expect_true("age_group" %in% names(result))
+  expect_true("sex" %in% names(result))
+  expect_true("outcome" %in% names(result))
+  expect_true("setting" %in% names(result))
+  
+  # Check valid values
+  expect_true(all(result$age_group %in% c("Child", "Adult", "Elderly")))
+  expect_true(all(result$sex %in% c("Female", "Male")))
+})
+
+# Tests for pattern parameter
+test_that("simulate_outbreak with pattern = 'continuous' returns uniform distribution", {
+  result <- simulate_outbreak(
+    n = 200,
+    pattern = "continuous",
+    date_range = 10,
+    exposure = "2024-01-01",
+    seed = 707
+  )
+  
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 200)
+  
+  # Dates should span approximately date_range days
+  date_spread <- as.numeric(max(result$onset_date) - min(result$onset_date))
+  expect_lte(date_spread, 10)
+})
+
+test_that("simulate_outbreak with pattern = 'point_source' follows log-normal (default)", {
+  result <- simulate_outbreak(
+    n = 100,
+    pattern = "point_source",
+    exposure = "2024-01-01",
+    seed = 808
+  )
+  
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 100)
+  
+  # All dates should be after exposure
+  expect_true(all(result$onset_date > as.Date("2024-01-01")))
+})
+
+test_that("simulate_outbreak continuous pattern with hourly time_unit", {
+  result <- simulate_outbreak(
+    n = 50,
+    time_unit = "hourly",
+    pattern = "continuous",
+    date_range = 5,
+    exposure = "2024-06-01",
+    seed = 909
+  )
+  
+  expect_s3_class(result$onset_time, "POSIXct")
+  expect_equal(nrow(result), 50)
+  
+  # Time spread should be approximately date_range days in hours
+  time_spread_hours <- as.numeric(difftime(max(result$onset_time), min(result$onset_time), units = "hours"))
+  expect_lte(time_spread_hours, 5 * 24)
+})
+
+test_that("simulate_outbreak date_range parameter affects continuous pattern", {
+  result_narrow <- simulate_outbreak(
+    n = 100,
+    pattern = "continuous",
+    date_range = 5,
+    exposure = "2024-01-01",
+    seed = 1001
+  )
+  
+  result_wide <- simulate_outbreak(
+    n = 100,
+    pattern = "continuous",
+    date_range = 20,
+    exposure = "2024-01-01",
+    seed = 1001
+  )
+  
+  spread_narrow <- as.numeric(max(result_narrow$onset_date) - min(result_narrow$onset_date))
+  spread_wide <- as.numeric(max(result_wide$onset_date) - min(result_wide$onset_date))
+  
+  expect_lt(spread_narrow, spread_wide)
+})
