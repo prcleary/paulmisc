@@ -1,4 +1,4 @@
-test_that("annotate_event creates ggplot layers", {
+test_that("annotate_event creates annotation object", {
   library(ggplot2)
   
   # Create annotation
@@ -8,13 +8,11 @@ test_that("annotate_event creates ggplot layers", {
     colour = "red"
   )
   
-  # Should return a list of layers
-  expect_type(event, "list")
-  expect_equal(length(event), 2)  # vline + text
-  
-  # Check layer types
-  expect_s3_class(event[[1]], "ggproto")
-  expect_s3_class(event[[2]], "ggproto")
+  # Should return an S3 annotation object
+  expect_s3_class(event, "epicurve_event_annotation")
+  expect_s3_class(event, "epicurve_annotation")
+  expect_equal(event$label, "Test Event")
+  expect_equal(event$colour, "red")
 })
 
 test_that("annotate_event works with Date", {
@@ -97,7 +95,7 @@ test_that("annotate_event accepts custom label positioning", {
   })
 })
 
-test_that("annotate_period creates ggplot layers", {
+test_that("annotate_period creates annotation object", {
   library(ggplot2)
   
   # Create annotation
@@ -107,13 +105,10 @@ test_that("annotate_period creates ggplot layers", {
     label = "Test Period"
   )
   
-  # Should return a list of layers
-  expect_type(period, "list")
-  expect_equal(length(period), 2)  # rect + text
-  
-  # Check layer types
-  expect_s3_class(period[[1]], "ggproto")
-  expect_s3_class(period[[2]], "ggproto")
+  # Should return an S3 annotation object
+  expect_s3_class(period, "epicurve_period_annotation")
+  expect_s3_class(period, "epicurve_annotation")
+  expect_equal(period$label, "Test Period")
 })
 
 test_that("annotate_period requires end_date", {
@@ -247,19 +242,18 @@ test_that("annotate_period handles custom alpha and fill", {
 test_that("annotate_event customization parameters work", {
   library(ggplot2)
   
-  expect_no_error({
-    event <- annotate_event(
-      date = as.Date("2024-06-05"),
-      label = "Custom",
-      colour = "purple",
-      linetype = "dotted",
-      linewidth = 1.5,
-      label_size = 4
-    )
-  })
+  event <- annotate_event(
+    date = as.Date("2024-06-05"),
+    label = "Custom",
+    colour = "purple",
+    linetype = "dotted",
+    linewidth = 1.5,
+    label_size = 4
+  )
   
-  # Check that parameters are used
-  expect_equal(event[[1]]$aes_params$linetype, "dotted")
-  expect_equal(event[[1]]$aes_params$colour, "purple")
-  expect_equal(event[[1]]$aes_params$linewidth, 1.5)
+  # Check that parameters are stored on the annotation object
+  expect_equal(event$linetype, "dotted")
+  expect_equal(event$colour, "purple")
+  expect_equal(event$linewidth, 1.5)
+  expect_equal(event$label_size, 4)
 })

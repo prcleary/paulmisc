@@ -92,8 +92,41 @@
 #' }
 #'
 #' @name annotate_epicurve
-#' @importFrom ggplot2 geom_vline geom_rect geom_text aes
+#' @importFrom ggplot2 geom_vline geom_rect geom_text geom_segment aes ggplot_add ggplot_build
 NULL
+
+# Annotations are stored as lightweight S3 objects and resolved lazily via
+# ggplot_add(). When the user adds an annotation to a plot with `+`, we build
+# the plot up to that point to obtain the trained y-scale, then construct
+# standard ggplot2 geom layers with finite, explicit y coordinates. This is
+# essential for plotly compatibility: plotly extracts data from layers via
+# ggplot_build, and cannot handle Inf or untrained placeholder coordinates.
+# Using finite explicit values means the same code works for both static
+# ggplot2 plots and interactive ggplotly() conversions with no extra code.
+
+# Compute the trained y-range for a plot, falling back to (0, 1) when the
+# plot has no other layers contributing y data.
+.epicurve_y_range <- function(plot) {
+  yr <- tryCatch({
+    b <- suppressMessages(suppressWarnings(ggplot2::ggplot_build(plot)))
+    b$layout$panel_scales_y[[1]]$dimension()
+  }, error = function(e) NULL)
+  if (is.null(yr) || length(yr) < 2 || any(!is.finite(yr))) {
+    yr <- c(0, 1)
+  }
+  yr
+}
+
+# Resolve a fractional label_y (0 = bottom, 1 = top) given user input that
+# may be Inf, -Inf, a fraction, or a string like "top"/"middle"/"bottom".
+.resolve_y_frac <- function(label_y) {
+  if (is.character(label_y)) {
+    return(switch(tolower(label_y), "top" = 1, "bottom" = 0, "middle" = 0.5, 1))
+  }
+  if (is.infinite(label_y) && label_y > 0) return(1)
+  if (is.infinite(label_y) && label_y < 0) return(0)
+  label_y
+}
 
 #' @rdname annotate_epicurve
 #' @export
@@ -108,40 +141,26 @@ annotate_event <- function(date,
                           label_vjust = 1,
                           label_size = 3.5,
                           ...) {
-  
+
   # Handle American spelling
   if (!is.null(color)) {
     colour <- color
   }
-  
-  # Convert label_y shortcuts
-  if (is.character(label_y)) {
-    label_y <- switch(
-      tolower(label_y),
-      "top" = Inf,
-      "bottom" = -Inf,
-      "middle" = 0,
-      Inf  # default to top if unrecognized
-    )
-  }
-  
-  list(
-    ggplot2::geom_vline(
-      xintercept = date,
+
+  structure(
+    list(
+      date = date,
+      label = label,
+      colour = colour,
       linetype = linetype,
-      colour = colour,
       linewidth = linewidth,
-      ...
+      label_y = label_y,
+      label_hjust = label_hjust,
+      label_vjust = label_vjust,
+      label_size = label_size,
+      extra = list(...)
     ),
-    ggplot2::geom_text(
-      data = data.frame(x = date, y = label_y, label = label),
-      ggplot2::aes(x = x, y = y, label = label),
-      hjust = label_hjust,
-      vjust = label_vjust,
-      colour = colour,
-      size = label_size,
-      inherit.aes = FALSE
-    )
+    class = c("epicurve_event_annotation", "epicurve_annotation")
   )
 }
 
@@ -159,60 +178,116 @@ annotate_period <- function(date,
                            label_vjust = 1,
                            label_size = 3.5,
                            ...) {
-  
+
   if (missing(end_date)) {
     stop("end_date is required for annotate_period()", call. = FALSE)
   }
-  
+
   # Handle American spelling
   if (!is.null(color)) {
     colour <- color
   }
-  
-  # Convert label_y shortcuts
-  if (is.character(label_y)) {
-    label_y <- switch(
-      tolower(label_y),
-      "top" = Inf,
-      "bottom" = -Inf,
-      "middle" = 0,
-      Inf  # default to top if unrecognized
-    )
-  }
-  
+
   # Calculate midpoint for label
   if (inherits(date, "POSIXt") || inherits(end_date, "POSIXt")) {
-    # For POSIXct, compute numeric midpoint and convert back
-    mid_date <- as.POSIXct((as.numeric(date) + as.numeric(end_date)) / 2, 
+    mid_date <- as.POSIXct((as.numeric(date) + as.numeric(end_date)) / 2,
                            origin = "1970-01-01", tz = attr(date, "tzone") %||% "UTC")
   } else {
-    # For Date or numeric
     mid_date <- (as.numeric(date) + as.numeric(end_date)) / 2
     if (inherits(date, "Date")) {
       mid_date <- as.Date(mid_date, origin = "1970-01-01")
     }
   }
-  
-  list(
-    ggplot2::geom_rect(
-      xmin = date,
-      xmax = end_date,
-      ymin = 0,
-      ymax = Inf,
+
+  structure(
+    list(
+      date = date,
+      end_date = end_date,
+      mid_date = mid_date,
+      label = label,
       fill = fill,
       colour = colour,
       alpha = alpha,
+      label_y = label_y,
+      label_hjust = label_hjust,
+      label_vjust = label_vjust,
+      label_size = label_size,
+      extra = list(...)
+    ),
+    class = c("epicurve_period_annotation", "epicurve_annotation")
+  )
+}
+
+# ggplot_add methods: resolve annotations lazily when added to a plot via `+`.
+# At this point we can build the existing plot to obtain the trained y-scale
+# and inject finite coordinates suitable for both static rendering and
+# ggplotly() conversion.
+
+#' @export
+#' @importFrom ggplot2 ggplot_add
+ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
+  yr <- .epicurve_y_range(plot)
+  y_frac <- .resolve_y_frac(object$label_y)
+  label_y_val <- yr[1] + y_frac * (yr[2] - yr[1])
+
+  layers <- list(
+    ggplot2::geom_segment(
+      data = data.frame(x = object$date, xend = object$date,
+                        y = yr[1], yend = yr[2]),
+      mapping = ggplot2::aes(x = x, xend = xend, y = y, yend = yend),
       inherit.aes = FALSE,
-      ...
+      show.legend = FALSE,
+      linetype = object$linetype,
+      colour = object$colour,
+      linewidth = object$linewidth,
+      na.rm = TRUE
     ),
     ggplot2::geom_text(
-      data = data.frame(x = mid_date, y = label_y, label = label),
-      ggplot2::aes(x = x, y = y, label = label),
-      hjust = label_hjust,
-      vjust = label_vjust,
-      colour = if (is.na(colour)) "black" else colour,
-      size = label_size,
-      inherit.aes = FALSE
+      data = data.frame(x = object$date, y = label_y_val, label = object$label),
+      mapping = ggplot2::aes(x = x, y = y, label = label),
+      inherit.aes = FALSE,
+      show.legend = FALSE,
+      hjust = object$label_hjust,
+      vjust = object$label_vjust,
+      colour = object$colour,
+      size = object$label_size,
+      na.rm = TRUE
     )
   )
+  Reduce(`+`, layers, init = plot)
+}
+
+#' @export
+#' @importFrom ggplot2 ggplot_add
+ggplot_add.epicurve_period_annotation <- function(object, plot, object_name) {
+  yr <- .epicurve_y_range(plot)
+  y_frac <- .resolve_y_frac(object$label_y)
+  label_y_val <- yr[1] + y_frac * (yr[2] - yr[1])
+  label_colour <- if (is.na(object$colour)) "black" else object$colour
+
+  layers <- list(
+    ggplot2::geom_rect(
+      data = data.frame(xmin = object$date, xmax = object$end_date,
+                        ymin = yr[1], ymax = yr[2]),
+      mapping = ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      inherit.aes = FALSE,
+      show.legend = FALSE,
+      fill = object$fill,
+      colour = object$colour,
+      alpha = object$alpha,
+      na.rm = TRUE
+    ),
+    ggplot2::geom_text(
+      data = data.frame(x = object$mid_date, y = label_y_val, label = object$label),
+      mapping = ggplot2::aes(x = x, y = y, label = label),
+      inherit.aes = FALSE,
+      show.legend = FALSE,
+      hjust = object$label_hjust,
+      vjust = object$label_vjust,
+      colour = label_colour,
+      size = object$label_size,
+      na.rm = TRUE
+    )
+  )
+  Reduce(`+`, layers, init = plot)
 }
