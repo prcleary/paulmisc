@@ -343,18 +343,6 @@ ggplot(outbreak_cases, aes(x = onset_date)) +
   ) +
   scale_y_epicurve() +
   theme_minimal()
-#> Warning in ggplot2::geom_rect(data = data.frame(xmin = object$date, xmax =
-#> object$end_date, : Ignoring unknown aesthetics: text
-#> Warning in ggplot2::geom_text(data = data.frame(x = object$mid_date, y =
-#> label_y_val, : Ignoring unknown aesthetics: text
-#> Warning in ggplot2::geom_segment(data = data.frame(x = object$date, xend =
-#> object$date, : Ignoring unknown aesthetics: text
-#> Warning in ggplot2::geom_text(data = data.frame(x = label_x, y = label_y_val, :
-#> Ignoring unknown aesthetics: text
-#> Warning in ggplot2::geom_segment(data = data.frame(x = object$date, xend =
-#> object$date, : Ignoring unknown aesthetics: text
-#> Warning in ggplot2::geom_text(data = data.frame(x = label_x, y = label_y_val, :
-#> Ignoring unknown aesthetics: text
 ```
 
 <img src="man/figures/README-annotated-epicurve-1.png" alt="" width="100%" />
