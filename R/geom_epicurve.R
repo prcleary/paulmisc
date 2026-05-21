@@ -55,6 +55,14 @@
 #'   this threshold, the plot automatically displays as a column chart
 #'   instead of stacked squares. Set to `NULL` to always show squares
 #'   (default: `20`).
+#' @param symbol Character string specifying a Unicode symbol or emoji to use
+#'   instead of squares (default: `NULL` for squares). When provided, each
+#'   case is rendered as the specified symbol. Examples: `"●"` (bullet),
+#'   `"■"` (square), `"▲"` (triangle), `"♥"` (heart), `"😷"` (face mask emoji).
+#'   Ignored if `max_stack` threshold is exceeded (uses column chart instead).
+#'   Can also be mapped as an aesthetic for different symbols per group.
+#' @param symbol_size Size of symbols when `symbol` is used (default: `3`).
+#'   Adjust if symbols appear too large or small relative to the plot.
 #' @param na.rm If `FALSE` (the default), missing values are removed with
 #'   a warning.
 #' @param show.legend Logical. Should this layer be included in the
@@ -118,6 +126,20 @@
 #'   theme_minimal() +
 #'   labs(title = "Large Outbreak (forced square mode)")
 #'
+#' # Use symbols instead of squares
+#' cases_symbols <- simulate_outbreak(n = 30, seed = 999)
+#' ggplot(cases_symbols, aes(x = onset_date)) +
+#'   geom_epicurve(symbol = "●", symbol_size = 4, colour = "darkblue") +
+#'   theme_minimal() +
+#'   labs(title = "Epidemic Curve with Bullet Symbols")
+#'
+#' # Use emoji symbols (requires font support)
+#' ggplot(cases_symbols, aes(x = onset_date, colour = sex)) +
+#'   geom_epicurve(symbol = "😷", symbol_size = 5) +
+#'   scale_colour_manual(values = c("Female" = "#D55E00", "Male" = "#0072B2")) +
+#'   theme_minimal() +
+#'   labs(title = "COVID-19 Cases with Face Mask Emoji")
+#'
 #' @seealso [simulate_outbreak()] for generating example data.
 #'
 #' @importFrom ggplot2 layer ggproto Stat aes
@@ -130,11 +152,17 @@ geom_epicurve <- function(mapping = NULL,
                           width = NULL,
                           height = 0.9,
                           max_stack = 20,
+                          symbol = NULL,
+                          symbol_size = 3,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
+  # Determine which geom to use based on symbol parameter
+  # If symbol is provided, we'll try to use text mode (unless max_stack overrides)
+  use_geom <- if (!is.null(symbol)) "text" else "rect"
+  
   ggplot2::layer(
-    geom        = "rect",
+    geom        = use_geom,
     mapping     = mapping,
     data        = data,
     stat        = stat,
@@ -145,6 +173,8 @@ geom_epicurve <- function(mapping = NULL,
       width = width,
       height = height,
       max_stack = max_stack,
+      symbol = symbol,
+      symbol_size = symbol_size,
       na.rm = na.rm,
       ...
     )
@@ -161,6 +191,8 @@ stat_epicurve <- function(mapping = NULL,
                           width = NULL,
                           height = 0.9,
                           max_stack = 20,
+                          symbol = NULL,
+                          symbol_size = 3,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
@@ -176,6 +208,8 @@ stat_epicurve <- function(mapping = NULL,
       width = width,
       height = height,
       max_stack = max_stack,
+      symbol = symbol,
+      symbol_size = symbol_size,
       na.rm = na.rm,
       ...
     )
@@ -264,7 +298,7 @@ StatEpicurve <- ggplot2::ggproto(
   ggplot2::Stat,
   required_aes = "x",
 
-  compute_panel = function(self, data, scales, na.rm = FALSE, width = NULL, height = 0.9, max_stack = 20) {
+  compute_panel = function(self, data, scales, na.rm = FALSE, width = NULL, height = 0.9, max_stack = 20, symbol = NULL, symbol_size = 3) {
     # Auto-detect appropriate width if not specified
     if (is.null(width)) {
       width <- detect_epicurve_width(data$x)
@@ -276,6 +310,9 @@ StatEpicurve <- ggplot2::ggproto(
     # Check if we should switch to column chart mode
     max_count <- max(data$y, na.rm = TRUE)
     use_column_mode <- !is.null(max_stack) && max_count > max_stack
+    
+    # Determine if we're using symbols (only if NOT in column mode)
+    use_symbol_mode <- !is.null(symbol) && !use_column_mode
     
     if (use_column_mode) {
       # Aggregate to counts for column chart mode
@@ -317,6 +354,25 @@ StatEpicurve <- ggplot2::ggproto(
       data$xmax <- data$x + width / 2
       data$ymin <- 0
       data$ymax <- data$y
+      
+      # If symbol was requested but we're in column mode, show count as label instead
+      # This ensures geom_text has the required label aesthetic
+      if (!is.null(symbol)) {
+        data$label <- as.character(data$y)
+        data$size <- symbol_size
+      }
+    } else if (use_symbol_mode) {
+      # Symbol mode - prepare data for geom_text
+      # Use center positions instead of rectangle boundaries
+      # y position is center of the "cell" where this case sits
+      data$y <- data$y - 0.5  # Center vertically in the stacking position
+      
+      # Add label aesthetic with the symbol
+      data$label <- symbol
+      data$size <- symbol_size
+      
+      # For geom_text, we don't need xmin/xmax/ymin/ymax
+      # x and y are already set correctly
     } else {
       # Individual case square mode (original behavior)
       # Compute rectangle boundaries for geom_rect
@@ -328,7 +384,9 @@ StatEpicurve <- ggplot2::ggproto(
     
     # Add padding points to ensure x-axis includes full width of edge rectangles
     # and a point at y=0 to ensure y-axis includes 0 for proper display
-    if (nrow(data) > 0) {
+    if (nrow(data) > 0 && !use_symbol_mode) {
+      # Only add rectangle-based padding for rect/column modes
+      # Symbol mode handles positioning differently
       zero_row <- data[1, , drop = FALSE]
       zero_row$y <- 0
       zero_row$ymin <- 0
@@ -350,6 +408,7 @@ StatEpicurve <- ggplot2::ggproto(
     }
     
     # Filter out anchor/padding rows (y=0) - they served their purpose for scales
+    # In symbol mode, this also ensures we don't try to render padding symbols
     data <- data[data$y > 0, , drop = FALSE]
     
     data

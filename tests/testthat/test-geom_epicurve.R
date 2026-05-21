@@ -627,3 +627,199 @@ test_that("column mode preserves aesthetics correctly", {
   # Should have correct number of rows (one per date/fill/colour combo)
   expect_equal(nrow(built$data[[1]]), 2)
 })
+
+# ============================================================================
+# Symbol Mode Tests
+# ============================================================================
+
+test_that("geom_epicurve accepts symbol parameter", {
+  library(ggplot2)
+  
+  cases <- simulate_outbreak(n = 20, seed = 123)
+  
+  expect_no_error({
+    p <- ggplot(cases, aes(x = onset_date)) +
+      geom_epicurve(symbol = "●")
+  })
+})
+
+test_that("geom_epicurve with symbol uses geom_text", {
+  library(ggplot2)
+  
+  cases <- simulate_outbreak(n = 15, seed = 456)
+  
+  p <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(symbol = "■")
+  
+  built <- ggplot_build(p)
+  
+  # Should have label column with the symbol
+  expect_true("label" %in% names(built$data[[1]]))
+  expect_equal(unique(built$data[[1]]$label), "■")
+})
+
+test_that("symbol mode creates one row per case", {
+  library(ggplot2)
+  
+  cases <- data.frame(
+    onset_date = as.Date("2024-01-01") + c(rep(0, 5), rep(1, 3), rep(2, 4))
+  )
+  
+  p <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(symbol = "●")
+  
+  built <- ggplot_build(p)
+  
+  # Should have 12 rows (one per case)
+  expect_equal(nrow(built$data[[1]]), 12)
+  
+  # Should all have the symbol
+  expect_true(all(built$data[[1]]$label == "●"))
+})
+
+test_that("symbol mode respects symbol_size parameter", {
+  library(ggplot2)
+  
+  cases <- simulate_outbreak(n = 10, seed = 789)
+  
+  p <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(symbol = "▲", symbol_size = 5)
+  
+  built <- ggplot_build(p)
+  
+  # Should have size set to 5
+  expect_equal(unique(built$data[[1]]$size), 5)
+})
+
+test_that("symbol mode works with Unicode symbols", {
+  library(ggplot2)
+  
+  cases <- simulate_outbreak(n = 10, seed = 101)
+  
+  # Test various Unicode symbols
+  symbols <- c("●", "■", "▲", "♥", "★")
+  
+  for (sym in symbols) {
+    expect_no_error({
+      p <- ggplot(cases, aes(x = onset_date)) +
+        geom_epicurve(symbol = sym)
+      ggplot_build(p)
+    })
+  }
+})
+
+test_that("symbol mode works with emoji", {
+  library(ggplot2)
+  
+  cases <- simulate_outbreak(n = 10, seed = 202)
+  
+  # Test emoji symbol
+  expect_no_error({
+    p <- ggplot(cases, aes(x = onset_date)) +
+      geom_epicurve(symbol = "😷")
+    ggplot_build(p)
+  })
+})
+
+test_that("symbol mode works with colour aesthetic", {
+  library(ggplot2)
+  
+  cases <- simulate_outbreak(n = 15, seed = 303)
+  
+  p <- ggplot(cases, aes(x = onset_date, colour = sex)) +
+    geom_epicurve(symbol = "●")
+  
+  built <- ggplot_build(p)
+  
+  # Should have colour aesthetic
+  expect_true("colour" %in% names(built$data[[1]]))
+  
+  # Should have one row per case
+  expect_equal(nrow(built$data[[1]]), 15)
+})
+
+test_that("symbol mode disabled when max_stack exceeded", {
+  library(ggplot2)
+  
+  # Create data that exceeds max_stack
+  cases <- data.frame(
+    onset_date = as.Date("2024-01-01") + c(rep(0, 25), rep(1, 15))
+  )
+  
+  p <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(symbol = "●", max_stack = 20)
+  
+  built <- ggplot_build(p)
+  
+  # Should switch to column mode (2 rows instead of 40)
+  expect_equal(nrow(built$data[[1]]), 2)
+  
+  # Should STILL have label column (showing counts as text labels)
+  expect_true("label" %in% names(built$data[[1]]))
+  
+  # Labels should show the counts
+  expect_equal(sort(as.numeric(built$data[[1]]$label)), c(15, 25))
+})
+
+test_that("symbol mode y positions are centered", {
+  library(ggplot2)
+  
+  cases <- data.frame(
+    onset_date = as.Date("2024-01-01") + c(0, 0, 0)  # 3 cases on same date
+  )
+  
+  p <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(symbol = "●")
+  
+  built <- ggplot_build(p)
+  
+  # Y positions should be 0.5, 1.5, 2.5 (centered in stacking positions)
+  expect_equal(built$data[[1]]$y, c(0.5, 1.5, 2.5))
+})
+
+test_that("NULL symbol uses default square mode", {
+  library(ggplot2)
+  
+  cases <- simulate_outbreak(n = 10, seed = 404)
+  
+  p <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(symbol = NULL)
+  
+  built <- ggplot_build(p)
+  
+  # Should NOT have label column (using rect mode)
+  expect_false("label" %in% names(built$data[[1]]))
+  
+  # Should have xmin/xmax (rect mode)
+  expect_true("xmin" %in% names(built$data[[1]]))
+  expect_true("xmax" %in% names(built$data[[1]]))
+})
+
+test_that("symbol mode works with faceting", {
+  library(ggplot2)
+  
+  cases <- simulate_outbreak(n = 30, seed = 505)
+  
+  expect_no_error({
+    p <- ggplot(cases, aes(x = onset_date)) +
+      geom_epicurve(symbol = "■") +
+      facet_wrap(~ setting)
+    ggplot_build(p)
+  })
+})
+
+test_that("symbol mode builds valid plots", {
+  library(ggplot2)
+  
+  cases <- simulate_outbreak(n = 20, seed = 606)
+  
+  p <- ggplot(cases, aes(x = onset_date)) +
+    geom_epicurve(symbol = "●", symbol_size = 4) +
+    theme_minimal()
+  
+  # Should build without errors
+  expect_no_error(ggplot_build(p))
+  
+  # Should be a valid ggplot object
+  expect_s3_class(p, "ggplot")
+})
