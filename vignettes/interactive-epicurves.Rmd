@@ -256,7 +256,7 @@ Add context to your epidemic curves with annotations.
 
 ### Interactive Annotations
 
-The `annotate_event()` and `annotate_period()` helper functions work with `ggplotly()` conversion for interactive epidemic curves with timeline context:
+Timeline annotations work with plotly using a combination of ggplot layers and plotly layout annotations:
 
 ```{r annotations-interactive, message=FALSE, warning=FALSE}
 # Add tooltip data
@@ -266,35 +266,74 @@ cases$tooltip <- with(cases, paste0(
   "<b>Age:</b> ", age_group
 ))
 
-# Create plot with annotations
+# Define annotation dates
+exposure_start <- as.Date("2024-05-28")
+exposure_end <- as.Date("2024-06-02")
+investigation_date <- as.Date("2024-06-05")
+
+# Create base plot with shaded period and event line
 p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
-  geom_epicurve(fill = "steelblue") +
-  annotate_period(
-    date = as.Date("2024-05-28"),
-    end_date = as.Date("2024-06-02"),
-    label = "Exposure period",
+  # Shaded exposure period
+  geom_rect(
+    xmin = exposure_start,
+    xmax = exposure_end,
+    ymin = 0,
+    ymax = Inf,
     fill = "yellow",
-    alpha = 0.25
+    alpha = 0.25,
+    inherit.aes = FALSE
   ) +
-  annotate_event(
-    date = as.Date("2024-06-05"),
-    label = "Investigation",
-    colour = "red"
+  # Event marker
+  geom_vline(
+    xintercept = investigation_date,
+    linetype = "dashed",
+    colour = "red",
+    linewidth = 0.75
   ) +
+  # Epidemic curve
+  geom_epicurve(fill = "steelblue") +
   labs(
     title = "Interactive Outbreak Timeline",
     subtitle = "Hover over cases for details",
-    x = "Date", 
+    x = "Date",
     y = "Cases"
   ) +
   scale_y_epicurve() +
   theme_minimal()
 
-# Convert directly to plotly - annotations and rectangles transfer
-ggplotly(p, tooltip = "text")
+# Convert to plotly and add text annotations
+ggplotly(p, tooltip = "text") %>%
+  layout(
+    annotations = list(
+      # Exposure period label
+      list(
+        x = mean(c(exposure_start, exposure_end)),
+        y = 1,
+        text = "Exposure period",
+        showarrow = FALSE,
+        xref = "x",
+        yref = "paper",
+        yanchor = "top",
+        font = list(color = "black", size = 12)
+      ),
+      # Investigation event label
+      list(
+        x = investigation_date,
+        y = 0.95,
+        text = "Investigation",
+        showarrow = TRUE,
+        ax = 0,
+        ay = -40,
+        arrowcolor = "red",
+        xref = "x",
+        yref = "paper",
+        font = list(color = "red", size = 12)
+      )
+    )
+  )
 ```
 
-The shaded period and event line convert to interactive plotly elements automatically!
+The shaded period converts from ggplot2, and text labels are added via plotly's `layout()` annotations for full interactivity!
 
 ## Tips for Interactive Visualisation
 
