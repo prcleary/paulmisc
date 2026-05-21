@@ -180,7 +180,6 @@ cases <- simulate_outbreak()
 ggplot(cases, aes(x = onset_date)) +
   geom_epicurve(fill = "steelblue") +
   theme_minimal()
-#> Warning: Ignoring empty aesthetic: `width`.
 
 
 # Coloured by age group, faceted by setting
@@ -189,7 +188,6 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
   facet_wrap(~ setting, ncol = 1) +
   scale_fill_brewer(palette = "Set2") +
   theme_bw()
-#> Warning: Ignoring empty aesthetic: `width`.
 
 
 # Hourly data (width auto-detects from POSIXct intervals)
@@ -201,7 +199,6 @@ ggplot(hourly_cases, aes(x = onset_time)) +
   geom_epicurve(fill = "darkred") +
   theme_minimal() +
   labs(title = "Hourly Epidemic Curve")
-#> Warning: Ignoring empty aesthetic: `width`.
 
 
 # Weekly data (width auto-detects from Date intervals)
@@ -213,7 +210,6 @@ ggplot(weekly_cases, aes(x = epi_week)) +
   geom_epicurve(fill = "forestgreen") +
   theme_minimal() +
   labs(title = "Weekly Epidemic Curve")
-#> Warning: Ignoring empty aesthetic: `width`.
 
 
 # Automatic column chart for large outbreaks (max_stack threshold)
@@ -225,7 +221,6 @@ ggplot(large_outbreak, aes(x = onset_date)) +
   geom_epicurve(fill = "coral", max_stack = 20) +
   theme_minimal() +
   labs(title = "Large Outbreak (auto-switched to column chart)")
-#> Warning: Ignoring empty aesthetic: `width`.
 
 
 # Force square mode even for large counts by setting max_stack = NULL
@@ -233,7 +228,6 @@ ggplot(large_outbreak, aes(x = onset_date)) +
   geom_epicurve(fill = "coral", max_stack = NULL) +
   theme_minimal() +
   labs(title = "Large Outbreak (forced square mode)")
-#> Warning: Ignoring empty aesthetic: `width`.
 
 
 # Use symbols instead of squares

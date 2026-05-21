@@ -109,9 +109,6 @@ ggplot(cases, aes(x = onset_date)) +
     colour = "red"
   ) +
   theme_minimal()
-#> Warning: A <numeric> value was passed to a Date scale.
-#> ℹ The value was converted to a <Date> object.
-#> Warning: Ignoring empty aesthetic: `width`.
 
 
 # Add a period for exposure window
@@ -124,7 +121,6 @@ ggplot(cases, aes(x = onset_date)) +
     fill = "coral"
   ) +
   theme_minimal()
-#> Warning: Ignoring empty aesthetic: `width`.
 
 
 # Combine multiple annotations
@@ -148,10 +144,5 @@ ggplot(cases, aes(x = onset_date)) +
   ) +
   theme_minimal() +
   labs(title = "Outbreak Timeline with Annotations")
-#> Warning: A <numeric> value was passed to a Date scale.
-#> ℹ The value was converted to a <Date> object.
-#> Warning: A <numeric> value was passed to a Date scale.
-#> ℹ The value was converted to a <Date> object.
-#> Warning: Ignoring empty aesthetic: `width`.
 
 ```
