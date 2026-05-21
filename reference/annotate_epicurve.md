@@ -18,7 +18,7 @@ annotate_event(
   linewidth = 0.75,
   label_y = Inf,
   label_hjust = 0,
-  label_vjust = 1,
+  label_vjust = 0,
   label_size = 3.5,
   ...
 )
@@ -33,7 +33,7 @@ annotate_period(
   alpha = 0.3,
   label_y = Inf,
   label_hjust = 0.5,
-  label_vjust = 1,
+  label_vjust = 0,
   label_size = 3.5,
   ...
 )
@@ -112,6 +112,8 @@ ggplot(cases, aes(x = onset_date)) +
     colour = "red"
   ) +
   theme_minimal()
+#> Warning: Ignoring unknown aesthetics: text
+#> Warning: Ignoring unknown aesthetics: text
 
 
 # Add a period for exposure window
@@ -124,6 +126,8 @@ ggplot(cases, aes(x = onset_date)) +
     fill = "coral"
   ) +
   theme_minimal()
+#> Warning: Ignoring unknown aesthetics: text
+#> Warning: Ignoring unknown aesthetics: text
 
 
 # Combine multiple annotations
@@ -147,6 +151,12 @@ ggplot(cases, aes(x = onset_date)) +
   ) +
   theme_minimal() +
   labs(title = "Outbreak Timeline with Annotations")
+#> Warning: Ignoring unknown aesthetics: text
+#> Warning: Ignoring unknown aesthetics: text
+#> Warning: Ignoring unknown aesthetics: text
+#> Warning: Ignoring unknown aesthetics: text
+#> Warning: Ignoring unknown aesthetics: text
+#> Warning: Ignoring unknown aesthetics: text
 
 
 # Works with plotly for interactive plots (same code!)
