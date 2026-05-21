@@ -138,7 +138,7 @@ annotate_event <- function(date,
                           linewidth = 0.75,
                           label_y = Inf,
                           label_hjust = 0,
-                          label_vjust = 1,
+                          label_vjust = 0,
                           label_size = 3.5,
                           ...) {
 
@@ -175,7 +175,7 @@ annotate_period <- function(date,
                            alpha = 0.3,
                            label_y = Inf,
                            label_hjust = 0.5,
-                           label_vjust = 1,
+                           label_vjust = 0,
                            label_size = 3.5,
                            ...) {
 
@@ -227,14 +227,24 @@ annotate_period <- function(date,
 #' @importFrom ggplot2 ggplot_add
 ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
   yr <- .epicurve_y_range(plot)
+  span <- yr[2] - yr[1]
   y_frac <- .resolve_y_frac(object$label_y)
-  label_y_val <- yr[1] + y_frac * (yr[2] - yr[1])
+  label_y_val <- yr[1] + y_frac * span
+  # When labelling at the top, anchor at yr[2] and rely on vjust to render the
+  # text above the line. Using vjust (not a y nudge) keeps the label out of
+  # the y-scale training data, so adding more annotations doesn't progressively
+  # push subsequent labels higher ("creep").
+  use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
+  effective_vjust <- if (use_top_vjust) -0.5 else object$label_vjust
+
+  # Hover text for plotly tooltips (ignored by ggplot2 but used by ggplotly).
+  hover_text <- paste0(object$label, "<br>", format(object$date))
 
   layers <- list(
     ggplot2::geom_segment(
       data = data.frame(x = object$date, xend = object$date,
-                        y = yr[1], yend = yr[2]),
-      mapping = ggplot2::aes(x = x, xend = xend, y = y, yend = yend),
+                        y = yr[1], yend = yr[2], text = hover_text),
+      mapping = ggplot2::aes(x = x, xend = xend, y = y, yend = yend, text = text),
       inherit.aes = FALSE,
       show.legend = FALSE,
       linetype = object$linetype,
@@ -243,12 +253,13 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
       na.rm = TRUE
     ),
     ggplot2::geom_text(
-      data = data.frame(x = object$date, y = label_y_val, label = object$label),
-      mapping = ggplot2::aes(x = x, y = y, label = label),
+      data = data.frame(x = object$date, y = label_y_val,
+                        label = object$label, text = hover_text),
+      mapping = ggplot2::aes(x = x, y = y, label = label, text = text),
       inherit.aes = FALSE,
       show.legend = FALSE,
       hjust = object$label_hjust,
-      vjust = object$label_vjust,
+      vjust = effective_vjust,
       colour = object$colour,
       size = object$label_size,
       na.rm = TRUE
@@ -261,15 +272,28 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
 #' @importFrom ggplot2 ggplot_add
 ggplot_add.epicurve_period_annotation <- function(object, plot, object_name) {
   yr <- .epicurve_y_range(plot)
+  span <- yr[2] - yr[1]
   y_frac <- .resolve_y_frac(object$label_y)
-  label_y_val <- yr[1] + y_frac * (yr[2] - yr[1])
+  label_y_val <- yr[1] + y_frac * span
+  # See note in ggplot_add.epicurve_event_annotation: use vjust to lift the
+  # label above the data range so the label position doesn't itself train
+  # the y-scale and push subsequent annotations higher.
+  use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
+  effective_vjust <- if (use_top_vjust) -0.5 else object$label_vjust
   label_colour <- if (is.na(object$colour)) "black" else object$colour
+
+  # Hover text for plotly tooltips: label plus the date range.
+  hover_text <- paste0(
+    object$label, "<br>",
+    format(object$date), " \u2013 ", format(object$end_date)
+  )
 
   layers <- list(
     ggplot2::geom_rect(
       data = data.frame(xmin = object$date, xmax = object$end_date,
-                        ymin = yr[1], ymax = yr[2]),
-      mapping = ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+                        ymin = yr[1], ymax = yr[2], text = hover_text),
+      mapping = ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax,
+                             text = text),
       inherit.aes = FALSE,
       show.legend = FALSE,
       fill = object$fill,
@@ -278,12 +302,13 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name) {
       na.rm = TRUE
     ),
     ggplot2::geom_text(
-      data = data.frame(x = object$mid_date, y = label_y_val, label = object$label),
-      mapping = ggplot2::aes(x = x, y = y, label = label),
+      data = data.frame(x = object$mid_date, y = label_y_val,
+                        label = object$label, text = hover_text),
+      mapping = ggplot2::aes(x = x, y = y, label = label, text = text),
       inherit.aes = FALSE,
       show.legend = FALSE,
       hjust = object$label_hjust,
-      vjust = object$label_vjust,
+      vjust = effective_vjust,
       colour = label_colour,
       size = object$label_size,
       na.rm = TRUE

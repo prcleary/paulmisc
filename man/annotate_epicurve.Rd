@@ -15,7 +15,7 @@ annotate_event(
   linewidth = 0.75,
   label_y = Inf,
   label_hjust = 0,
-  label_vjust = 1,
+  label_vjust = 0,
   label_size = 3.5,
   ...
 )
@@ -30,7 +30,7 @@ annotate_period(
   alpha = 0.3,
   label_y = Inf,
   label_hjust = 0.5,
-  label_vjust = 1,
+  label_vjust = 0,
   label_size = 3.5,
   ...
 )
