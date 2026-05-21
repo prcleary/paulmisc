@@ -36,11 +36,8 @@ First, let’s create a basic interactive epidemic curve:
 
 ``` r
 
-# Create a simple tooltip showing date and stacked position
-cases$tooltip <- paste0(format(cases$onset_date, "%d %B %Y"))
-
 # Create ggplot with text aesthetic for tooltips
-p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
+p <- ggplot(cases, aes(x = onset_date, text = format(onset_date, "%d %B %Y"))) +
   geom_epicurve(fill = "steelblue") +
   labs(
     title = "Interactive Epidemic Curve",
@@ -54,7 +51,8 @@ p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
 ggplotly(p, tooltip = "text")
 ```
 
-Hover over any square to see the date and count!
+Hover over any square to see its onset date. Each square represents one
+case, stacked vertically by date!
 
 ## Interactive by Age Group
 
