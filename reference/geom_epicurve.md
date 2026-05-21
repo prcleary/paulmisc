@@ -95,8 +95,10 @@ stat_epicurve(
   rendered as the specified symbol. Examples: `"●"` (bullet), `"■"`
   (square), `"▲"` (triangle), `"♥"` (heart), `"😷"` (face mask emoji).
   Ignored if `max_stack` threshold is exceeded (uses column chart
-  instead). Can also be mapped as an aesthetic for different symbols per
-  group.
+  instead). Pass a named character vector (e.g.
+  `c(Female = "♀", Male = "♂")`) to use different symbols per category;
+  the names are matched against the discrete aesthetic mapping
+  (typically `colour` or `fill`).
 
 - symbol_size:
 

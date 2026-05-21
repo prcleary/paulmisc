@@ -139,7 +139,9 @@ instead of squares (default: <code>NULL</code> for squares). When provided, each
 case is rendered as the specified symbol. Examples: <code>"●"</code> (bullet),
 <code>"■"</code> (square), <code>"▲"</code> (triangle), <code>"♥"</code> (heart), <code>"😷"</code> (face mask emoji).
 Ignored if <code>max_stack</code> threshold is exceeded (uses column chart instead).
-Can also be mapped as an aesthetic for different symbols per group.</p></dd>
+Pass a named character vector (e.g. <code>c(Female = "♀", Male = "♂")</code>) to
+use different symbols per category; the names are matched against the
+discrete aesthetic mapping (typically <code>colour</code> or <code>fill</code>).</p></dd>
 
 
 <dt id="arg-symbol-size">symbol_size<a class="anchor" aria-label="anchor" href="#arg-symbol-size"></a></dt>
