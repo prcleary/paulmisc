@@ -2,6 +2,9 @@
 
 Helper functions to add contextual annotations to epidemic curves, such
 as intervention dates (events) or exposure periods (shaded regions).
+These functions work with both static ggplot2 plots and interactive
+plotly conversions using
+[`ggplotly()`](https://rdrr.io/pkg/plotly/man/ggplotly.html).
 
 ## Usage
 
@@ -145,4 +148,24 @@ ggplot(cases, aes(x = onset_date)) +
   theme_minimal() +
   labs(title = "Outbreak Timeline with Annotations")
 
+
+# Works with plotly for interactive plots (same code!)
+if (FALSE) { # \dontrun{
+library(plotly)
+p <- ggplot(cases, aes(x = onset_date)) +
+  geom_epicurve(fill = "steelblue") +
+  annotate_period(
+    date = as.Date("2024-05-28"),
+    end_date = as.Date("2024-06-02"),
+    label = "Exposure period",
+    fill = "yellow"
+  ) +
+  annotate_event(
+    date = as.Date("2024-06-05"),
+    label = "Investigation",
+    colour = "red"
+  ) +
+  theme_minimal()
+ggplotly(p)
+} # }
 ```

@@ -269,8 +269,8 @@ Add context to your epidemic curves with annotations.
 
 ### Interactive Annotations
 
-Timeline annotations work with plotly using a combination of ggplot
-layers and plotly layout annotations:
+Timeline annotations work seamlessly with plotly using the same code as
+for static plots:
 
 ``` r
 
@@ -281,32 +281,21 @@ cases$tooltip <- with(cases, paste0(
   "<b>Age:</b> ", age_group
 ))
 
-# Define annotation dates
-exposure_start <- as.Date("2024-05-28")
-exposure_end <- as.Date("2024-06-02")
-investigation_date <- as.Date("2024-06-05")
-
-# Create base plot with shaded period and event line
+# Create plot with annotations - same code works for both static and interactive!
 p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
-  # Shaded exposure period
-  geom_rect(
-    xmin = exposure_start,
-    xmax = exposure_end,
-    ymin = 0,
-    ymax = Inf,
-    fill = "yellow",
-    alpha = 0.25,
-    inherit.aes = FALSE
-  ) +
-  # Event marker
-  geom_vline(
-    xintercept = investigation_date,
-    linetype = "dashed",
-    colour = "red",
-    linewidth = 0.75
-  ) +
-  # Epidemic curve
   geom_epicurve(fill = "steelblue") +
+  annotate_period(
+    date = as.Date("2024-05-28"),
+    end_date = as.Date("2024-06-02"),
+    label = "Exposure period",
+    fill = "yellow",
+    alpha = 0.25
+  ) +
+  annotate_event(
+    date = as.Date("2024-06-05"),
+    label = "Investigation",
+    colour = "red"
+  ) +
   labs(
     title = "Interactive Outbreak Timeline",
     subtitle = "Hover over cases for details",
@@ -316,40 +305,12 @@ p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
   scale_y_epicurve() +
   theme_minimal()
 
-# Convert to plotly and add text annotations
-ggplotly(p, tooltip = "text") %>%
-  layout(
-    annotations = list(
-      # Exposure period label
-      list(
-        x = mean(c(exposure_start, exposure_end)),
-        y = 1,
-        text = "Exposure period",
-        showarrow = FALSE,
-        xref = "x",
-        yref = "paper",
-        yanchor = "top",
-        font = list(color = "black", size = 12)
-      ),
-      # Investigation event label
-      list(
-        x = investigation_date,
-        y = 0.95,
-        text = "Investigation",
-        showarrow = TRUE,
-        ax = 0,
-        ay = -40,
-        arrowcolor = "red",
-        xref = "x",
-        yref = "paper",
-        font = list(color = "red", size = 12)
-      )
-    )
-  )
+# Convert to plotly - all annotations transfer automatically!
+ggplotly(p, tooltip = "text")
 ```
 
-The shaded period converts from ggplot2, and text labels are added via
-plotly’s `layout()` annotations for full interactivity!
+The shaded period, event line, and all labels convert to plotly
+automatically!
 
 ## Tips for Interactive Visualisation
 
