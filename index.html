@@ -366,7 +366,19 @@
 <span>    y <span class="op">=</span> <span class="st">"Number of Cases"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/scale_y_epicurve.html">scale_y_epicurve</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in ggplot2::geom_rect(data = data.frame(xmin = object$date, xmax =</span></span>
+<span><span class="co">#&gt; object$end_date, : Ignoring unknown aesthetics: text</span></span>
+<span><span class="co">#&gt; Warning in ggplot2::geom_text(data = data.frame(x = object$mid_date, y =</span></span>
+<span><span class="co">#&gt; label_y_val, : Ignoring unknown aesthetics: text</span></span>
+<span><span class="co">#&gt; Warning in ggplot2::geom_segment(data = data.frame(x = object$date, xend =</span></span>
+<span><span class="co">#&gt; object$date, : Ignoring unknown aesthetics: text</span></span>
+<span><span class="co">#&gt; Warning in ggplot2::geom_text(data = data.frame(x = label_x, y = label_y_val, :</span></span>
+<span><span class="co">#&gt; Ignoring unknown aesthetics: text</span></span>
+<span><span class="co">#&gt; Warning in ggplot2::geom_segment(data = data.frame(x = object$date, xend =</span></span>
+<span><span class="co">#&gt; object$date, : Ignoring unknown aesthetics: text</span></span>
+<span><span class="co">#&gt; Warning in ggplot2::geom_text(data = data.frame(x = label_x, y = label_y_val, :</span></span>
+<span><span class="co">#&gt; Ignoring unknown aesthetics: text</span></span></code></pre></div>
 <p><img src="reference/figures/README-annotated-epicurve-1.png" alt="" width="100%"></p>
 <p>For interactive plotly timelines, see the <a href="articles/interactive-epicurves.html">interactive epicurves vignette</a> which shows how to combine ggplot2 layers with plotly annotations.</p>
 </div>
