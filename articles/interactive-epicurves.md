@@ -120,7 +120,6 @@ rich tooltips:
 # Create formatted tooltips with HTML
 cases$tooltip <- with(cases, paste0(
   "<b>Case ", case_id, "</b><br>",
-  "<hr>",
   "<b>Date:</b> ", format(onset_date, "%d %B %Y"), "<br>",
   "<b>Demographics:</b> ", age_group, ", ", sex, "<br>",
   "<b>Setting:</b> ", setting, "<br>",
