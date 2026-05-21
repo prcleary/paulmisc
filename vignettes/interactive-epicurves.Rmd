@@ -34,23 +34,22 @@ cases <- simulate_outbreak(n = 50, seed = 123)
 First, let's create a basic interactive epidemic curve:
 
 ```{r basic-interactive, message=FALSE, warning=FALSE}
-# Create ggplot
-# Note: We use a constant fill aesthetic so ggplotly has proper tooltip context
-p <- ggplot(cases, aes(x = onset_date, fill = "Cases")) +
-  geom_epicurve() +
-  scale_fill_manual(values = c("Cases" = "steelblue"), name = NULL) +
+# Create a simple tooltip showing date and stacked position
+cases$tooltip <- paste0(format(cases$onset_date, "%d %B %Y"))
+
+# Create ggplot with text aesthetic for tooltips
+p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
+  geom_epicurve(fill = "steelblue") +
   labs(
     title = "Interactive Epidemic Curve",
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
-  theme_minimal() +
-  theme(legend.position = "none")
+  theme_minimal()
 
 # Convert to interactive plotly plot
-# tooltip = c("x", "y") specifies to show only date and count, 
-# not the fill value (which would be "Cases" for every square)
-ggplotly(p, tooltip = c("x", "y"))
+# tooltip = "text" shows only our custom tooltip
+ggplotly(p, tooltip = "text")
 ```
 
 Hover over any square to see the date and count!
