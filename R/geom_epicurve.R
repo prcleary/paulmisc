@@ -60,7 +60,9 @@
 #'   case is rendered as the specified symbol. Examples: `"●"` (bullet),
 #'   `"■"` (square), `"▲"` (triangle), `"♥"` (heart), `"😷"` (face mask emoji).
 #'   Ignored if `max_stack` threshold is exceeded (uses column chart instead).
-#'   Can also be mapped as an aesthetic for different symbols per group.
+#'   Pass a named character vector (e.g. `c(Female = "♀", Male = "♂")`) to
+#'   use different symbols per category; the names are matched against the
+#'   discrete aesthetic mapping (typically `colour` or `fill`).
 #' @param symbol_size Size of symbols when `symbol` is used (default: `3`).
 #'   Adjust if symbols appear too large or small relative to the plot.
 #' @param na.rm If `FALSE` (the default), missing values are removed with
@@ -376,11 +378,34 @@ StatEpicurve <- ggplot2::ggproto(
       # Use center positions instead of rectangle boundaries
       # y position is center of the "cell" where this case sits
       data$y <- data$y - 0.5  # Center vertically in the stacking position
-      
-      # Add label aesthetic with the symbol
-      data$label <- symbol
+
+      # Add label aesthetic with the symbol. When `symbol` is a named
+      # character vector (e.g. c(Female = "\u2640", Male = "\u2642")), look up
+      # the symbol per row using whichever discrete aesthetic column in `data`
+      # has values matching the names of the vector. This allows different
+      # symbols per category while sharing a single stacking sequence.
+      if (length(symbol) > 1 && !is.null(names(symbol))) {
+        match_col <- NULL
+        for (col in c("colour", "color", "fill", "group")) {
+          if (col %in% names(data)) {
+            vals <- as.character(data[[col]])
+            if (length(vals) > 0 && all(unique(vals) %in% names(symbol))) {
+              match_col <- col
+              break
+            }
+          }
+        }
+        if (is.null(match_col)) {
+          stop("`symbol` is a named vector but no aesthetic column in the data ",
+               "(colour, fill, group) has values matching its names: ",
+               paste(names(symbol), collapse = ", "))
+        }
+        data$label <- symbol[as.character(data[[match_col]])]
+      } else {
+        data$label <- symbol[[1]]
+      }
       data$size <- symbol_size
-      
+
       # For geom_text, we don't need xmin/xmax/ymin/ymax
       # x and y are already set correctly
     } else {

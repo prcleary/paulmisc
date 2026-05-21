@@ -69,7 +69,9 @@ instead of squares (default: \code{NULL} for squares). When provided, each
 case is rendered as the specified symbol. Examples: \code{"●"} (bullet),
 \code{"■"} (square), \code{"▲"} (triangle), \code{"♥"} (heart), \code{"😷"} (face mask emoji).
 Ignored if \code{max_stack} threshold is exceeded (uses column chart instead).
-Can also be mapped as an aesthetic for different symbols per group.}
+Pass a named character vector (e.g. \code{c(Female = "♀", Male = "♂")}) to
+use different symbols per category; the names are matched against the
+discrete aesthetic mapping (typically \code{colour} or \code{fill}).}
 
 \item{symbol_size}{Size of symbols when \code{symbol} is used (default: \code{3}).
 Adjust if symbols appear too large or small relative to the plot.}
