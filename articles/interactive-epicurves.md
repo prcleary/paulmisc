@@ -37,6 +37,7 @@ First, let’s create a basic interactive epidemic curve:
 ``` r
 
 # Create ggplot
+# Note: We use a constant fill aesthetic so ggplotly has proper tooltip context
 p <- ggplot(cases, aes(x = onset_date, fill = "Cases")) +
   geom_epicurve() +
   scale_fill_manual(values = c("Cases" = "steelblue"), name = NULL) +
@@ -49,6 +50,8 @@ p <- ggplot(cases, aes(x = onset_date, fill = "Cases")) +
   theme(legend.position = "none")
 
 # Convert to interactive plotly plot
+# tooltip = c("x", "y") specifies to show only date and count, 
+# not the fill value (which would be "Cases" for every square)
 ggplotly(p, tooltip = c("x", "y"))
 ```
 
