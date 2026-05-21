@@ -225,7 +225,7 @@ symbol_cases$tooltip <- with(symbol_cases, paste0(
 ))
 
 p <- ggplot(symbol_cases, aes(x = onset_date, colour = sex, text = tooltip)) +
-  geom_epicurve(symbol = "●", symbol_size = 4) +
+  geom_epicurve(symbol = "●", symbol_size = 6) +
   scale_colour_manual(
     values = c("Female" = "#D55E00", "Male" = "#0072B2"),
     name = "Sex"
@@ -282,18 +282,29 @@ cases$tooltip <- with(cases, paste0(
   "<b>Age:</b> ", age_group
 ))
 
+# Define dates for annotations
+exposure_start <- as.Date("2024-05-28")
+exposure_end <- as.Date("2024-06-02")
+investigation_date <- as.Date("2024-06-05")
+
 # Use standard geoms for plotly compatibility
 p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
   # Shaded period (converts to plotly)
   geom_rect(
-    aes(xmin = as.Date("2024-05-28"), xmax = as.Date("2024-06-02"),
-        ymin = -Inf, ymax = Inf),
-    fill = "yellow", alpha = 0.2, inherit.aes = FALSE
+    xmin = exposure_start, 
+    xmax = exposure_end,
+    ymin = 0, 
+    ymax = Inf,
+    fill = "yellow", 
+    alpha = 0.2, 
+    inherit.aes = FALSE
   ) +
-  # Event markers (convert to plotly)
+  # Event marker (converts to plotly)
   geom_vline(
-    xintercept = as.Date("2024-06-05"),
-    linetype = "dashed", colour = "red", linewidth = 0.75
+    xintercept = as.numeric(investigation_date),
+    linetype = "dashed", 
+    colour = "red", 
+    linewidth = 0.75
   ) +
   # The epicurve itself
   geom_epicurve(fill = "steelblue") +
@@ -305,19 +316,33 @@ p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
   ) +
   theme_minimal()
 
+# Convert to plotly and add text annotations
 ggplotly(p, tooltip = "text") %>%
   layout(annotations = list(
-    list(x = as.Date("2024-05-30"), y = 1, 
-         text = "Exposure period", showarrow = FALSE,
-         xref = "x", yref = "paper", yanchor = "bottom"),
-    list(x = as.Date("2024-06-05"), y = 0.95,
-         text = "Investigation", showarrow = TRUE, 
-         ax = 20, ay = -40, arrowcolor = "red",
-         xref = "x", yref = "paper")
+    list(
+      x = as.numeric(as.POSIXct(as.Date((as.numeric(exposure_start) + as.numeric(exposure_end)) / 2, origin = "1970-01-01"))) * 1000,
+      y = 1, 
+      text = "Exposure period", 
+      showarrow = FALSE,
+      xref = "x", 
+      yref = "paper", 
+      yanchor = "top"
+    ),
+    list(
+      x = as.numeric(as.POSIXct(investigation_date)) * 1000,
+      y = 0.95,
+      text = "Investigation", 
+      showarrow = TRUE, 
+      ax = 20, 
+      ay = -30, 
+      arrowcolor = "red",
+      xref = "x", 
+      yref = "paper"
+    )
   ))
 ```
 
-**Note:** The `layout(annotations = ...)` approach adds text labels directly in plotly after conversion, giving you full control over interactive annotation placement.
+**Note:** The `layout(annotations = ...)` approach adds text labels directly in plotly after conversion. Date values must be converted to milliseconds since epoch (`as.numeric(as.POSIXct(date)) * 1000`) for plotly's x-axis reference.
 
 ## Tips for Interactive Visualisation
 

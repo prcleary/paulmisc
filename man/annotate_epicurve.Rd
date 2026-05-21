@@ -15,7 +15,7 @@ annotate_event(
   linewidth = 0.75,
   label_y = Inf,
   label_hjust = 0,
-  label_vjust = -0.5,
+  label_vjust = 1,
   label_size = 3.5,
   ...
 )
@@ -30,7 +30,7 @@ annotate_period(
   alpha = 0.3,
   label_y = Inf,
   label_hjust = 0.5,
-  label_vjust = -0.5,
+  label_vjust = 1,
   label_size = 3.5,
   ...
 )
@@ -52,8 +52,8 @@ annotate_period(
 \item{label_hjust}{Horizontal justification for label (default: 0 for events,
 0.5 for periods)}
 
-\item{label_vjust}{Vertical justification for label (default: -0.5 for events,
--0.5 for periods)}
+\item{label_vjust}{Vertical justification for label (default: 1 for events,
+1 for periods - labels hang down from the top)}
 
 \item{label_size}{Text size for label (default: 3.5)}
 

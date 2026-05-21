@@ -340,13 +340,13 @@ visualisations:
 symbol_cases <- simulate_outbreak(n = 35, seed = 999)
 
 p1 <- ggplot(symbol_cases, aes(x = onset_date, colour = sex)) +
-  geom_epicurve(symbol = "●", symbol_size = 4) +
+  geom_epicurve(symbol = "●", symbol_size = 6) +
   scale_colour_manual(values = c("Female" = "#D55E00", "Male" = "#0072B2")) +
   labs(title = "Bullet Symbols (●)", x = NULL, y = "Cases") +
   theme_minimal()
 
 p2 <- ggplot(symbol_cases, aes(x = onset_date, colour = outcome)) +
-  geom_epicurve(symbol = "■", symbol_size = 3.5) +
+  geom_epicurve(symbol = "■", symbol_size = 5.5) +
   scale_colour_manual(
     values = c("Recovered" = "steelblue", "Hospitalised" = "tomato")
   ) +
@@ -363,7 +363,7 @@ Emoji work too (requires appropriate font support):
 ``` r
 # COVID-19 cases with face mask emoji
 ggplot(cases, aes(x = onset_date, colour = age_group)) +
-  geom_epicurve(symbol = "😷", symbol_size = 5) +
+  geom_epicurve(symbol = "😷", symbol_size = 6) +
   scale_colour_brewer(palette = "Set2") +
   labs(title = "COVID-19 Cases", x = "Date", y = "Cases") +
   theme_minimal()
