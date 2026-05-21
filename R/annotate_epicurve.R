@@ -1,7 +1,9 @@
 #' Annotate epidemic curves with events and periods
 #'
 #' Helper functions to add contextual annotations to epidemic curves, such as
-#' intervention dates (events) or exposure periods (shaded regions).
+#' intervention dates (events) or exposure periods (shaded regions). These
+#' functions work with both static ggplot2 plots and interactive plotly
+#' conversions using `ggplotly()`.
 #'
 #' @param date Date or POSIXct value for the event or start of period
 #' @param label Character string for the annotation label
@@ -69,8 +71,28 @@
 #'   theme_minimal() +
 #'   labs(title = "Outbreak Timeline with Annotations")
 #'
+#' # Works with plotly for interactive plots (same code!)
+#' \dontrun{
+#' library(plotly)
+#' p <- ggplot(cases, aes(x = onset_date)) +
+#'   geom_epicurve(fill = "steelblue") +
+#'   annotate_period(
+#'     date = as.Date("2024-05-28"),
+#'     end_date = as.Date("2024-06-02"),
+#'     label = "Exposure period",
+#'     fill = "yellow"
+#'   ) +
+#'   annotate_event(
+#'     date = as.Date("2024-06-05"),
+#'     label = "Investigation",
+#'     colour = "red"
+#'   ) +
+#'   theme_minimal()
+#' ggplotly(p)
+#' }
+#'
 #' @name annotate_epicurve
-#' @importFrom ggplot2 geom_vline geom_rect annotate
+#' @importFrom ggplot2 geom_vline geom_rect geom_text aes
 NULL
 
 #' @rdname annotate_epicurve
@@ -111,15 +133,14 @@ annotate_event <- function(date,
       linewidth = linewidth,
       ...
     ),
-    ggplot2::annotate(
-      "text",
-      x = date,
-      y = label_y,
-      label = label,
+    ggplot2::geom_text(
+      data = data.frame(x = date, y = label_y, label = label),
+      ggplot2::aes(x = x, y = y, label = label),
       hjust = label_hjust,
       vjust = label_vjust,
       colour = colour,
-      size = label_size
+      size = label_size,
+      inherit.aes = FALSE
     )
   )
 }
@@ -176,7 +197,7 @@ annotate_period <- function(date,
     ggplot2::geom_rect(
       xmin = date,
       xmax = end_date,
-      ymin = -Inf,
+      ymin = 0,
       ymax = Inf,
       fill = fill,
       colour = colour,
@@ -184,15 +205,14 @@ annotate_period <- function(date,
       inherit.aes = FALSE,
       ...
     ),
-    ggplot2::annotate(
-      "text",
-      x = mid_date,
-      y = label_y,
-      label = label,
+    ggplot2::geom_text(
+      data = data.frame(x = mid_date, y = label_y, label = label),
+      ggplot2::aes(x = x, y = y, label = label),
       hjust = label_hjust,
       vjust = label_vjust,
       colour = if (is.na(colour)) "black" else colour,
-      size = label_size
+      size = label_size,
+      inherit.aes = FALSE
     )
   )
 }
