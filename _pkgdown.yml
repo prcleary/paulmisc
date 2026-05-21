@@ -30,6 +30,7 @@ reference:
       - GeomEpicurve
       - StatEpicurve
       - simulate_outbreak
+      - annotate_epicurve
   - title: "Shiny Applications"
     desc: "Interactive web applications"
     contents:
