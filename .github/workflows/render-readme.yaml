@@ -4,7 +4,10 @@ on:
   push:
     paths:
       - 'README.Rmd'
+      - 'R/**'
+      - 'DESCRIPTION'
       - '.github/workflows/render-readme.yaml'
+  workflow_dispatch:
 
 name: render-readme
 
