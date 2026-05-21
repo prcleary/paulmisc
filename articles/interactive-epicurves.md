@@ -37,14 +37,16 @@ First, let’s create a basic interactive epidemic curve:
 ``` r
 
 # Create ggplot
-p <- ggplot(cases, aes(x = onset_date)) +
+p <- ggplot(cases, aes(x = onset_date, fill = "Cases")) +
   geom_epicurve() +
+  scale_fill_manual(values = c("Cases" = "steelblue"), name = NULL) +
   labs(
     title = "Interactive Epidemic Curve",
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "none")
 
 # Convert to interactive plotly plot
 ggplotly(p, tooltip = c("x", "y"))
