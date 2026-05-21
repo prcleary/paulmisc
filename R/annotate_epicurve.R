@@ -117,6 +117,16 @@ NULL
   yr
 }
 
+# Compute the trained x-range for a plot (numeric, in scale units). Returns
+# NULL when the range can't be determined.
+.epicurve_x_range <- function(plot) {
+  tryCatch({
+    b <- suppressMessages(suppressWarnings(ggplot2::ggplot_build(plot)))
+    xr <- b$layout$panel_scales_x[[1]]$dimension()
+    if (length(xr) < 2 || any(!is.finite(xr))) NULL else xr
+  }, error = function(e) NULL)
+}
+
 # Resolve a fractional label_y (0 = bottom, 1 = top) given user input that
 # may be Inf, -Inf, a fraction, or a string like "top"/"middle"/"bottom".
 .resolve_y_frac <- function(label_y) {
@@ -257,6 +267,21 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
   # Hover text for plotly tooltips (ignored by ggplot2 but used by ggplotly).
   hover_text <- paste0(object$label, "<br>", format(object$date))
 
+  # Nudge the label slightly to the right of the line so it doesn't sit on
+  # top of the vertical line in the static ggplot2 rendering.
+  label_x <- object$date
+  xr <- .epicurve_x_range(plot)
+  if (!is.null(xr) && object$label_hjust >= 0 && object$label_hjust <= 0.25) {
+    nudge_units <- 0.01 * (xr[2] - xr[1])
+    label_x <- if (inherits(object$date, "Date")) {
+      object$date + nudge_units
+    } else if (inherits(object$date, "POSIXct")) {
+      object$date + nudge_units
+    } else {
+      object$date + nudge_units
+    }
+  }
+
   layers <- list(
     ggplot2::geom_segment(
       data = data.frame(x = object$date, xend = object$date,
@@ -270,7 +295,7 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
       na.rm = TRUE
     ),
     ggplot2::geom_text(
-      data = data.frame(x = object$date, y = label_y_val,
+      data = data.frame(x = label_x, y = label_y_val,
                         label = object$label, text = hover_text),
       mapping = ggplot2::aes(x = x, y = y, label = label, text = text),
       inherit.aes = FALSE,
