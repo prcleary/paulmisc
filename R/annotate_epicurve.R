@@ -239,14 +239,20 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
   yr <- .epicurve_orig_yr(plot)
   span <- yr[2] - yr[1]
   y_frac <- .resolve_y_frac(object$label_y)
-  label_y_val <- yr[1] + y_frac * span
-  # When labelling at the top, anchor at yr[2] and rely on vjust to render the
-  # text above the data range. Combined with the expand_limits() below, this
-  # places the label in dedicated headroom above the data so it doesn't
-  # overlap the top of bars or shaded period rectangles.
+  # When labelling at the top, place the label in dedicated headroom above the
+  # data top (yr[2]) so it doesn't overlap bars or shaded period rectangles.
+  # expand_limits() below grows the panel to fit. Using a fixed offset from
+  # the snapshotted yr (not the current built scale) prevents "creep".
   use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
-  effective_vjust <- if (use_top_vjust) -0.5 else object$label_vjust
-  top_pad <- if (use_top_vjust) yr[2] + 0.18 * span else NULL
+  if (use_top_vjust) {
+    label_y_val <- yr[2] + 0.10 * span
+    effective_vjust <- 0
+    top_pad <- yr[2] + 0.18 * span
+  } else {
+    label_y_val <- yr[1] + y_frac * span
+    effective_vjust <- object$label_vjust
+    top_pad <- NULL
+  }
 
   # Hover text for plotly tooltips (ignored by ggplot2 but used by ggplotly).
   hover_text <- paste0(object$label, "<br>", format(object$date))
@@ -290,13 +296,19 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name) {
   yr <- .epicurve_orig_yr(plot)
   span <- yr[2] - yr[1]
   y_frac <- .resolve_y_frac(object$label_y)
-  label_y_val <- yr[1] + y_frac * span
-  # See note in ggplot_add.epicurve_event_annotation: expand_limits() adds
-  # headroom above the data once, and vjust lifts the label into that
-  # headroom so it doesn't overlap the shaded period or tall bars.
+  # See note in ggplot_add.epicurve_event_annotation: place the label in the
+  # headroom added by expand_limits() so it sits clearly above the shaded
+  # period rectangle rather than overlapping its top edge.
   use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
-  effective_vjust <- if (use_top_vjust) -0.5 else object$label_vjust
-  top_pad <- if (use_top_vjust) yr[2] + 0.18 * span else NULL
+  if (use_top_vjust) {
+    label_y_val <- yr[2] + 0.10 * span
+    effective_vjust <- 0
+    top_pad <- yr[2] + 0.18 * span
+  } else {
+    label_y_val <- yr[1] + y_frac * span
+    effective_vjust <- object$label_vjust
+    top_pad <- NULL
+  }
   label_colour <- if (is.na(object$colour)) "black" else object$colour
 
   # Hover text for plotly tooltips: label plus the date range.
