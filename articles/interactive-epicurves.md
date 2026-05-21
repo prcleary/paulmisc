@@ -306,7 +306,15 @@ p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
   theme_minimal()
 
 # Convert to plotly - all annotations transfer automatically!
-ggplotly(p, tooltip = "text")
+# ggplotly() doesn't render ggplot subtitles, so re-inject the title via
+# layout() using an HTML <br> + <sup> for the subtitle.
+ggplotly(p, tooltip = "text") |>
+  layout(title = list(
+    text = paste0(
+      "Interactive Outbreak Timeline",
+      "<br><sup>Hover over cases for details</sup>"
+    )
+  ))
 ```
 
 The shaded period, event line, and all labels convert to plotly
