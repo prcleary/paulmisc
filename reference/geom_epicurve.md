@@ -15,7 +15,7 @@ geom_epicurve(
   stat = "epicurve",
   position = "identity",
   ...,
-  width = 0.9,
+  width = NULL,
   height = 0.9,
   na.rm = FALSE,
   show.legend = NA,
@@ -28,7 +28,7 @@ stat_epicurve(
   geom = "rect",
   position = "identity",
   ...,
-  width = 0.9,
+  width = NULL,
   height = 0.9,
   na.rm = FALSE,
   show.legend = NA,
@@ -63,8 +63,11 @@ stat_epicurve(
 
 - width:
 
-  Numeric width of each case square in x-axis units. For daily date data
-  this is in days; defaults to `0.9`.
+  Numeric width of each case square in x-axis units. If `NULL` (the
+  default), automatically determines appropriate width based on the time
+  unit: 0.9 for daily Date data, 3600 seconds for hourly POSIXct data,
+  6.3 for weekly data, etc. Specify explicitly to override
+  auto-detection.
 
 - height:
 
@@ -144,10 +147,11 @@ library(ggplot2)
 
 cases <- simulate_outbreak()
 
-# Minimal epicurve
+# Minimal epicurve (daily data)
 ggplot(cases, aes(x = onset_date)) +
   geom_epicurve(fill = "steelblue") +
   theme_minimal()
+#> Warning: Ignoring empty aesthetic: `width`.
 
 
 # Coloured by age group, faceted by setting
@@ -156,5 +160,30 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
   facet_wrap(~ setting, ncol = 1) +
   scale_fill_brewer(palette = "Set2") +
   theme_bw()
+#> Warning: Ignoring empty aesthetic: `width`.
+
+
+# Hourly data (width auto-detects from POSIXct intervals)
+hourly_cases <- data.frame(
+  onset_time = as.POSIXct("2024-06-01 08:00:00") + 3600 * c(0, 1, 1, 2, 3, 3, 4),
+  case_id = 1:7
+)
+ggplot(hourly_cases, aes(x = onset_time)) +
+  geom_epicurve(fill = "darkred") +
+  theme_minimal() +
+  labs(title = "Hourly Epidemic Curve")
+#> Warning: Ignoring empty aesthetic: `width`.
+
+
+# Weekly data (width auto-detects from Date intervals)
+weekly_cases <- data.frame(
+  epi_week = as.Date("2024-01-01") + 7 * c(0, 1, 1, 1, 2, 2, 3, 4),
+  case_id = 1:8
+)
+ggplot(weekly_cases, aes(x = epi_week)) +
+  geom_epicurve(fill = "forestgreen") +
+  theme_minimal() +
+  labs(title = "Weekly Epidemic Curve")
+#> Warning: Ignoring empty aesthetic: `width`.
 
 ```
