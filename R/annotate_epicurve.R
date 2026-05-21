@@ -138,6 +138,21 @@ NULL
   label_y
 }
 
+# Suppress the harmless "Ignoring unknown aesthetics: text" warning that
+# ggplot2 emits when we attach a `text` aesthetic for plotly tooltip use.
+# The aesthetic is benign in static rendering and required for ggplotly().
+.silence_text_aes <- function(expr) {
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      if (grepl("Ignoring unknown aesthetics: text", conditionMessage(w),
+                fixed = TRUE)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}
+
 #' @rdname annotate_epicurve
 #' @export
 annotate_event <- function(date,
@@ -282,7 +297,7 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
     }
   }
 
-  layers <- list(
+  layers <- .silence_text_aes(list(
     ggplot2::geom_segment(
       data = data.frame(x = object$date, xend = object$date,
                         y = yr[1], yend = label_y_val, text = hover_text),
@@ -306,7 +321,7 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
       size = object$label_size,
       na.rm = TRUE
     )
-  )
+  ))
   if (!is.null(top_pad)) {
     layers <- c(layers, list(ggplot2::expand_limits(y = top_pad)))
   }
@@ -342,7 +357,7 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name) {
     format(object$date), " \u2013 ", format(object$end_date)
   )
 
-  layers <- list(
+  layers <- .silence_text_aes(list(
     ggplot2::geom_rect(
       data = data.frame(xmin = object$date, xmax = object$end_date,
                         ymin = yr[1], ymax = yr[2], text = hover_text),
@@ -367,7 +382,7 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name) {
       size = object$label_size,
       na.rm = TRUE
     )
-  )
+  ))
   if (!is.null(top_pad)) {
     layers <- c(layers, list(ggplot2::expand_limits(y = top_pad)))
   }
