@@ -13,6 +13,9 @@ Functions for creating epidemic curves and simulating outbreak data
   : StatEpicurve: ggproto for stacking individual cases
 - [`simulate_outbreak()`](https://prcleary.github.io/paulmisc/reference/simulate_outbreak.md)
   : Simulate onset dates for a point-source disease outbreak
+- [`annotate_event()`](https://prcleary.github.io/paulmisc/reference/annotate_epicurve.md)
+  [`annotate_period()`](https://prcleary.github.io/paulmisc/reference/annotate_epicurve.md)
+  : Annotate epidemic curves with events and periods
 
 ## Shiny Applications
 
