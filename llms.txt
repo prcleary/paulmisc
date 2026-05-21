@@ -227,9 +227,11 @@ data:
 ``` r
 
 # Hourly data for rapid outbreak investigation
-hourly_cases <- data.frame(
-  onset_time = as.POSIXct("2024-06-01 08:00:00") + 
-    3600 * c(0, 1, 1, 2, 2, 2, 3, 4, 4, 5, 6, 7, 8)
+hourly_cases <- simulate_outbreak(
+  n = 15,
+  time_unit = "hourly",
+  exposure = "2024-06-01",
+  seed = 123
 )
 
 p1 <- ggplot(hourly_cases, aes(x = onset_time)) +
@@ -238,11 +240,14 @@ p1 <- ggplot(hourly_cases, aes(x = onset_time)) +
   theme_minimal()
 
 # Weekly aggregated data for surveillance
-weekly_cases <- data.frame(
-  epi_week = as.Date("2024-01-01") + 7 * c(0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 5)
+weekly_cases <- simulate_outbreak(
+  n = 20,
+  time_unit = "weekly",
+  exposure = "2024-01-01",
+  seed = 456
 )
 
-p2 <- ggplot(weekly_cases, aes(x = epi_week)) +
+p2 <- ggplot(weekly_cases, aes(x = onset_date)) +
   geom_epicurve(fill = "forestgreen") +
   labs(title = "Weekly Epidemic Curve", x = "Week", y = "Cases") +
   theme_minimal()
@@ -262,9 +267,13 @@ switches to a column chart for better readability:
 
 ``` r
 
-# Simulate a large outbreak
-large_outbreak <- data.frame(
-  onset_date = as.Date("2024-01-01") + sample(0:14, 300, replace = TRUE)
+# Simulate a large continuous outbreak
+large_outbreak <- simulate_outbreak(
+  n = 300,
+  pattern = "continuous",
+  date_range = 14,
+  exposure = "2024-01-01",
+  seed = 789
 )
 
 ggplot(large_outbreak, aes(x = onset_date)) +

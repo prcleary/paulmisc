@@ -65,6 +65,9 @@ demonstrate or test plotting functions such as <code><a href="geom_epicurve.html
 <span>  exposure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2024-06-01"</span><span class="op">)</span>,</span>
 <span>  meanlog <span class="op">=</span> <span class="fl">1.6</span>,</span>
 <span>  sdlog <span class="op">=</span> <span class="fl">0.45</span>,</span>
+<span>  time_unit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"daily"</span>, <span class="st">"hourly"</span>, <span class="st">"weekly"</span><span class="op">)</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"point_source"</span>, <span class="st">"continuous"</span><span class="op">)</span>,</span>
+<span>  date_range <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">42</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -93,6 +96,25 @@ pathogens. For quick-onset diseases like norovirus, try
 hepatitis A, try <code>meanlog = 3</code> (median ~20 days).</p></dd>
 
 
+<dt id="arg-time-unit">time_unit<a class="anchor" aria-label="anchor" href="#arg-time-unit"></a></dt>
+<dd><p>Character string specifying the time resolution of the
+outbreak data. Options: <code>"daily"</code> (default, returns Date), <code>"hourly"</code>
+(returns POSIXct with hour resolution), or <code>"weekly"</code> (returns Date
+aggregated to weeks).</p></dd>
+
+
+<dt id="arg-pattern">pattern<a class="anchor" aria-label="anchor" href="#arg-pattern"></a></dt>
+<dd><p>Character string specifying the outbreak pattern. Options:
+<code>"point_source"</code> (default, log-normal incubation from single exposure)
+or <code>"continuous"</code> (uniform distribution over a date range for ongoing
+transmission).</p></dd>
+
+
+<dt id="arg-date-range">date_range<a class="anchor" aria-label="anchor" href="#arg-date-range"></a></dt>
+<dd><p>Integer. For continuous pattern, the number of days/hours/weeks
+over which cases are uniformly distributed. Ignored for point_source pattern.</p></dd>
+
+
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Optional integer used to seed the random number generator
 for reproducibility. Use <code>NULL</code> to leave the RNG state untouched.</p></dd>
@@ -100,8 +122,9 @@ for reproducibility. Use <code>NULL</code> to leave the RNG state untouched.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame with one row per case and the columns
-<code>case_id</code>, <code>onset_date</code>, <code>age_group</code>, <code>sex</code>, <code>outcome</code>, and <code>setting</code>.</p>
+    <p>A data frame with one row per case. For daily/weekly data: columns
+<code>case_id</code>, <code>onset_date</code>, <code>age_group</code>, <code>sex</code>, <code>outcome</code>, and <code>setting</code>.
+For hourly data: <code>onset_time</code> instead of <code>onset_date</code>.</p>
     </div>
 
     <div class="section level2">
@@ -128,6 +151,39 @@ for reproducibility. Use <code>NULL</code> to leave the RNG state untouched.</p>
 <span class="r-in"><span><span class="co"># Long incubation period (e.g., Hepatitis A)</span></span></span>
 <span class="r-in"><span><span class="co"># meanlog = 3 gives median of exp(3) = 20 days</span></span></span>
 <span class="r-in"><span><span class="va">slow</span> <span class="op">&lt;-</span> <span class="fu">simulate_outbreak</span><span class="op">(</span>meanlog <span class="op">=</span> <span class="fl">3</span>, sdlog <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Hourly outbreak data for rapid response</span></span></span>
+<span class="r-in"><span><span class="va">hourly</span> <span class="op">&lt;-</span> <span class="fu">simulate_outbreak</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">15</span>, time_unit <span class="op">=</span> <span class="st">"hourly"</span>, seed <span class="op">=</span> <span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">hourly</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   case_id          onset_time age_group    sex   outcome   setting</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    C001 2024-06-05 16:00:00     Adult   Male Recovered Wedding A</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    C002 2024-06-06 02:00:00     Adult Female Recovered Wedding B</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    C003 2024-06-11 11:00:00   Elderly Female Recovered Wedding B</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    C004 2024-06-06 21:00:00     Adult   Male Recovered Wedding A</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    C005 2024-06-07 00:00:00     Adult Female Recovered Wedding A</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    C006 2024-06-12 18:00:00     Child Female Recovered Wedding B</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Weekly surveillance data</span></span></span>
+<span class="r-in"><span><span class="va">weekly</span> <span class="op">&lt;-</span> <span class="fu">simulate_outbreak</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">20</span>, time_unit <span class="op">=</span> <span class="st">"weekly"</span>, seed <span class="op">=</span> <span class="fl">456</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">weekly</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   case_id onset_date age_group    sex      outcome   setting</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    C001 2024-06-03     Adult Female    Recovered Wedding B</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    C002 2024-06-03     Adult Female    Recovered Wedding B</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    C003 2024-06-03     Adult   Male    Recovered Wedding B</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    C004 2024-06-03     Adult   Male Hospitalised Wedding A</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    C005 2024-06-03     Adult Female    Recovered Wedding B</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    C006 2024-06-03     Adult Female Hospitalised Wedding B</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Large continuous outbreak (not point-source)</span></span></span>
+<span class="r-in"><span><span class="va">large</span> <span class="op">&lt;-</span> <span class="fu">simulate_outbreak</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">300</span>, pattern <span class="op">=</span> <span class="st">"continuous"</span>, date_range <span class="op">=</span> <span class="fl">14</span>, seed <span class="op">=</span> <span class="fl">789</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">large</span><span class="op">$</span><span class="va">onset_date</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-06-01 2024-06-02 2024-06-03 2024-06-04 2024-06-05 2024-06-06 2024-06-07 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         16         24         21         24         19         21         18 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-06-08 2024-06-09 2024-06-10 2024-06-11 2024-06-12 2024-06-13 2024-06-14 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         19         13         23         23         17         18         23 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-06-15 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         21 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

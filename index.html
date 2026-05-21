@@ -268,9 +268,11 @@
 <p>Epidemic curves automatically adapt to hourly, daily, weekly, or monthly data:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Hourly data for rapid outbreak investigation</span></span>
-<span><span class="va">hourly_cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  onset_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2024-06-01 08:00:00"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>    <span class="fl">3600</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">8</span><span class="op">)</span></span>
+<span><span class="va">hourly_cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span></span>
+<span>  n <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  time_unit <span class="op">=</span> <span class="st">"hourly"</span>,</span>
+<span>  exposure <span class="op">=</span> <span class="st">"2024-06-01"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">123</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">hourly_cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_time</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -279,11 +281,14 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Weekly aggregated data for surveillance</span></span>
-<span><span class="va">weekly_cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  epi_week <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2024-01-01"</span><span class="op">)</span> <span class="op">+</span> <span class="fl">7</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="va">weekly_cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span></span>
+<span>  n <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>  time_unit <span class="op">=</span> <span class="st">"weekly"</span>,</span>
+<span>  exposure <span class="op">=</span> <span class="st">"2024-01-01"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">456</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">weekly_cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">epi_week</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">weekly_cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"forestgreen"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Weekly Epidemic Curve"</span>, x <span class="op">=</span> <span class="st">"Week"</span>, y <span class="op">=</span> <span class="st">"Cases"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -297,9 +302,13 @@
 </h3>
 <p>When case counts exceed a threshold (default 20), the plot automatically switches to a column chart for better readability:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Simulate a large outbreak</span></span>
-<span><span class="va">large_outbreak</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  onset_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2024-01-01"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">14</span>, <span class="fl">300</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Simulate a large continuous outbreak</span></span>
+<span><span class="va">large_outbreak</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span></span>
+<span>  n <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="st">"continuous"</span>,</span>
+<span>  date_range <span class="op">=</span> <span class="fl">14</span>,</span>
+<span>  exposure <span class="op">=</span> <span class="st">"2024-01-01"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">789</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">large_outbreak</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>

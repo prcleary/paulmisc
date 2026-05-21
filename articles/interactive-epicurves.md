@@ -155,10 +155,11 @@ outbreak:
 ``` r
 
 # Create hourly outbreak data
-hourly_cases <- data.frame(
-  onset_time = as.POSIXct("2024-06-01 08:00:00") + 
-    3600 * c(0, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 6, 7, 8),
-  case_id = 1:16
+hourly_cases <- simulate_outbreak(
+  n = 16,
+  time_unit = "hourly",
+  exposure = "2024-06-01",
+  seed = 321
 )
 
 # Add tooltips with formatted time
@@ -188,11 +189,13 @@ mode when case counts exceed the threshold:
 
 ``` r
 
-# Simulate a large outbreak
-set.seed(456)
-large_outbreak <- data.frame(
-  onset_date = as.Date("2024-01-01") + sample(0:10, 200, replace = TRUE),
-  case_id = 1:200
+# Simulate a large continuous outbreak
+large_outbreak <- simulate_outbreak(
+  n = 200,
+  pattern = "continuous",
+  date_range = 10,
+  exposure = "2024-01-01",
+  seed = 456
 )
 
 # Count cases per date for custom tooltips
