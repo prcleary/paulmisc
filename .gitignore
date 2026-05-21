@@ -11,3 +11,5 @@ docs
 .aider*
 .positai
 README.html
+/doc/
+/Meta/

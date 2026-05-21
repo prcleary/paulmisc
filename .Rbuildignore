@@ -8,3 +8,5 @@
 ^\.claude$
 ^README\.Rmd$
 ^\.github$
+^doc$
+^Meta$

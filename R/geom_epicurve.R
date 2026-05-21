@@ -43,8 +43,10 @@
 #'   to `"epicurve"`.
 #' @param geom The geometric object to use; defaults to `"epicurve"`.
 #' @param position Position adjustment, defaults to `"identity"`.
-#' @param width Numeric width of each case square in x-axis units. For
-#'   daily date data this is in days; defaults to `0.9`.
+#' @param width Numeric width of each case square in x-axis units. If `NULL`
+#'   (the default), automatically determines appropriate width based on the
+#'   time unit: 0.9 for daily Date data, 3600 seconds for hourly POSIXct data,
+#'   6.3 for weekly data, etc. Specify explicitly to override auto-detection.
 #' @param height Numeric height of each case square in y-axis units;
 #'   defaults to `0.9`. Values below 1 produce visible gaps between
 #'   stacked cases.
@@ -63,7 +65,7 @@
 #'
 #' cases <- simulate_outbreak()
 #'
-#' # Minimal epicurve
+#' # Minimal epicurve (daily data)
 #' ggplot(cases, aes(x = onset_date)) +
 #'   geom_epicurve(fill = "steelblue") +
 #'   theme_minimal()
@@ -75,6 +77,26 @@
 #'   scale_fill_brewer(palette = "Set2") +
 #'   theme_bw()
 #'
+#' # Hourly data (width auto-detects from POSIXct intervals)
+#' hourly_cases <- data.frame(
+#'   onset_time = as.POSIXct("2024-06-01 08:00:00") + 3600 * c(0, 1, 1, 2, 3, 3, 4),
+#'   case_id = 1:7
+#' )
+#' ggplot(hourly_cases, aes(x = onset_time)) +
+#'   geom_epicurve(fill = "darkred") +
+#'   theme_minimal() +
+#'   labs(title = "Hourly Epidemic Curve")
+#'
+#' # Weekly data (width auto-detects from Date intervals)
+#' weekly_cases <- data.frame(
+#'   epi_week = as.Date("2024-01-01") + 7 * c(0, 1, 1, 1, 2, 2, 3, 4),
+#'   case_id = 1:8
+#' )
+#' ggplot(weekly_cases, aes(x = epi_week)) +
+#'   geom_epicurve(fill = "forestgreen") +
+#'   theme_minimal() +
+#'   labs(title = "Weekly Epidemic Curve")
+#'
 #' @seealso [simulate_outbreak()] for generating example data.
 #'
 #' @importFrom ggplot2 layer ggproto Stat aes
@@ -84,7 +106,7 @@ geom_epicurve <- function(mapping = NULL,
                           stat = "epicurve",
                           position = "identity",
                           ...,
-                          width = 0.9,
+                          width = NULL,
                           height = 0.9,
                           na.rm = FALSE,
                           show.legend = NA,
@@ -113,7 +135,7 @@ stat_epicurve <- function(mapping = NULL,
                           geom = "rect",
                           position = "identity",
                           ...,
-                          width = 0.9,
+                          width = NULL,
                           height = 0.9,
                           na.rm = FALSE,
                           show.legend = NA,
@@ -135,6 +157,75 @@ stat_epicurve <- function(mapping = NULL,
   )
 }
 
+#' Detect appropriate width for epicurve based on x-axis data
+#'
+#' @param x Vector of x-axis values (Date, POSIXct, or numeric)
+#' @return Numeric width value appropriate for the data type and range
+#' @keywords internal
+#' @noRd
+detect_epicurve_width <- function(x) {
+  # Remove NAs for analysis
+  x <- x[!is.na(x)]
+  
+  if (length(x) < 2) {
+    # Not enough data to detect - use default
+    return(0.9)
+  }
+  
+  # Handle POSIXct/POSIXlt (datetime)
+  if (inherits(x, "POSIXt")) {
+    # Calculate median time difference in seconds
+    x_sorted <- sort(x)
+    diffs <- as.numeric(diff(x_sorted), units = "secs")
+    median_diff <- stats::median(diffs, na.rm = TRUE)
+    
+    # Determine time unit based on typical difference
+    if (median_diff <= 90) {
+      # Minute-level data (≤1.5 minutes)
+      return(60 * 0.9)  # 54 seconds
+    } else if (median_diff <= 5400) {
+      # Hourly data (≤1.5 hours)
+      return(3600 * 0.9)  # 54 minutes in seconds
+    } else if (median_diff <= 129600) {
+      # Daily data (≤1.5 days)
+      return(86400 * 0.9)  # ~21.6 hours in seconds
+    } else {
+      # Weekly or longer - use median difference * 0.9
+      return(median_diff * 0.9)
+    }
+  }
+  
+  # Handle Date objects
+  if (inherits(x, "Date")) {
+    # Calculate median difference in days
+    x_sorted <- sort(x)
+    diffs <- as.numeric(diff(x_sorted))
+    median_diff <- stats::median(diffs, na.rm = TRUE)
+    
+    if (median_diff <= 1.5) {
+      # Daily data
+      return(0.9)
+    } else if (median_diff <= 10) {
+      # Weekly-ish data (2-10 days between points)
+      return(median_diff * 0.9)
+    } else if (median_diff <= 45) {
+      # Monthly-ish data (10-45 days between points)
+      return(median_diff * 0.9)
+    } else {
+      # Longer periods
+      return(median_diff * 0.9)
+    }
+  }
+  
+  # Handle numeric x-axis (generic fallback)
+  x_sorted <- sort(x)
+  diffs <- diff(x_sorted)
+  median_diff <- stats::median(diffs, na.rm = TRUE)
+  
+  # For numeric, use 90% of median difference or 0.9 as minimum
+  return(max(median_diff * 0.9, 0.9))
+}
+
 #' StatEpicurve: ggproto for stacking individual cases
 #'
 #' Computes, within each panel, a stacking index `y` for every case sharing
@@ -148,7 +239,12 @@ StatEpicurve <- ggplot2::ggproto(
   ggplot2::Stat,
   required_aes = "x",
 
-  compute_panel = function(self, data, scales, na.rm = FALSE, width = 0.9, height = 0.9) {
+  compute_panel = function(self, data, scales, na.rm = FALSE, width = NULL, height = 0.9) {
+    # Auto-detect appropriate width if not specified
+    if (is.null(width)) {
+      width <- detect_epicurve_width(data$x)
+    }
+    
     data <- data[order(data$x, data$group), , drop = FALSE]
     data$y <- stats::ave(seq_len(nrow(data)), data$x, FUN = seq_along)
     
