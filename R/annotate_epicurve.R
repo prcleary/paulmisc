@@ -235,7 +235,7 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
   # the y-scale training data, so adding more annotations doesn't progressively
   # push subsequent labels higher ("creep").
   use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
-  effective_vjust <- if (use_top_vjust) -0.5 else object$label_vjust
+  effective_vjust <- if (use_top_vjust) -1.2 else object$label_vjust
 
   # Hover text for plotly tooltips (ignored by ggplot2 but used by ggplotly).
   hover_text <- paste0(object$label, "<br>", format(object$date))
@@ -279,7 +279,7 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name) {
   # label above the data range so the label position doesn't itself train
   # the y-scale and push subsequent annotations higher.
   use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
-  effective_vjust <- if (use_top_vjust) -0.5 else object$label_vjust
+  effective_vjust <- if (use_top_vjust) -1.2 else object$label_vjust
   label_colour <- if (is.na(object$colour)) "black" else object$colour
 
   # Hover text for plotly tooltips: label plus the date range.
