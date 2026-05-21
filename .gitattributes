@@ -1,0 +1,3 @@
+# Exclude pkgdown documentation from language statistics
+docs/* linguist-documentation
+docs/** linguist-documentation

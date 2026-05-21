@@ -161,6 +161,24 @@ geom_epicurve <- function(mapping = NULL,
   # If symbol is provided, we'll try to use text mode (unless max_stack overrides)
   use_geom <- if (!is.null(symbol)) "text" else "rect"
   
+  # Build params list, excluding NULL width to avoid aesthetic warnings
+  params <- list(
+    height = height,
+    max_stack = max_stack,
+    symbol = symbol,
+    symbol_size = symbol_size,
+    na.rm = na.rm,
+    ...
+  )
+  if (!is.null(width)) {
+    params$width <- width
+  }
+  
+  # For symbol mode, default to no legend (prevents "a" showing in legend)
+  if (!is.null(symbol) && is.na(show.legend)) {
+    show.legend <- FALSE
+  }
+  
   ggplot2::layer(
     geom        = use_geom,
     mapping     = mapping,
@@ -169,15 +187,7 @@ geom_epicurve <- function(mapping = NULL,
     position    = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    params      = list(
-      width = width,
-      height = height,
-      max_stack = max_stack,
-      symbol = symbol,
-      symbol_size = symbol_size,
-      na.rm = na.rm,
-      ...
-    )
+    params      = params
   )
 }
 
@@ -196,6 +206,19 @@ stat_epicurve <- function(mapping = NULL,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
+  # Build params list, excluding NULL width to avoid aesthetic warnings
+  params <- list(
+    height = height,
+    max_stack = max_stack,
+    symbol = symbol,
+    symbol_size = symbol_size,
+    na.rm = na.rm,
+    ...
+  )
+  if (!is.null(width)) {
+    params$width <- width
+  }
+  
   ggplot2::layer(
     stat        = StatEpicurve,
     data        = data,
@@ -204,15 +227,7 @@ stat_epicurve <- function(mapping = NULL,
     position    = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    params      = list(
-      width = width,
-      height = height,
-      max_stack = max_stack,
-      symbol = symbol,
-      symbol_size = symbol_size,
-      na.rm = na.rm,
-      ...
-    )
+    params      = params
   )
 }
 

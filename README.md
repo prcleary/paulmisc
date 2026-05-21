@@ -135,8 +135,6 @@ ggplot(cases, aes(x = onset_date)) +
     y = "Number of Cases"
   ) +
   theme_minimal()
-#> Warning in geom_epicurve(fill = "steelblue"): Ignoring empty aesthetic:
-#> `width`.
 ```
 
 <img src="man/figures/README-basic-epicurve-1.png" alt="" width="100%" />
@@ -157,7 +155,6 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
     fill = "Age Group"
   ) +
   theme_bw()
-#> Warning in geom_epicurve(colour = "grey20"): Ignoring empty aesthetic: `width`.
 ```
 
 <img src="man/figures/README-coloured-epicurve-1.png" alt="" width="100%" />
@@ -181,7 +178,6 @@ ggplot(cases, aes(x = onset_date, fill = outcome)) +
     fill = "Outcome"
   ) +
   theme_minimal()
-#> Warning in geom_epicurve(height = 0.85): Ignoring empty aesthetic: `width`.
 ```
 
 <img src="man/figures/README-faceted-epicurve-1.png" alt="" width="100%" />
@@ -228,8 +224,6 @@ p2 <- ggplot(long_incubation, aes(x = onset_date)) +
   theme_minimal()
 
 p1 / p2
-#> Warning in geom_epicurve(fill = "coral"): Ignoring empty aesthetic: `width`.
-#> Warning in geom_epicurve(fill = "skyblue"): Ignoring empty aesthetic: `width`.
 ```
 
 <img src="man/figures/README-incubation-comparison-1.png" alt="" width="100%" />
@@ -262,9 +256,6 @@ p2 <- ggplot(weekly_cases, aes(x = epi_week)) +
   theme_minimal()
 
 p1 / p2
-#> Warning in geom_epicurve(fill = "darkred"): Ignoring empty aesthetic: `width`.
-#> Warning in geom_epicurve(fill = "forestgreen"): Ignoring empty aesthetic:
-#> `width`.
 ```
 
 <img src="man/figures/README-time-periods-1.png" alt="" width="100%" />
@@ -292,8 +283,6 @@ ggplot(large_outbreak, aes(x = onset_date)) +
     y = "Number of Cases"
   ) +
   theme_minimal()
-#> Warning in geom_epicurve(fill = "coral", max_stack = 20): Ignoring empty
-#> aesthetic: `width`.
 ```
 
 <img src="man/figures/README-large-outbreak-1.png" alt="" width="100%" />
@@ -337,12 +326,6 @@ ggplot(outbreak_cases, aes(x = onset_date)) +
     y = "Number of Cases"
   ) +
   theme_minimal()
-#> Warning in scale_x_date(): A <numeric> value was passed to a Date scale.
-#> ℹ The value was converted to a <Date> object.
-#> A <numeric> value was passed to a Date scale.
-#> ℹ The value was converted to a <Date> object.
-#> Warning in geom_epicurve(fill = "steelblue", alpha = 0.8): Ignoring empty
-#> aesthetic: `width`.
 ```
 
 <img src="man/figures/README-annotated-epicurve-1.png" alt="" width="100%" />
@@ -381,9 +364,12 @@ Emoji work too (requires appropriate font support):
 # COVID-19 cases with face mask emoji
 ggplot(cases, aes(x = onset_date, colour = age_group)) +
   geom_epicurve(symbol = "😷", symbol_size = 5) +
+  scale_colour_brewer(palette = "Set2") +
   labs(title = "COVID-19 Cases", x = "Date", y = "Cases") +
   theme_minimal()
 ```
+
+<img src="man/figures/README-emoji-1.png" alt="" width="100%" />
 
 ### Advanced Customisation
 

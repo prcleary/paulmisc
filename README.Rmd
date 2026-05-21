@@ -336,10 +336,11 @@ p1 / p2
 
 Emoji work too (requires appropriate font support):
 
-```{r emoji, eval=FALSE}
+```{r emoji, fig.height=4, fig.width=7}
 # COVID-19 cases with face mask emoji
 ggplot(cases, aes(x = onset_date, colour = age_group)) +
   geom_epicurve(symbol = "😷", symbol_size = 5) +
+  scale_colour_brewer(palette = "Set2") +
   labs(title = "COVID-19 Cases", x = "Date", y = "Cases") +
   theme_minimal()
 ```

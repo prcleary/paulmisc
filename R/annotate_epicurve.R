@@ -105,7 +105,7 @@ annotate_event <- function(date,
   
   list(
     ggplot2::geom_vline(
-      xintercept = as.numeric(date),
+      xintercept = date,
       linetype = linetype,
       colour = colour,
       linewidth = linewidth,
@@ -174,8 +174,8 @@ annotate_period <- function(date,
   
   list(
     ggplot2::geom_rect(
-      xmin = as.numeric(date),
-      xmax = as.numeric(end_date),
+      xmin = date,
+      xmax = end_date,
       ymin = -Inf,
       ymax = Inf,
       fill = fill,
