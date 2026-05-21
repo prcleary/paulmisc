@@ -245,9 +245,9 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
   # the snapshotted yr (not the current built scale) prevents "creep".
   use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
   if (use_top_vjust) {
-    label_y_val <- yr[2] + 0.10 * span
+    label_y_val <- yr[2] + 0.05 * span
     effective_vjust <- 0
-    top_pad <- yr[2] + 0.18 * span
+    top_pad <- yr[2] + 0.11 * span
   } else {
     label_y_val <- yr[1] + y_frac * span
     effective_vjust <- object$label_vjust
@@ -301,9 +301,9 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name) {
   # period rectangle rather than overlapping its top edge.
   use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
   if (use_top_vjust) {
-    label_y_val <- yr[2] + 0.10 * span
+    label_y_val <- yr[2] + 0.05 * span
     effective_vjust <- 0
-    top_pad <- yr[2] + 0.18 * span
+    top_pad <- yr[2] + 0.11 * span
   } else {
     label_y_val <- yr[1] + y_frac * span
     effective_vjust <- object$label_vjust
