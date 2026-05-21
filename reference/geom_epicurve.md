@@ -167,7 +167,9 @@ parameter:
 ## See also
 
 [`simulate_outbreak()`](https://prcleary.github.io/paulmisc/reference/simulate_outbreak.md)
-for generating example data.
+for generating example data,
+[`scale_y_epicurve()`](https://prcleary.github.io/paulmisc/reference/scale_y_epicurve.md)
+for integer y-axis labels.
 
 ## Examples
 

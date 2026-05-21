@@ -89,6 +89,7 @@ p <- ggplot(cases, aes(x = onset_date, fill = age_group, text = tooltip)) +
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 
 # Convert to interactive, showing only our custom tooltip
@@ -113,6 +114,7 @@ p <- ggplot(cases, aes(x = onset_date, fill = sex, text = tooltip)) +
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 
 ggplotly(p, tooltip = "text")
@@ -142,6 +144,7 @@ p <- ggplot(cases, aes(x = onset_date, fill = outcome, text = tooltip)) +
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 
 ggplotly(p, tooltip = "text")
@@ -175,6 +178,7 @@ p <- ggplot(hourly_cases, aes(x = onset_time, text = tooltip)) +
     x = "Time of Onset",
     y = "Number of Cases"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 
 ggplotly(p, tooltip = "text")
@@ -218,6 +222,7 @@ p <- ggplot(large_outbreak, aes(x = onset_date, text = tooltip)) +
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 
 ggplotly(p, tooltip = "text")
@@ -246,11 +251,13 @@ p <- ggplot(symbol_cases, aes(x = onset_date, colour = sex, text = tooltip)) +
     values = c("Female" = "#D55E00", "Male" = "#0072B2"),
     name = "Sex"
   ) +
+  guides(colour = guide_legend(override.aes = list(label = "●", size = 6))) +
   labs(
     title = "Interactive Epidemic Curve with Symbols",
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 
 ggplotly(p, tooltip = "text")
@@ -260,46 +267,15 @@ ggplotly(p, tooltip = "text")
 
 Add context to your epidemic curves with annotations.
 
-### Static Annotations (for non-interactive plots)
+### Interactive Annotations
 
 The
 [`annotate_event()`](https://prcleary.github.io/paulmisc/reference/annotate_epicurve.md)
 and
 [`annotate_period()`](https://prcleary.github.io/paulmisc/reference/annotate_epicurve.md)
-functions work great for static ggplot outputs:
-
-``` r
-
-# Perfect for static plots
-p <- ggplot(cases, aes(x = onset_date)) +
-  geom_epicurve(fill = "steelblue") +
-  annotate_period(
-    date = as.Date("2024-05-28"),
-    end_date = as.Date("2024-06-02"),
-    label = "Exposure period",
-    fill = "yellow",
-    alpha = 0.25
-  ) +
-  annotate_event(
-    date = as.Date("2024-06-05"),
-    label = "Investigation\nstarted",
-    colour = "red"
-  ) +
-  labs(title = "Outbreak Timeline", x = "Date", y = "Cases") +
-  theme_minimal()
-
-print(p)
-```
-
-![](interactive-epicurves_files/figure-html/annotations-static-1.png)
-
-### Interactive Annotations (for plotly)
-
-For interactive plots, use
-[`geom_vline()`](https://ggplot2.tidyverse.org/reference/geom_abline.html)
-and
-[`geom_rect()`](https://ggplot2.tidyverse.org/reference/geom_tile.html)
-directly, as these convert better to plotly:
+helper functions work with
+[`ggplotly()`](https://rdrr.io/pkg/plotly/man/ggplotly.html) conversion
+for interactive epidemic curves with timeline context:
 
 ``` r
 
@@ -310,70 +286,36 @@ cases$tooltip <- with(cases, paste0(
   "<b>Age:</b> ", age_group
 ))
 
-# Define dates for annotations
-exposure_start <- as.Date("2024-05-28")
-exposure_end <- as.Date("2024-06-02")
-investigation_date <- as.Date("2024-06-05")
-
-# Use standard geoms for plotly compatibility
+# Create plot with annotations
 p <- ggplot(cases, aes(x = onset_date, text = tooltip)) +
-  # Shaded period (converts to plotly)
-  geom_rect(
-    xmin = exposure_start, 
-    xmax = exposure_end,
-    ymin = 0, 
-    ymax = Inf,
-    fill = "yellow", 
-    alpha = 0.2, 
-    inherit.aes = FALSE
-  ) +
-  # Event marker (converts to plotly)
-  geom_vline(
-    xintercept = as.numeric(investigation_date),
-    linetype = "dashed", 
-    colour = "red", 
-    linewidth = 0.75
-  ) +
-  # The epicurve itself
   geom_epicurve(fill = "steelblue") +
+  annotate_period(
+    date = as.Date("2024-05-28"),
+    end_date = as.Date("2024-06-02"),
+    label = "Exposure period",
+    fill = "yellow",
+    alpha = 0.25
+  ) +
+  annotate_event(
+    date = as.Date("2024-06-05"),
+    label = "Investigation",
+    colour = "red"
+  ) +
   labs(
     title = "Interactive Outbreak Timeline",
     subtitle = "Hover over cases for details",
     x = "Date", 
     y = "Cases"
   ) +
+  scale_y_epicurve() +
   theme_minimal()
 
-# Convert to plotly and add text annotations
-ggplotly(p, tooltip = "text") %>%
-  layout(annotations = list(
-    list(
-      x = as.numeric(as.POSIXct(as.Date((as.numeric(exposure_start) + as.numeric(exposure_end)) / 2, origin = "1970-01-01"))) * 1000,
-      y = 1, 
-      text = "Exposure period", 
-      showarrow = FALSE,
-      xref = "x", 
-      yref = "paper", 
-      yanchor = "top"
-    ),
-    list(
-      x = as.numeric(as.POSIXct(investigation_date)) * 1000,
-      y = 0.95,
-      text = "Investigation", 
-      showarrow = TRUE, 
-      ax = 20, 
-      ay = -30, 
-      arrowcolor = "red",
-      xref = "x", 
-      yref = "paper"
-    )
-  ))
+# Convert directly to plotly - annotations and rectangles transfer
+ggplotly(p, tooltip = "text")
 ```
 
-**Note:** The `layout(annotations = ...)` approach adds text labels
-directly in plotly after conversion. Date values must be converted to
-milliseconds since epoch (`as.numeric(as.POSIXct(date)) * 1000`) for
-plotly’s x-axis reference.
+The shaded period and event line convert to interactive plotly elements
+automatically!
 
 ## Tips for Interactive Visualisation
 
