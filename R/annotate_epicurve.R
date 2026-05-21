@@ -223,19 +223,30 @@ annotate_period <- function(date,
 # and inject finite coordinates suitable for both static rendering and
 # ggplotly() conversion.
 
+# Snapshot the data-driven y-range the first time an annotation is added, and
+# stash it on the plot so subsequent annotations reuse the same baseline. This
+# prevents "creep" where each annotation's geometry extends the trained scale
+# and pushes later annotations progressively higher.
+.epicurve_orig_yr <- function(plot) {
+  yr <- attr(plot, "epicurve_orig_yr")
+  if (is.null(yr)) yr <- .epicurve_y_range(plot)
+  yr
+}
+
 #' @export
 #' @importFrom ggplot2 ggplot_add
 ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
-  yr <- .epicurve_y_range(plot)
+  yr <- .epicurve_orig_yr(plot)
   span <- yr[2] - yr[1]
   y_frac <- .resolve_y_frac(object$label_y)
   label_y_val <- yr[1] + y_frac * span
   # When labelling at the top, anchor at yr[2] and rely on vjust to render the
-  # text above the line. Using vjust (not a y nudge) keeps the label out of
-  # the y-scale training data, so adding more annotations doesn't progressively
-  # push subsequent labels higher ("creep").
+  # text above the data range. Combined with the expand_limits() below, this
+  # places the label in dedicated headroom above the data so it doesn't
+  # overlap the top of bars or shaded period rectangles.
   use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
-  effective_vjust <- if (use_top_vjust) -1.2 else object$label_vjust
+  effective_vjust <- if (use_top_vjust) -0.5 else object$label_vjust
+  top_pad <- if (use_top_vjust) yr[2] + 0.18 * span else NULL
 
   # Hover text for plotly tooltips (ignored by ggplot2 but used by ggplotly).
   hover_text <- paste0(object$label, "<br>", format(object$date))
@@ -265,21 +276,27 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
       na.rm = TRUE
     )
   )
-  Reduce(`+`, layers, init = plot)
+  if (!is.null(top_pad)) {
+    layers <- c(layers, list(ggplot2::expand_limits(y = top_pad)))
+  }
+  result <- Reduce(`+`, layers, init = plot)
+  attr(result, "epicurve_orig_yr") <- yr
+  result
 }
 
 #' @export
 #' @importFrom ggplot2 ggplot_add
 ggplot_add.epicurve_period_annotation <- function(object, plot, object_name) {
-  yr <- .epicurve_y_range(plot)
+  yr <- .epicurve_orig_yr(plot)
   span <- yr[2] - yr[1]
   y_frac <- .resolve_y_frac(object$label_y)
   label_y_val <- yr[1] + y_frac * span
-  # See note in ggplot_add.epicurve_event_annotation: use vjust to lift the
-  # label above the data range so the label position doesn't itself train
-  # the y-scale and push subsequent annotations higher.
+  # See note in ggplot_add.epicurve_event_annotation: expand_limits() adds
+  # headroom above the data once, and vjust lifts the label into that
+  # headroom so it doesn't overlap the shaded period or tall bars.
   use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
-  effective_vjust <- if (use_top_vjust) -1.2 else object$label_vjust
+  effective_vjust <- if (use_top_vjust) -0.5 else object$label_vjust
+  top_pad <- if (use_top_vjust) yr[2] + 0.18 * span else NULL
   label_colour <- if (is.na(object$colour)) "black" else object$colour
 
   # Hover text for plotly tooltips: label plus the date range.
@@ -314,5 +331,10 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name) {
       na.rm = TRUE
     )
   )
-  Reduce(`+`, layers, init = plot)
+  if (!is.null(top_pad)) {
+    layers <- c(layers, list(ggplot2::expand_limits(y = top_pad)))
+  }
+  result <- Reduce(`+`, layers, init = plot)
+  attr(result, "epicurve_orig_yr") <- yr
+  result
 }
