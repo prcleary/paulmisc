@@ -162,20 +162,32 @@ geom_epicurve <- function(mapping = NULL,
   # Determine which geom to use based on symbol parameter
   # If symbol is provided, we'll try to use text mode (unless max_stack overrides)
   use_geom <- if (!is.null(symbol)) "text" else "rect"
-  
+
+  # Collect dots so we can inject a sensible default colour for rect mode.
+  # GeomRect defaults colour = NA, which makes adjacent / stacked blocks
+  # appear to touch. A thin white border gives the tiny horizontal (and
+  # vertical) gap that readers expect on an epicurve.
+  dots <- list(...)
+  if (use_geom == "rect" &&
+      !any(c("colour", "color") %in% names(dots))) {
+    dots$colour <- "white"
+  }
+
   # Build params list, excluding NULL width to avoid aesthetic warnings
-  params <- list(
-    height = height,
-    max_stack = max_stack,
-    symbol = symbol,
-    symbol_size = symbol_size,
-    na.rm = na.rm,
-    ...
+  params <- c(
+    list(
+      height = height,
+      max_stack = max_stack,
+      symbol = symbol,
+      symbol_size = symbol_size,
+      na.rm = na.rm
+    ),
+    dots
   )
   if (!is.null(width)) {
     params$width <- width
   }
-  
+
   ggplot2::layer(
     geom        = use_geom,
     mapping     = mapping,
@@ -203,14 +215,23 @@ stat_epicurve <- function(mapping = NULL,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
+  # Inject default white border for rect geoms, matching geom_epicurve().
+  dots <- list(...)
+  if (identical(geom, "rect") &&
+      !any(c("colour", "color") %in% names(dots))) {
+    dots$colour <- "white"
+  }
+
   # Build params list, excluding NULL width to avoid aesthetic warnings
-  params <- list(
-    height = height,
-    max_stack = max_stack,
-    symbol = symbol,
-    symbol_size = symbol_size,
-    na.rm = na.rm,
-    ...
+  params <- c(
+    list(
+      height = height,
+      max_stack = max_stack,
+      symbol = symbol,
+      symbol_size = symbol_size,
+      na.rm = na.rm
+    ),
+    dots
   )
   if (!is.null(width)) {
     params$width <- width
