@@ -16,6 +16,7 @@ geom_epicurve(
   max_stack = 20,
   symbol = NULL,
   symbol_size = 3,
+  auto_aspect = TRUE,
   na.rm = TRUE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -73,7 +74,14 @@ Pass a named character vector (e.g. \code{c(Female = "♀", Male = "♂")}) to
 use different symbols per category; the names are matched against the
 discrete aesthetic mapping (typically \code{colour} or \code{fill}).}
 
-\item{symbol_size}{Size of symbols when \code{symbol} is used (default: \code{3}).
+\item{symbol_size}{Size of symbols when \code{symbol} is used (default: \code{3}).}
+
+\item{auto_aspect}{Logical. When \code{TRUE} (the default), \code{\link[=coord_epicurve]{coord_epicurve()}}
+is added automatically so datetime (hourly / sub-daily) plots get a
+shorter panel that makes each case rectangle look approximately
+square instead of a tall, narrow stick. For Date / numeric x axes
+no aspect ratio is imposed. Set to \code{FALSE} to manage the
+coordinate system yourself.
 Adjust if symbols appear too large or small relative to the plot.}
 
 \item{na.rm}{If \code{FALSE} (the default), missing values are removed with

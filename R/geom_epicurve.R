@@ -68,6 +68,12 @@
 #'   use different symbols per category; the names are matched against the
 #'   discrete aesthetic mapping (typically `colour` or `fill`).
 #' @param symbol_size Size of symbols when `symbol` is used (default: `3`).
+#' @param auto_aspect Logical. When `TRUE` (the default), [coord_epicurve()]
+#'   is added automatically so datetime (hourly / sub-daily) plots get a
+#'   shorter panel that makes each case rectangle look approximately
+#'   square instead of a tall, narrow stick. For Date / numeric x axes
+#'   no aspect ratio is imposed. Set to `FALSE` to manage the
+#'   coordinate system yourself.
 #'   Adjust if symbols appear too large or small relative to the plot.
 #' @param na.rm If `FALSE` (the default), missing values are removed with
 #'   a warning.
@@ -163,6 +169,7 @@ geom_epicurve <- function(mapping = NULL,
                           max_stack = 20,
                           symbol = NULL,
                           symbol_size = 3,
+                          auto_aspect = TRUE,
                           na.rm = TRUE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
@@ -208,30 +215,80 @@ geom_epicurve <- function(mapping = NULL,
   # the guides() alongside the layer in a single `+` step. We override
   # both colour and fill guides: whichever the user maps will pick up the
   # override; the other is a no-op.
+  auto_coord <- if (isTRUE(auto_aspect)) list(coord_epicurve()) else list()
+
   if (!is.null(symbol) && length(symbol) > 1 && !is.null(names(symbol))) {
     override <- list(label = unname(symbol), size = symbol_size)
-    return(list(
+    return(c(list(
       layer_obj,
       ggplot2::guides(
         colour = ggplot2::guide_legend(override.aes = override),
         fill   = ggplot2::guide_legend(override.aes = override)
       )
-    ))
+    ), auto_coord))
   }
   # Single-symbol case: still auto-override so the legend shows the
   # symbol rather than a default text glyph.
   if (!is.null(symbol) && length(symbol) == 1) {
     override <- list(label = symbol, size = symbol_size)
-    return(list(
+    return(c(list(
       layer_obj,
       ggplot2::guides(
         colour = ggplot2::guide_legend(override.aes = override),
         fill   = ggplot2::guide_legend(override.aes = override)
       )
-    ))
+    ), auto_coord))
   }
 
+  if (length(auto_coord) > 0) {
+    return(c(list(layer_obj), auto_coord))
+  }
   layer_obj
+}
+
+#' Coordinate system for epidemic curves
+#'
+#' A thin [ggplot2::CoordCartesian] subclass that automatically constrains
+#' the *panel* aspect ratio when the x-axis is a datetime (POSIXct) so
+#' that case rectangles look approximately square instead of tall, narrow
+#' sticks on typical figure dimensions. For Date / numeric x axes it
+#' behaves exactly like `coord_cartesian()` (no aspect is imposed).
+#'
+#' `geom_epicurve()` adds `coord_epicurve()` automatically; users can opt
+#' out with `auto_aspect = FALSE`, or override by adding their own
+#' coordinate system (e.g. `coord_cartesian()`) after the geom.
+#'
+#' @param clip Should drawing be clipped to the panel extent? Passed
+#'   through to [ggplot2::CoordCartesian]. Defaults to `"on"`.
+#'
+#' @return A ggproto [ggplot2::CoordCartesian] subclass.
+#' @export
+coord_epicurve <- function(clip = "on") {
+  ggplot2::ggproto(NULL, ggplot2::CoordCartesian,
+    limits = list(x = NULL, y = NULL),
+    expand = TRUE,
+    default = FALSE,
+    clip = clip,
+    aspect = function(self, ranges) {
+      x_range <- diff(as.numeric(ranges$x.range))
+      y_range <- diff(as.numeric(ranges$y.range))
+      x_min   <- as.numeric(ranges$x.range[1])
+      if (!is.finite(x_min) || !is.finite(x_range) ||
+          !is.finite(y_range) || x_range <= 0 || y_range <= 0) {
+        return(NULL)
+      }
+      # Only intervene when x is datetime (POSIXct seconds since epoch).
+      # Magnitude > 1e7 distinguishes from Date (days since epoch < 1e5)
+      # and from typical numeric axes.
+      if (x_min < 1e7) return(NULL)
+      bw <- 3600  # 1 hour, matches detect_epicurve_width for hourly
+      # Cell-square aspect = bin_width * y_range / x_range. Clamp so we
+      # never produce a wildly tall or wildly flat panel; 0.15 keeps the
+      # default hourly README chart comfortably visible.
+      raw <- bw * y_range / x_range
+      max(0.15, min(2, raw))
+    }
+  )
 }
 
 #' @rdname geom_epicurve
