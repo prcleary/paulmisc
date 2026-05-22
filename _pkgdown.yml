@@ -33,6 +33,7 @@ reference:
       - simulate_outbreak
       - annotate_epicurve
       - epicurve_footnote
+      - epicurve_ggplotly
   - title: "Shiny Applications"
     desc: "Interactive web applications"
     contents:
