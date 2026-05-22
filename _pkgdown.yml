@@ -28,6 +28,7 @@ reference:
       - geom_epicurve
       - stat_epicurve
       - scale_y_epicurve
+      - coord_epicurve
       - GeomEpicurve
       - StatEpicurve
       - simulate_outbreak
