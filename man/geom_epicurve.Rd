@@ -16,6 +16,7 @@ geom_epicurve(
   max_stack = 20,
   symbol = NULL,
   symbol_size = 3,
+  square_size = 3,
   na.rm = TRUE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -73,7 +74,14 @@ Pass a named character vector (e.g. \code{c(Female = "♀", Male = "♂")}) to
 use different symbols per category; the names are matched against the
 discrete aesthetic mapping (typically \code{colour} or \code{fill}).}
 
-\item{symbol_size}{Size of symbols when \code{symbol} is used (default: \code{3}).
+\item{symbol_size}{Size of symbols when \code{symbol} is used (default: \code{3}).}
+
+\item{square_size}{Visual size of each case square in millimetres
+(default: \code{3}). Cases are drawn as fixed-size square markers via
+\code{grid::pointsGrob(pch = 22)} so they look square regardless of
+whether the x-axis is hourly, daily, weekly or monthly. Only
+applies to the default rectangular mode; ignored in column-chart
+(\code{max_stack}) and \code{symbol} modes.
 Adjust if symbols appear too large or small relative to the plot.}
 
 \item{na.rm}{If \code{FALSE} (the default), missing values are removed with
