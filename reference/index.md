@@ -18,6 +18,8 @@ Functions for creating epidemic curves and simulating outbreak data
 - [`annotate_event()`](https://prcleary.github.io/paulmisc/reference/annotate_epicurve.md)
   [`annotate_period()`](https://prcleary.github.io/paulmisc/reference/annotate_epicurve.md)
   : Annotate epidemic curves with events and periods
+- [`epicurve_footnote()`](https://prcleary.github.io/paulmisc/reference/epicurve_footnote.md)
+  : Summary footnote for an epicurve
 
 ## Shiny Applications
 

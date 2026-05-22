@@ -20,6 +20,7 @@ simulate_outbreak(
   time_unit = c("daily", "hourly", "weekly"),
   pattern = c("point_source", "continuous"),
   date_range = 10,
+  prop_missing = 0.05,
   seed = 42
 )
 ```
@@ -67,6 +68,15 @@ simulate_outbreak(
   which cases are uniformly distributed. Ignored for point_source
   pattern.
 
+- prop_missing:
+
+  Numeric in `[0, 1]`. Approximate proportion of values that should be
+  set to `NA` in each non-ID column (including the onset date/time and
+  each categorical attribute). Defaults to `0.05` so that demonstration
+  data exercises the missing-data code paths in
+  [`geom_epicurve()`](https://prcleary.github.io/paulmisc/reference/geom_epicurve.md).
+  Set to `0` to disable.
+
 - seed:
 
   Optional integer used to seed the random number generator for
@@ -94,7 +104,7 @@ head(cases)
 # A larger outbreak with a different exposure date
 big <- simulate_outbreak(n = 100, exposure = as.Date("2025-03-15"))
 range(big$onset_date)
-#> [1] "2025-03-16" "2025-03-29"
+#> [1] NA NA
 
 # Short incubation period (e.g., Salmonella)
 # meanlog = 0.5 gives median of exp(0.5) = 1.6 days
@@ -113,17 +123,17 @@ head(hourly)
 #> 3    C003 2024-06-11 11:00:00   Elderly Female Recovered Wedding B
 #> 4    C004 2024-06-06 21:00:00     Adult   Male Recovered Wedding A
 #> 5    C005 2024-06-07 00:00:00     Adult Female Recovered Wedding A
-#> 6    C006 2024-06-12 18:00:00     Child Female Recovered Wedding B
+#> 6    C006 2024-06-12 18:00:00     Child   <NA> Recovered Wedding B
 
 # Weekly surveillance data
 weekly <- simulate_outbreak(n = 20, time_unit = "weekly", seed = 456)
 head(weekly)
 #>   case_id onset_date age_group    sex      outcome   setting
-#> 1    C001 2024-06-03     Adult Female    Recovered Wedding B
+#> 1    C001       <NA>     Adult Female    Recovered Wedding B
 #> 2    C002 2024-06-03     Adult Female    Recovered Wedding B
 #> 3    C003 2024-06-03     Adult   Male    Recovered Wedding B
 #> 4    C004 2024-06-03     Adult   Male Hospitalised Wedding A
-#> 5    C005 2024-06-03     Adult Female    Recovered Wedding B
+#> 5    C005 2024-06-03      <NA> Female    Recovered Wedding B
 #> 6    C006 2024-06-03     Adult Female Hospitalised Wedding B
 
 # Large continuous outbreak (not point-source)
@@ -131,9 +141,9 @@ large <- simulate_outbreak(n = 300, pattern = "continuous", date_range = 14, see
 table(large$onset_date)
 #> 
 #> 2024-06-01 2024-06-02 2024-06-03 2024-06-04 2024-06-05 2024-06-06 2024-06-07 
-#>         16         24         21         24         19         21         18 
+#>         14         23         19         23         17         21         16 
 #> 2024-06-08 2024-06-09 2024-06-10 2024-06-11 2024-06-12 2024-06-13 2024-06-14 
-#>         19         13         23         23         17         18         23 
+#>         19         12         22         22         16         18         23 
 #> 2024-06-15 
 #>         21 
 ```

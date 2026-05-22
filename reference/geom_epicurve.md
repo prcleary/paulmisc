@@ -234,19 +234,20 @@ ggplot(large_outbreak, aes(x = onset_date)) +
   labs(title = "Large Outbreak (forced square mode)")
 
 
-# Use symbols instead of squares
+# Use symbols instead of squares (Unicode glyphs need font support;
+# not rendered during R CMD check on minimal devices)
+if (FALSE) { # \dontrun{
 cases_symbols <- simulate_outbreak(n = 30, seed = 999)
 ggplot(cases_symbols, aes(x = onset_date)) +
-  geom_epicurve(symbol = "●", symbol_size = 4, colour = "darkblue") +
+  geom_epicurve(symbol = "\u25CF", symbol_size = 4, colour = "darkblue") +
   theme_minimal() +
   labs(title = "Epidemic Curve with Bullet Symbols")
 
-
 # Use emoji symbols (requires font support)
 ggplot(cases_symbols, aes(x = onset_date, colour = sex)) +
-  geom_epicurve(symbol = "😷", symbol_size = 5) +
+  geom_epicurve(symbol = "\U0001F637", symbol_size = 5) +
   scale_colour_manual(values = c("Female" = "#D55E00", "Male" = "#0072B2")) +
   theme_minimal() +
   labs(title = "COVID-19 Cases with Face Mask Emoji")
-
+} # }
 ```

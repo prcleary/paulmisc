@@ -68,6 +68,7 @@ demonstrate or test plotting functions such as <code><a href="geom_epicurve.html
 <span>  time_unit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"daily"</span>, <span class="st">"hourly"</span>, <span class="st">"weekly"</span><span class="op">)</span>,</span>
 <span>  pattern <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"point_source"</span>, <span class="st">"continuous"</span><span class="op">)</span>,</span>
 <span>  date_range <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  prop_missing <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">42</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -115,6 +116,14 @@ transmission).</p></dd>
 over which cases are uniformly distributed. Ignored for point_source pattern.</p></dd>
 
 
+<dt id="arg-prop-missing">prop_missing<a class="anchor" aria-label="anchor" href="#arg-prop-missing"></a></dt>
+<dd><p>Numeric in <code>[0, 1]</code>. Approximate proportion of values
+that should be set to <code>NA</code> in each non-ID column (including the onset
+date/time and each categorical attribute). Defaults to <code>0.05</code> so that
+demonstration data exercises the missing-data code paths in
+<code><a href="geom_epicurve.html">geom_epicurve()</a></code>. Set to <code>0</code> to disable.</p></dd>
+
+
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Optional integer used to seed the random number generator
 for reproducibility. Use <code>NULL</code> to leave the RNG state untouched.</p></dd>
@@ -142,7 +151,7 @@ For hourly data: <code>onset_time</code> instead of <code>onset_date</code>.</p>
 <span class="r-in"><span><span class="co"># A larger outbreak with a different exposure date</span></span></span>
 <span class="r-in"><span><span class="va">big</span> <span class="op">&lt;-</span> <span class="fu">simulate_outbreak</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, exposure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2025-03-15"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">big</span><span class="op">$</span><span class="va">onset_date</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2025-03-16" "2025-03-29"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA NA</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Short incubation period (e.g., Salmonella)</span></span></span>
 <span class="r-in"><span><span class="co"># meanlog = 0.5 gives median of exp(0.5) = 1.6 days</span></span></span>
@@ -161,17 +170,17 @@ For hourly data: <code>onset_time</code> instead of <code>onset_date</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3    C003 2024-06-11 11:00:00   Elderly Female Recovered Wedding B</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4    C004 2024-06-06 21:00:00     Adult   Male Recovered Wedding A</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5    C005 2024-06-07 00:00:00     Adult Female Recovered Wedding A</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6    C006 2024-06-12 18:00:00     Child Female Recovered Wedding B</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    C006 2024-06-12 18:00:00     Child   &lt;NA&gt; Recovered Wedding B</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weekly surveillance data</span></span></span>
 <span class="r-in"><span><span class="va">weekly</span> <span class="op">&lt;-</span> <span class="fu">simulate_outbreak</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">20</span>, time_unit <span class="op">=</span> <span class="st">"weekly"</span>, seed <span class="op">=</span> <span class="fl">456</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">weekly</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   case_id onset_date age_group    sex      outcome   setting</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    C001 2024-06-03     Adult Female    Recovered Wedding B</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    C001       &lt;NA&gt;     Adult Female    Recovered Wedding B</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2    C002 2024-06-03     Adult Female    Recovered Wedding B</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3    C003 2024-06-03     Adult   Male    Recovered Wedding B</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4    C004 2024-06-03     Adult   Male Hospitalised Wedding A</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    C005 2024-06-03     Adult Female    Recovered Wedding B</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    C005 2024-06-03      &lt;NA&gt; Female    Recovered Wedding B</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6    C006 2024-06-03     Adult Female Hospitalised Wedding B</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Large continuous outbreak (not point-source)</span></span></span>
@@ -179,9 +188,9 @@ For hourly data: <code>onset_time</code> instead of <code>onset_date</code>.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">large</span><span class="op">$</span><span class="va">onset_date</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2024-06-01 2024-06-02 2024-06-03 2024-06-04 2024-06-05 2024-06-06 2024-06-07 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         16         24         21         24         19         21         18 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         14         23         19         23         17         21         16 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2024-06-08 2024-06-09 2024-06-10 2024-06-11 2024-06-12 2024-06-13 2024-06-14 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         19         13         23         23         17         18         23 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         19         12         22         22         16         18         23 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2024-06-15 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         21 </span>
 <span class="r-in"><span></span></span>
