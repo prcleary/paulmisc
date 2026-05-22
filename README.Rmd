@@ -458,7 +458,12 @@ outbreak <- simulate_outbreak(
 
 sex_symbols <- c(Female = "\u2640", Male = "\u2642")
 
-ggplot(outbreak, aes(x = onset_date, colour = sex)) +
+# Drop rows with NA in the aesthetics we use (real-life chart prep)
+plot_data <- outbreak[!is.na(outbreak$sex) &
+                        !is.na(outbreak$setting) &
+                        !is.na(outbreak$onset_date), ]
+
+ggplot(plot_data, aes(x = onset_date, colour = sex)) +
   geom_epicurve(symbol = sex_symbols, symbol_size = 5) +
   annotate_period(
     date = as.Date("2024-04-22"),
