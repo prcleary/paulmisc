@@ -164,7 +164,7 @@ ggplot(plot_data, aes(x = onset_date, colour = sex)) +
     values = c(Female = "#D55E00", Male = "#0072B2"),
     name = "Sex"
   ) +
-  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
+  facet_wrap(~ setting, ncol = 1) +
   scale_y_epicurve(expand = ggplot2::expansion(mult = c(0, 0.25))) +
   labs(
     title = "Multi-setting outbreak: a complete example",
