@@ -368,6 +368,17 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name, ...
   # right of the plot, anchor to the right edge with hjust = 1; otherwise
   # centre it on the period midpoint.
   xr <- .epicurve_x_range(plot)
+  # The geom_rect below extends the panel to include [date, end_date].
+  # Compute the *effective* x range against the period extent so the
+  # midpoint isn't spuriously flagged as out-of-range when the period
+  # starts before (or ends after) the data-driven scale, which would
+  # mis-clamp the label to the data edge.
+  if (!is.null(xr) && length(xr) == 2 && all(is.finite(as.numeric(xr)))) {
+    xr <- c(
+      min(as.numeric(xr[1]), as.numeric(object$date)),
+      max(as.numeric(xr[2]), as.numeric(object$end_date))
+    )
+  }
   label_x <- object$mid_date
   label_hjust_dyn <- object$label_hjust
   if (!is.null(xr) && length(xr) == 2 && all(is.finite(as.numeric(xr)))) {
