@@ -68,12 +68,6 @@
 #'   use different symbols per category; the names are matched against the
 #'   discrete aesthetic mapping (typically `colour` or `fill`).
 #' @param symbol_size Size of symbols when `symbol` is used (default: `3`).
-#' @param square_size Visual size of each case square in millimetres
-#'   (default: `3`). Cases are drawn as fixed-size square markers via
-#'   `grid::pointsGrob(pch = 22)` so they look square regardless of
-#'   whether the x-axis is hourly, daily, weekly or monthly. Only
-#'   applies to the default rectangular mode; ignored in column-chart
-#'   (`max_stack`) and `symbol` modes.
 #'   Adjust if symbols appear too large or small relative to the plot.
 #' @param na.rm If `FALSE` (the default), missing values are removed with
 #'   a warning.
@@ -169,7 +163,6 @@ geom_epicurve <- function(mapping = NULL,
                           max_stack = 20,
                           symbol = NULL,
                           symbol_size = 3,
-                          square_size = 3,
                           na.rm = TRUE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
@@ -190,7 +183,6 @@ geom_epicurve <- function(mapping = NULL,
       max_stack = max_stack,
       symbol = symbol,
       symbol_size = symbol_size,
-      square_size = square_size,
       na.rm = na.rm
     ),
     dots
@@ -377,7 +369,7 @@ StatEpicurve <- ggplot2::ggproto(
     params
   },
 
-  compute_panel = function(self, data, scales, na.rm = FALSE, width = NULL, height = 0.9, max_stack = 20, symbol = NULL, symbol_size = 3, square_size = 3) {
+  compute_panel = function(self, data, scales, na.rm = FALSE, width = NULL, height = 0.9, max_stack = 20, symbol = NULL, symbol_size = 3) {
     # Drop rows with NA in mapped aesthetics so they don't appear as a
     # bogus "NA" legend entry and don't render anywhere on the plot.
     if (isTRUE(na.rm)) {
@@ -445,9 +437,7 @@ StatEpicurve <- ggplot2::ggproto(
       data$xmax <- data$x + width / 2
       data$ymin <- 0
       data$ymax <- data$y
-      data$.epic_mode <- "column"
-      data$.epic_square_size <- NA_real_
-
+      
       # In column mode we always regenerate the tooltip text using the
       # post-aggregation counts so plotly hovers show the per-bar count
       # (and so any per-case `text` carried over from the first row of a
@@ -489,19 +479,12 @@ StatEpicurve <- ggplot2::ggproto(
       # For geom_text, we don't need xmin/xmax/ymin/ymax
       # x and y are already set correctly
     } else {
-      # Individual case square mode. We still compute xmin/xmax/ymin/ymax
-      # so any consumer that introspects the stat output (tests, custom
-      # geoms) gets a rect-shaped layout. The default GeomEpicurveRect
-      # draw_panel overrides rendering to use a fixed visual-size square
-      # marker (independent of bin width) so hourly/weekly cases look
-      # like squares too — with bin-filled rects they would otherwise
-      # render as flat horizontal bars on typical figure aspect ratios.
+      # Individual case square mode (original behavior)
+      # Compute rectangle boundaries for geom_rect
       data$xmin <- data$x - width / 2
       data$xmax <- data$x + width / 2
       data$ymin <- pmax(0, data$y - 1 + (1 - height) / 2)
       data$ymax <- data$y - (1 - height) / 2
-      data$.epic_mode <- "square"
-      data$.epic_square_size <- square_size
     }
     
     # Add padding points to ensure x-axis includes full width of edge rectangles
@@ -632,44 +615,7 @@ GeomEpicurveRect <- ggplot2::ggproto(
     linetype  = 1,
     alpha     = NA,
     text      = NULL
-  ),
-  draw_panel = function(data, panel_params, coord, ...) {
-    # Two render paths:
-    #  * Column mode (max_stack auto-switch): delegate to GeomRect so
-    #    bars fill the bin and run from 0 to the count.
-    #  * Case-square mode (default): draw each case as a fixed
-    #    visual-size square marker using grid::pointsGrob(pch = 22).
-    #    This is what gives an epicurve its characteristic look and
-    #    makes hourly / weekly plots render as squares too, instead of
-    #    bin-filled bars that look horizontally squashed.
-    mode <- if (".epic_mode" %in% names(data)) data$.epic_mode[1] else "square"
-    if (identical(mode, "column")) {
-      data$.epic_mode <- NULL
-      data$.epic_square_size <- NULL
-      return(ggplot2::GeomRect$draw_panel(data, panel_params, coord, ...))
-    }
-
-    # Square mode: render each row as a square point at (x, stack centre).
-    sq_size <- if (".epic_square_size" %in% names(data) &&
-                   is.finite(data$.epic_square_size[1])) {
-      data$.epic_square_size[1]
-    } else 3
-
-    pt <- data.frame(
-      x       = data$x,
-      y       = (data$ymin + data$ymax) / 2,
-      colour  = data$colour,
-      fill    = data$fill,
-      size    = sq_size,
-      shape   = 22L,
-      stroke  = data$linewidth %||% 0.3,
-      alpha   = data$alpha %||% NA,
-      PANEL   = data$PANEL,
-      group   = data$group %||% -1L,
-      stringsAsFactors = FALSE
-    )
-    ggplot2::GeomPoint$draw_panel(pt, panel_params, coord, na.rm = TRUE)
-  }
+  )
 )
 
 #' GeomEpicurveText: GeomText that knows about `text` and draws symbol keys
