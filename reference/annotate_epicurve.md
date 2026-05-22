@@ -118,8 +118,6 @@ ggplot(cases, aes(x = onset_date)) +
   theme_minimal()
 #> Warning: Ignoring unknown aesthetics: text
 #> Warning: Ignoring unknown aesthetics: text
-#> Warning: Removed 4 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 
 
 # Add a period for exposure window
@@ -134,8 +132,6 @@ ggplot(cases, aes(x = onset_date)) +
   theme_minimal()
 #> Warning: Ignoring unknown aesthetics: text
 #> Warning: Ignoring unknown aesthetics: text
-#> Warning: Removed 4 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 
 
 # Combine multiple annotations
@@ -165,8 +161,6 @@ ggplot(cases, aes(x = onset_date)) +
 #> Warning: Ignoring unknown aesthetics: text
 #> Warning: Ignoring unknown aesthetics: text
 #> Warning: Ignoring unknown aesthetics: text
-#> Warning: Removed 4 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 
 
 # Works with plotly for interactive plots (same code!)

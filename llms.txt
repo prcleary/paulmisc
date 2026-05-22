@@ -124,6 +124,8 @@ ggplot(cases, aes(x = onset_date)) +
   ) +
   scale_y_epicurve() +
   theme_minimal()
+#> Warning: Removed 3 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
 ```
 
 ![](reference/figures/README-basic-epicurve-1.png)
@@ -145,6 +147,8 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
     fill = "Age Group"
   ) +
   theme_bw()
+#> Warning: Removed 3 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
 ```
 
 ![](reference/figures/README-coloured-epicurve-1.png)
@@ -170,6 +174,8 @@ ggplot(cases, aes(x = onset_date, fill = outcome)) +
   ) +
   scale_y_epicurve() +
   theme_minimal()
+#> Warning: Removed 3 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
 ```
 
 ![](reference/figures/README-faceted-epicurve-1.png)
@@ -219,6 +225,10 @@ p2 <- ggplot(long_incubation, aes(x = onset_date)) +
   theme_minimal()
 
 p1 / p2
+#> Warning: Removed 5 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
+#> Removed 5 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
 ```
 
 ![](reference/figures/README-incubation-comparison-1.png)
@@ -259,6 +269,8 @@ p2 <- ggplot(weekly_cases, aes(x = onset_date)) +
   theme_minimal()
 
 p1 / p2
+#> Warning: Removed 1 row containing non-finite outside the scale range
+#> (`stat_epicurve()`).
 ```
 
 ![](reference/figures/README-time-periods-1.png)
@@ -292,6 +304,8 @@ ggplot(large_outbreak, aes(x = onset_date)) +
   ) +
   scale_y_epicurve() +
   theme_minimal()
+#> Warning: Removed 14 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
 ```
 
 ![](reference/figures/README-large-outbreak-1.png)
@@ -337,6 +351,8 @@ ggplot(outbreak_cases, aes(x = onset_date)) +
   ) +
   scale_y_epicurve() +
   theme_minimal()
+#> Warning: Removed 4 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
 ```
 
 ![](reference/figures/README-annotated-epicurve-1.png)
@@ -348,20 +364,18 @@ which shows how to combine ggplot2 layers with plotly annotations.
 ### Custom Symbols and Emoji
 
 Replace squares with Unicode symbols or emoji for creative
-visualisations:
+visualisations. When you pass a *named* vector to `symbol`, each
+category gets its own symbol and the legend is updated automatically —
+no `guides(... override.aes = ...)` boilerplate needed:
 
 ``` r
 
-# Different symbols per category by passing a named vector
-symbol_cases <- simulate_outbreak(n = 35, seed = 999)
+symbol_cases <- simulate_outbreak(n = 35, seed = 999, prop_missing = 0)
 
 sex_symbols <- c(Female = "\u2640", Male = "\u2642")  # ♀ ♂
 p1 <- ggplot(symbol_cases, aes(x = onset_date, colour = sex)) +
   geom_epicurve(symbol = sex_symbols, symbol_size = 6) +
   scale_colour_manual(values = c("Female" = "#D55E00", "Male" = "#0072B2")) +
-  guides(colour = guide_legend(override.aes = list(
-    label = sex_symbols, size = 6
-  ))) +
   labs(title = "Different symbol per sex (\u2640 / \u2642)",
        x = NULL, y = "Cases") +
   scale_y_epicurve() +
@@ -373,9 +387,6 @@ p2 <- ggplot(symbol_cases, aes(x = onset_date, colour = outcome)) +
   scale_colour_manual(
     values = c("Recovered" = "steelblue", "Hospitalised" = "tomato")
   ) +
-  guides(colour = guide_legend(override.aes = list(
-    label = outcome_symbols, size = 6
-  ))) +
   labs(title = "Different symbol per outcome (\u25CB / \u2716)",
        x = "Date of Onset", y = "Cases") +
   scale_y_epicurve() +
@@ -386,21 +397,164 @@ p1 / p2
 
 ![](reference/figures/README-symbols-1.png)
 
-Emoji work too (requires appropriate font support):
+Emoji work too (requires appropriate font support), with a different
+emoji for each category:
 
 ``` r
 
-# COVID-19 cases with face mask emoji
+age_emojis <- c(Child = "\U0001F476", Adult = "\U0001F468",
+                Elderly = "\U0001F474")
 ggplot(cases, aes(x = onset_date, colour = age_group)) +
-  geom_epicurve(symbol = "😷", symbol_size = 6) +
-  scale_colour_brewer(palette = "Set2") +
-  guides(colour = guide_legend(override.aes = list(label = "😷", size = 6))) +
-  labs(title = "COVID-19 Cases", x = "Date", y = "Cases") +
+  geom_epicurve(symbol = age_emojis, symbol_size = 7) +
+  scale_colour_manual(values = c(Child = "#D55E00", Adult = "#0072B2",
+                                 Elderly = "#009E73")) +
+  labs(title = "Cases by age group (one emoji per category)",
+       x = "Date", y = "Cases") +
   scale_y_epicurve() +
   theme_minimal()
+#> Warning: Removed 3 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
 ```
 
 ![](reference/figures/README-emoji-1.png)
+
+### Integer y-axis with `scale_y_epicurve()`
+
+Case counts are integers by definition, so a y-axis showing values like
+`2.5` or `7.5` is misleading.
+[`scale_y_epicurve()`](https://prcleary.github.io/paulmisc/reference/scale_y_epicurve.md)
+is a thin wrapper around
+[`ggplot2::scale_y_continuous()`](https://ggplot2.tidyverse.org/reference/scale_continuous.html)
+that:
+
+- forces axis breaks to non-negative integers;
+- uses [`pretty()`](https://rdrr.io/r/base/pretty.html) to pick visually
+  sensible intervals;
+- accepts any other
+  [`scale_y_continuous()`](https://ggplot2.tidyverse.org/reference/scale_continuous.html)
+  argument (`limits`, `name`, `expand`, …).
+
+``` r
+
+ggplot(cases, aes(x = onset_date)) +
+  geom_epicurve(fill = "steelblue") +
+  scale_y_epicurve(name = "Number of cases", limits = c(0, NA)) +
+  theme_minimal()
+#> Warning: Removed 3 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
+```
+
+![](reference/figures/README-scale-y-epicurve-1.png)
+
+If you want fractional ticks (e.g. to compare against a rate), use the
+standard
+[`scale_y_continuous()`](https://ggplot2.tidyverse.org/reference/scale_continuous.html)
+instead.
+
+### Automatic footnotes with `epicurve_footnote()`
+
+Every real outbreak plot should disclose when it was generated and how
+much information is missing. `epicurve_footnote(data)` returns a
+`labs(caption = ...)` element that summarises the proportion of rows
+with at least one missing value and stamps the chart with the current
+date and time. Add it to any plot with `+`:
+
+``` r
+
+ggplot(cases, aes(x = onset_date, fill = age_group)) +
+  geom_epicurve() +
+  scale_fill_brewer(palette = "Set2") +
+  labs(title = "Cases with auto-footnote", x = NULL, y = "Cases") +
+  scale_y_epicurve() +
+  theme_minimal() +
+  epicurve_footnote(cases)
+#> Warning: Removed 3 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
+```
+
+![](reference/figures/README-footnote-1.png)
+
+### Realistic line list with missing data
+
+[`simulate_outbreak()`](https://prcleary.github.io/paulmisc/reference/simulate_outbreak.md)
+injects a small proportion of missing values into the demographic and
+onset columns by default, mirroring what real notification systems look
+like. You can tune the level with `prop_missing`:
+
+``` r
+
+realistic <- simulate_outbreak(n = 120, seed = 2024, prop_missing = 0.08)
+
+ggplot(realistic, aes(x = onset_date, fill = outcome)) +
+  geom_epicurve() +
+  scale_fill_manual(values = c(Recovered = "steelblue",
+                               Hospitalised = "tomato")) +
+  labs(title = "Outbreak with realistic missingness",
+       x = "Date of onset", y = "Cases",
+       fill = "Outcome") +
+  scale_y_epicurve() +
+  theme_minimal() +
+  epicurve_footnote(realistic)
+#> Warning: Removed 7 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
+```
+
+![](reference/figures/README-missing-realistic-1.png)
+
+### A complex, realistic example
+
+This example pulls in nearly every feature of the package: missing data,
+faceting, custom symbols per category, an automatic footnote, an
+exposure-window shading, and an event line marking when control measures
+began.
+
+``` r
+
+outbreak <- simulate_outbreak(
+  n = 180,
+  exposure = as.Date("2024-04-22"),
+  meanlog = 1.4,
+  sdlog = 0.55,
+  prop_missing = 0.04,
+  seed = 7
+)
+
+sex_symbols <- c(Female = "\u2640", Male = "\u2642")
+
+# Drop rows with NA in the aesthetics we use (real-life chart prep)
+plot_data <- outbreak[!is.na(outbreak$sex) &
+                        !is.na(outbreak$setting) &
+                        !is.na(outbreak$onset_date), ]
+
+ggplot(plot_data, aes(x = onset_date, colour = sex)) +
+  geom_epicurve(symbol = sex_symbols, symbol_size = 5) +
+  annotate_period(
+    date = as.Date("2024-04-22"),
+    end_date = as.Date("2024-04-26"),
+    label = "Suspected exposure window",
+    fill = "gold", alpha = 0.25
+  ) +
+  annotate_event(
+    date = as.Date("2024-05-02"),
+    label = "Control\nmeasures begin",
+    colour = "darkgreen"
+  ) +
+  scale_colour_manual(
+    values = c(Female = "#D55E00", Male = "#0072B2"),
+    name = "Sex"
+  ) +
+  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
+  labs(
+    title = "Multi-setting outbreak with missing data",
+    subtitle = "Symbols per sex, exposure shaded, intervention marked",
+    x = "Date of onset", y = "Cases"
+  ) +
+  scale_y_epicurve() +
+  theme_minimal() +
+  epicurve_footnote(outbreak)
+```
+
+![](reference/figures/README-complex-example-1.png)
 
 ### Advanced Customisation
 
@@ -424,6 +578,8 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
   ) +
   scale_y_epicurve() +
   theme_minimal()
+#> Warning: Removed 3 rows containing non-finite outside the scale range
+#> (`stat_epicurve()`).
 ```
 
 ![](reference/figures/README-advanced-styling-1.png)

@@ -20,7 +20,7 @@ geom_epicurve(
   max_stack = 20,
   symbol = NULL,
   symbol_size = 3,
-  na.rm = FALSE,
+  na.rm = TRUE,
   show.legend = NA,
   inherit.aes = TRUE
 )
@@ -36,7 +36,7 @@ stat_epicurve(
   max_stack = 20,
   symbol = NULL,
   symbol_size = 3,
-  na.rm = FALSE,
+  na.rm = TRUE,
   show.legend = NA,
   inherit.aes = TRUE
 )
