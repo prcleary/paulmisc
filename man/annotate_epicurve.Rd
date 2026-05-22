@@ -61,6 +61,8 @@ annotate_period(
 
 \item{end_date}{End date for periods (required for \code{annotate_period()})}
 
+\item{fill}{Fill colour for period shading (default: same as \code{colour})}
+
 \item{alpha}{Transparency for period shading (default: 0.3)}
 }
 \value{

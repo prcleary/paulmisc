@@ -29,6 +29,11 @@
 #'   transmission).
 #' @param date_range Integer. For continuous pattern, the number of days/hours/weeks
 #'   over which cases are uniformly distributed. Ignored for point_source pattern.
+#' @param prop_missing Numeric in `[0, 1]`. Approximate proportion of values
+#'   that should be set to `NA` in each non-ID column (including the onset
+#'   date/time and each categorical attribute). Defaults to `0.05` so that
+#'   demonstration data exercises the missing-data code paths in
+#'   [geom_epicurve()]. Set to `0` to disable.
 #' @param seed Optional integer used to seed the random number generator
 #'   for reproducibility. Use `NULL` to leave the RNG state untouched.
 #'
@@ -64,19 +69,25 @@
 #' large <- simulate_outbreak(n = 300, pattern = "continuous", date_range = 14, seed = 789)
 #' table(large$onset_date)
 #'
-#' @importFrom stats rlnorm ave
+#' @importFrom stats rlnorm ave runif
 #' @export
-simulate_outbreak <- function(n          = 20,
-                              exposure   = as.Date("2024-06-01"),
-                              meanlog    = 1.6,
-                              sdlog      = 0.45,
-                              time_unit  = c("daily", "hourly", "weekly"),
-                              pattern    = c("point_source", "continuous"),
-                              date_range = 10,
-                              seed       = 42) {
+simulate_outbreak <- function(n            = 20,
+                              exposure     = as.Date("2024-06-01"),
+                              meanlog      = 1.6,
+                              sdlog        = 0.45,
+                              time_unit    = c("daily", "hourly", "weekly"),
+                              pattern      = c("point_source", "continuous"),
+                              date_range   = 10,
+                              prop_missing = 0.05,
+                              seed         = 42) {
   if (!is.null(seed))
     set.seed(seed)
-  
+
+  if (!is.numeric(prop_missing) || length(prop_missing) != 1 ||
+      is.na(prop_missing) || prop_missing < 0 || prop_missing > 1) {
+    stop("`prop_missing` must be a single number in [0, 1]", call. = FALSE)
+  }
+
   time_unit <- match.arg(time_unit)
   pattern <- match.arg(pattern)
   
@@ -144,6 +155,20 @@ simulate_outbreak <- function(n          = 20,
     prob = c(0.75, 0.25)
   )
   result$setting <- sample(c("Wedding A", "Wedding B"), n, replace = TRUE)
-  
+
+  # Inject a small proportion of missing values into each non-ID column.
+  # This mirrors real outbreak line lists where late-arriving information
+  # leaves some fields blank, and gives downstream tools (e.g. the
+  # epicurve geom) something to exercise their NA-handling on.
+  if (prop_missing > 0) {
+    miss_cols <- setdiff(names(result), "case_id")
+    for (col in miss_cols) {
+      idx <- which(stats::runif(n) < prop_missing)
+      if (length(idx) > 0) {
+        result[[col]][idx] <- NA
+      }
+    }
+  }
+
   result
 }

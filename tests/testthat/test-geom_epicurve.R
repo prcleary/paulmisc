@@ -194,7 +194,7 @@ test_that("geom_epicurve can be built", {
 test_that("geom_epicurve produces data in built plot", {
   library(ggplot2)
   
-  cases <- simulate_outbreak(n = 25, seed = 999)
+  cases <- simulate_outbreak(n = 25, seed = 999, prop_missing = 0)
   
   p <- ggplot(cases, aes(x = onset_date)) +
     geom_epicurve()
@@ -724,7 +724,7 @@ test_that("symbol mode works with emoji", {
 test_that("symbol mode works with colour aesthetic", {
   library(ggplot2)
   
-  cases <- simulate_outbreak(n = 15, seed = 303)
+  cases <- simulate_outbreak(n = 15, seed = 303, prop_missing = 0)
   
   p <- ggplot(cases, aes(x = onset_date, colour = sex)) +
     geom_epicurve(symbol = "●")

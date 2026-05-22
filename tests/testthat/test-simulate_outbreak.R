@@ -26,7 +26,7 @@ test_that("simulate_outbreak produces correct column types", {
 })
 
 test_that("simulate_outbreak produces valid categorical values", {
-  result <- simulate_outbreak(n = 50, seed = 789)
+  result <- simulate_outbreak(n = 50, seed = 789, prop_missing = 0)
   
   # Check age_group values
   expect_true(all(result$age_group %in% c("Child", "Adult", "Elderly")))
@@ -72,7 +72,7 @@ test_that("simulate_outbreak produces different results with different seeds", {
 
 test_that("simulate_outbreak respects exposure parameter", {
   exposure_date <- as.Date("2025-01-01")
-  result <- simulate_outbreak(n = 20, exposure = exposure_date, seed = 666)
+  result <- simulate_outbreak(n = 20, exposure = exposure_date, seed = 666, prop_missing = 0)
   
   # All onset dates should be after exposure
   expect_true(all(result$onset_date > exposure_date))
@@ -95,7 +95,8 @@ test_that("simulate_outbreak respects incubation period parameters", {
     exposure = as.Date("2024-01-01"),
     meanlog = 0, 
     sdlog = 0.1, 
-    seed = 888
+    seed = 888,
+    prop_missing = 0
   )
   
   # Very long incubation
@@ -104,7 +105,8 @@ test_that("simulate_outbreak respects incubation period parameters", {
     exposure = as.Date("2024-01-01"),
     meanlog = 3, 
     sdlog = 0.1, 
-    seed = 888
+    seed = 888,
+    prop_missing = 0
   )
   
   # Median onset should differ
@@ -126,8 +128,8 @@ test_that("simulate_outbreak works with seed = NULL", {
   expect_false(identical(result1$onset_date, result2$onset_date))
 })
 
-test_that("simulate_outbreak produces no missing values", {
-  result <- simulate_outbreak(n = 30, seed = 999)
+test_that("simulate_outbreak produces no missing values when prop_missing = 0", {
+  result <- simulate_outbreak(n = 30, seed = 999, prop_missing = 0)
   
   expect_false(any(is.na(result$case_id)))
   expect_false(any(is.na(result$onset_date)))
@@ -135,6 +137,24 @@ test_that("simulate_outbreak produces no missing values", {
   expect_false(any(is.na(result$sex)))
   expect_false(any(is.na(result$outcome)))
   expect_false(any(is.na(result$setting)))
+})
+
+test_that("simulate_outbreak injects missing values when prop_missing > 0", {
+  # With a high proportion and many rows we expect at least one NA in
+  # each non-id column.
+  result <- simulate_outbreak(n = 500, seed = 12345, prop_missing = 0.2)
+  miss_cols <- setdiff(names(result), "case_id")
+  na_counts <- vapply(result[, miss_cols], function(v) sum(is.na(v)), integer(1))
+  expect_true(all(na_counts > 0))
+  # case_id should remain complete
+  expect_false(any(is.na(result$case_id)))
+})
+
+test_that("simulate_outbreak rejects invalid prop_missing", {
+  expect_error(simulate_outbreak(prop_missing = -0.1))
+  expect_error(simulate_outbreak(prop_missing = 1.5))
+  expect_error(simulate_outbreak(prop_missing = NA))
+  expect_error(simulate_outbreak(prop_missing = "x"))
 })
 
 test_that("simulate_outbreak handles n = 1", {
@@ -181,7 +201,7 @@ test_that("simulate_outbreak with time_unit = 'daily' returns Date (default)", {
 })
 
 test_that("simulate_outbreak hourly data includes demographic attributes", {
-  result <- simulate_outbreak(n = 15, time_unit = "hourly", seed = 606)
+  result <- simulate_outbreak(n = 15, time_unit = "hourly", seed = 606, prop_missing = 0)
   
   # Should have all demographic columns
   expect_true("age_group" %in% names(result))
@@ -201,7 +221,8 @@ test_that("simulate_outbreak with pattern = 'continuous' returns uniform distrib
     pattern = "continuous",
     date_range = 10,
     exposure = "2024-01-01",
-    seed = 707
+    seed = 707,
+    prop_missing = 0
   )
   
   expect_s3_class(result, "data.frame")
@@ -217,7 +238,8 @@ test_that("simulate_outbreak with pattern = 'point_source' follows log-normal (d
     n = 100,
     pattern = "point_source",
     exposure = "2024-01-01",
-    seed = 808
+    seed = 808,
+    prop_missing = 0
   )
   
   expect_s3_class(result, "data.frame")
@@ -234,7 +256,8 @@ test_that("simulate_outbreak continuous pattern with hourly time_unit", {
     pattern = "continuous",
     date_range = 5,
     exposure = "2024-06-01",
-    seed = 909
+    seed = 909,
+    prop_missing = 0
   )
   
   expect_s3_class(result$onset_time, "POSIXct")
@@ -251,7 +274,8 @@ test_that("simulate_outbreak date_range parameter affects continuous pattern", {
     pattern = "continuous",
     date_range = 5,
     exposure = "2024-01-01",
-    seed = 1001
+    seed = 1001,
+    prop_missing = 0
   )
   
   result_wide <- simulate_outbreak(
@@ -259,7 +283,8 @@ test_that("simulate_outbreak date_range parameter affects continuous pattern", {
     pattern = "continuous",
     date_range = 20,
     exposure = "2024-01-01",
-    seed = 1001
+    seed = 1001,
+    prop_missing = 0
   )
   
   spread_narrow <- as.numeric(max(result_narrow$onset_date) - min(result_narrow$onset_date))

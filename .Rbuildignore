@@ -10,3 +10,8 @@
 ^\.github$
 ^doc$
 ^Meta$
+^LLM_CONTEXT\.md$
+^README\.html$
+^tmp_check\.R$
+^tmp_.*\.R$
+^\.vscode$

@@ -1,3 +1,7 @@
+# Null-coalescing helper used by helpers below. Inline definition keeps
+# the package compatible with older R versions where `%||%` is not in base.
+`%||%` <- function(a, b) if (is.null(a)) b else a
+
 #' Epicurve geom: one square per case
 #'
 #' `geom_epicurve()` draws a classical epidemiological curve in which every
@@ -128,19 +132,22 @@
 #'   theme_minimal() +
 #'   labs(title = "Large Outbreak (forced square mode)")
 #'
-#' # Use symbols instead of squares
+#' # Use symbols instead of squares (Unicode glyphs need font support;
+#' # not rendered during R CMD check on minimal devices)
+#' \dontrun{
 #' cases_symbols <- simulate_outbreak(n = 30, seed = 999)
 #' ggplot(cases_symbols, aes(x = onset_date)) +
-#'   geom_epicurve(symbol = "●", symbol_size = 4, colour = "darkblue") +
+#'   geom_epicurve(symbol = "\u25CF", symbol_size = 4, colour = "darkblue") +
 #'   theme_minimal() +
 #'   labs(title = "Epidemic Curve with Bullet Symbols")
 #'
 #' # Use emoji symbols (requires font support)
 #' ggplot(cases_symbols, aes(x = onset_date, colour = sex)) +
-#'   geom_epicurve(symbol = "😷", symbol_size = 5) +
+#'   geom_epicurve(symbol = "\U0001F637", symbol_size = 5) +
 #'   scale_colour_manual(values = c("Female" = "#D55E00", "Male" = "#0072B2")) +
 #'   theme_minimal() +
 #'   labs(title = "COVID-19 Cases with Face Mask Emoji")
+#' }
 #'
 #' @seealso [simulate_outbreak()] for generating example data, [scale_y_epicurve()] for integer y-axis labels.
 #'
@@ -159,19 +166,15 @@ geom_epicurve <- function(mapping = NULL,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
-  # Determine which geom to use based on symbol parameter
-  # If symbol is provided, we'll try to use text mode (unless max_stack overrides)
-  use_geom <- if (!is.null(symbol)) "text" else "rect"
+  # Determine which geom to use based on symbol parameter.
+  # If `symbol` is supplied we render each case as text; otherwise we
+  # render rectangles. Both helper geoms (GeomEpicurveRect /
+  # GeomEpicurveText) declare the `text` aesthetic as known so that the
+  # plotly tooltip mechanism works without ggplot2 warning about an
+  # unknown aesthetic.
+  use_geom <- if (!is.null(symbol)) GeomEpicurveText else GeomEpicurveRect
 
-  # Collect dots so we can inject a sensible default colour for rect mode.
-  # GeomRect defaults colour = NA, which makes adjacent / stacked blocks
-  # appear to touch. A thin white border gives the tiny horizontal (and
-  # vertical) gap that readers expect on an epicurve.
   dots <- list(...)
-  if (use_geom == "rect" &&
-      !any(c("colour", "color") %in% names(dots))) {
-    dots$colour <- "white"
-  }
 
   # Build params list, excluding NULL width to avoid aesthetic warnings
   params <- c(
@@ -188,7 +191,7 @@ geom_epicurve <- function(mapping = NULL,
     params$width <- width
   }
 
-  ggplot2::layer(
+  layer_obj <- ggplot2::layer(
     geom        = use_geom,
     mapping     = mapping,
     data        = data,
@@ -198,6 +201,37 @@ geom_epicurve <- function(mapping = NULL,
     inherit.aes = inherit.aes,
     params      = params
   )
+
+  # When `symbol` is a named character vector, automatically override the
+  # colour/fill legend so each key shows the per-category symbol rather
+  # than the default "a" glyph from GeomText. Returning a list lets us add
+  # the guides() alongside the layer in a single `+` step. We override
+  # both colour and fill guides: whichever the user maps will pick up the
+  # override; the other is a no-op.
+  if (!is.null(symbol) && length(symbol) > 1 && !is.null(names(symbol))) {
+    override <- list(label = unname(symbol), size = symbol_size)
+    return(list(
+      layer_obj,
+      ggplot2::guides(
+        colour = ggplot2::guide_legend(override.aes = override),
+        fill   = ggplot2::guide_legend(override.aes = override)
+      )
+    ))
+  }
+  # Single-symbol case: still auto-override so the legend shows the
+  # symbol rather than a default text glyph.
+  if (!is.null(symbol) && length(symbol) == 1) {
+    override <- list(label = symbol, size = symbol_size)
+    return(list(
+      layer_obj,
+      ggplot2::guides(
+        colour = ggplot2::guide_legend(override.aes = override),
+        fill   = ggplot2::guide_legend(override.aes = override)
+      )
+    ))
+  }
+
+  layer_obj
 }
 
 #' @rdname geom_epicurve
@@ -215,12 +249,7 @@ stat_epicurve <- function(mapping = NULL,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE) {
-  # Inject default white border for rect geoms, matching geom_epicurve().
   dots <- list(...)
-  if (identical(geom, "rect") &&
-      !any(c("colour", "color") %in% names(dots))) {
-    dots$colour <- "white"
-  }
 
   # Build params list, excluding NULL width to avoid aesthetic warnings
   params <- c(
@@ -466,7 +495,38 @@ StatEpicurve <- ggplot2::ggproto(
     # Filter out anchor/padding rows (y=0) - they served their purpose for scales
     # In symbol mode, this also ensures we don't try to render padding symbols
     data <- data[data$y > 0, , drop = FALSE]
-    
+
+    # Auto-generate a sensible default tooltip if the user didn't supply
+    # a `text` aesthetic. Counts per x are computed so the tooltip can
+    # show "<date>: N case(s)" without the user having to pre-aggregate
+    # and merge counts onto each row themselves. At this point ggplot2
+    # has already mapped x to its scale's internal numeric representation,
+    # so we look at `scales$x` to decide how to format it.
+    if (nrow(data) > 0 && !("text" %in% names(data))) {
+      x_key <- as.character(data$x)
+      counts <- as.integer(table(x_key)[x_key])
+      fmt_x <- tryCatch({
+        if (!is.null(scales) && !is.null(scales$x) &&
+            inherits(scales$x, "ScaleContinuousDatetime")) {
+          format(as.POSIXct(data$x, origin = "1970-01-01", tz = "UTC"),
+                 "%d %b %Y %H:%M")
+        } else if (!is.null(scales) && !is.null(scales$x) &&
+                   inherits(scales$x, "ScaleContinuousDate")) {
+          format(as.Date(data$x, origin = "1970-01-01"), "%d %b %Y")
+        } else if (inherits(data$x, "POSIXt")) {
+          format(data$x, "%d %b %Y %H:%M")
+        } else if (inherits(data$x, "Date")) {
+          format(data$x, "%d %b %Y")
+        } else {
+          as.character(data$x)
+        }
+      }, error = function(e) as.character(data$x))
+      data$text <- paste0(
+        "<b>", fmt_x, "</b><br>",
+        counts, " case", ifelse(counts == 1, "", "s")
+      )
+    }
+
     data
   }
 )
@@ -509,6 +569,78 @@ GeomEpicurve <- ggplot2::ggproto(
     data$ymax <- data$y     - (1 - height) / 2
 
     ggplot2::GeomRect$draw_panel(data, panel_params, coord)
+  }
+)
+
+#' GeomEpicurveRect: GeomRect that knows about the `text` aesthetic
+#'
+#' A thin subclass of [ggplot2::GeomRect] that declares the `text`
+#' aesthetic. This is needed so that the tooltip text added by
+#' [StatEpicurve] (or supplied by the user via
+#' `aes(text = ...)`) is propagated through to `plotly::ggplotly()`
+#' without ggplot2 emitting an "Ignoring unknown aesthetics: text"
+#' warning during static rendering.
+#'
+#' @format A [ggplot2::ggproto()] object inheriting from
+#'   [ggplot2::GeomRect].
+#' @keywords internal
+#' @export
+GeomEpicurveRect <- ggplot2::ggproto(
+  "GeomEpicurveRect",
+  ggplot2::GeomRect,
+  default_aes = ggplot2::aes(
+    colour    = NA,
+    fill      = "grey35",
+    linewidth = 0.5,
+    linetype  = 1,
+    alpha     = NA,
+    text      = NULL
+  )
+)
+
+#' GeomEpicurveText: GeomText that knows about `text` and draws symbol keys
+#'
+#' A thin subclass of [ggplot2::GeomText] used in symbol mode. It
+#' declares the `text` aesthetic (so plotly tooltips work without a
+#' warning) and overrides `draw_key` so that legend keys display the
+#' actual case symbol at the requested size rather than the default
+#' "a" glyph.
+#'
+#' @format A [ggplot2::ggproto()] object inheriting from
+#'   [ggplot2::GeomText].
+#' @keywords internal
+#' @export
+GeomEpicurveText <- ggplot2::ggproto(
+  "GeomEpicurveText",
+  ggplot2::GeomText,
+  default_aes = ggplot2::aes(
+    colour     = "black",
+    size       = 3.88,
+    angle      = 0,
+    hjust      = 0.5,
+    vjust      = 0.5,
+    alpha      = NA,
+    family     = "",
+    fontface   = 1,
+    lineheight = 1.2,
+    text       = NULL
+  ),
+  draw_key = function(data, params, size) {
+    # Use the label aesthetic from the legend data if present; fall back
+    # to the symbol supplied via params (single-symbol case).
+    lbl <- data$label
+    if (is.null(lbl) || is.na(lbl) || nchar(as.character(lbl)) == 0) {
+      lbl <- params$symbol %||% "\u25A0"
+    }
+    grid::textGrob(
+      label = as.character(lbl)[1],
+      x = 0.5, y = 0.5,
+      gp = grid::gpar(
+        col      = data$colour %||% "black",
+        fontsize = (data$size %||% params$symbol_size %||% 3) * .pt,
+        fontfamily = data$family %||% ""
+      )
+    )
   }
 )
 

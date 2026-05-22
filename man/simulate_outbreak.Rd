@@ -12,6 +12,7 @@ simulate_outbreak(
   time_unit = c("daily", "hourly", "weekly"),
   pattern = c("point_source", "continuous"),
   date_range = 10,
+  prop_missing = 0.05,
   seed = 42
 )
 }
@@ -42,6 +43,12 @@ transmission).}
 
 \item{date_range}{Integer. For continuous pattern, the number of days/hours/weeks
 over which cases are uniformly distributed. Ignored for point_source pattern.}
+
+\item{prop_missing}{Numeric in \verb{[0, 1]}. Approximate proportion of values
+that should be set to \code{NA} in each non-ID column (including the onset
+date/time and each categorical attribute). Defaults to \code{0.05} so that
+demonstration data exercises the missing-data code paths in
+\code{\link[=geom_epicurve]{geom_epicurve()}}. Set to \code{0} to disable.}
 
 \item{seed}{Optional integer used to seed the random number generator
 for reproducibility. Use \code{NULL} to leave the RNG state untouched.}

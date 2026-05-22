@@ -11,6 +11,7 @@
 #' @param linetype Line type for event markers (default: "dashed")
 #' @param linewidth Width of the event line (default: 0.75)
 #' @param alpha Transparency for period shading (default: 0.3)
+#' @param fill Fill colour for period shading (default: same as `colour`)
 #' @param label_y Vertical position for the label (default: "top" for events,
 #'   "top" for periods). Can be numeric or "top"/"bottom"/"middle".
 #' @param label_hjust Horizontal justification for label (default: 0 for events,
@@ -260,7 +261,7 @@ annotate_period <- function(date,
 
 #' @export
 #' @importFrom ggplot2 ggplot_add
-ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
+ggplot_add.epicurve_event_annotation <- function(object, plot, object_name, ...) {
   yr <- .epicurve_orig_yr(plot)
   span <- yr[2] - yr[1]
   y_frac <- .resolve_y_frac(object$label_y)
@@ -332,7 +333,7 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name) {
 
 #' @export
 #' @importFrom ggplot2 ggplot_add
-ggplot_add.epicurve_period_annotation <- function(object, plot, object_name) {
+ggplot_add.epicurve_period_annotation <- function(object, plot, object_name, ...) {
   yr <- .epicurve_orig_yr(plot)
   span <- yr[2] - yr[1]
   y_frac <- .resolve_y_frac(object$label_y)
