@@ -745,6 +745,8 @@ Functions for creating epidemic curves and simulating outbreak data
   : Annotate epidemic curves with events and periods
 - [`epicurve_footnote()`](https://prcleary.github.io/paulmisc/reference/epicurve_footnote.md)
   : Summary footnote for an epicurve
+- [`epicurve_ggplotly()`](https://prcleary.github.io/paulmisc/reference/epicurve_ggplotly.md)
+  : Interactive epicurve via plotly with sensible defaults
 
 ## Shiny Applications
 
