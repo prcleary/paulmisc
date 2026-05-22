@@ -54,7 +54,9 @@ hourly <- simulate_outbreak(
 ggplot(hourly, aes(x = onset_time, fill = age_group)) +
   geom_epicurve() +
   scale_y_epicurve() +
-  scale_fill_brewer(palette = "Set2") +
+  scale_x_datetime(date_breaks = "6 hours",
+                   date_labels = "%H:%M\n%d %b") +
+  scale_fill_brewer(palette = "Set2", na.translate = FALSE) +
   labs(title = "Hourly onsets over two days",
        x = "Time of onset", y = "Cases") +
   theme_minimal()
