@@ -136,8 +136,6 @@ ggplot(cases, aes(x = onset_date)) +
   ) +
   scale_y_epicurve() +
   theme_minimal()
-#> Warning: Removed 3 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-basic-epicurve-1.png" alt="" width="100%" />
@@ -158,8 +156,6 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
     fill = "Age Group"
   ) +
   theme_bw()
-#> Warning: Removed 3 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-coloured-epicurve-1.png" alt="" width="100%" />
@@ -184,8 +180,6 @@ ggplot(cases, aes(x = onset_date, fill = outcome)) +
   ) +
   scale_y_epicurve() +
   theme_minimal()
-#> Warning: Removed 3 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-faceted-epicurve-1.png" alt="" width="100%" />
@@ -234,10 +228,6 @@ p2 <- ggplot(long_incubation, aes(x = onset_date)) +
   theme_minimal()
 
 p1 / p2
-#> Warning: Removed 5 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
-#> Removed 5 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-incubation-comparison-1.png" alt="" width="100%" />
@@ -277,8 +267,6 @@ p2 <- ggplot(weekly_cases, aes(x = onset_date)) +
   theme_minimal()
 
 p1 / p2
-#> Warning: Removed 1 row containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-time-periods-1.png" alt="" width="100%" />
@@ -311,8 +299,6 @@ ggplot(large_outbreak, aes(x = onset_date)) +
   ) +
   scale_y_epicurve() +
   theme_minimal()
-#> Warning: Removed 14 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-large-outbreak-1.png" alt="" width="100%" />
@@ -357,8 +343,6 @@ ggplot(outbreak_cases, aes(x = onset_date)) +
   ) +
   scale_y_epicurve() +
   theme_minimal()
-#> Warning: Removed 4 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-annotated-epicurve-1.png" alt="" width="100%" />
@@ -416,8 +400,6 @@ ggplot(cases, aes(x = onset_date, colour = age_group)) +
        x = "Date", y = "Cases") +
   scale_y_epicurve() +
   theme_minimal()
-#> Warning: Removed 3 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-emoji-1.png" alt="" width="100%" />
@@ -440,8 +422,6 @@ ggplot(cases, aes(x = onset_date)) +
   geom_epicurve(fill = "steelblue") +
   scale_y_epicurve(name = "Number of cases", limits = c(0, NA)) +
   theme_minimal()
-#> Warning: Removed 3 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-scale-y-epicurve-1.png" alt="" width="100%" />
@@ -465,8 +445,6 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
   scale_y_epicurve() +
   theme_minimal() +
   epicurve_footnote(cases)
-#> Warning: Removed 3 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-footnote-1.png" alt="" width="100%" />
@@ -491,8 +469,6 @@ ggplot(realistic, aes(x = onset_date, fill = outcome)) +
   scale_y_epicurve() +
   theme_minimal() +
   epicurve_footnote(realistic)
-#> Warning: Removed 7 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-missing-realistic-1.png" alt="" width="100%" />
@@ -572,8 +548,6 @@ ggplot(cases, aes(x = onset_date, fill = sex)) +
   ) +
   scale_y_epicurve() +
   theme_minimal()
-#> Warning: Removed 3 rows containing non-finite outside the scale range
-#> (`stat_epicurve()`).
 ```
 
 <img src="man/figures/README-advanced-styling-1.png" alt="" width="100%" />
