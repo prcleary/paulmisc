@@ -386,14 +386,16 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name, ...
     }
     span_x <- as.numeric(xr[2]) - as.numeric(xr[1])
     pad <- 0.005 * span_x
-    period_start <- as.numeric(object$date)
-    period_end   <- as.numeric(object$end_date)
+    mid_x        <- as.numeric(object$mid_date)
     left_edge    <- as.numeric(xr[1])
     right_edge   <- as.numeric(xr[2])
-    if (period_start <= left_edge) {
+    # Only clamp when the *midpoint itself* would fall outside the plot
+    # window; clamping based on period_start/end aggressively pushed the
+    # label off-centre for periods that ended at or near the right edge.
+    if (mid_x < left_edge) {
       label_x <- to_x_type(left_edge + pad)
       label_hjust_dyn <- 0
-    } else if (period_end >= right_edge) {
+    } else if (mid_x > right_edge) {
       label_x <- to_x_type(right_edge - pad)
       label_hjust_dyn <- 1
     }

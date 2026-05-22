@@ -248,11 +248,12 @@ p1 <- ggplot(hourly_cases, aes(x = onset_time)) +
   scale_y_epicurve() +
   theme_minimal()
 
-# Weekly aggregated data for surveillance — 21 weeks gives a
-# realistically long surveillance window.
+# Weekly aggregated data for surveillance — 21 weeks of continuous
+# transmission gives a realistically long surveillance window.
 weekly_cases <- simulate_outbreak(
-  n = 60,
+  n = 120,
   time_unit = "weekly",
+  pattern = "continuous",
   date_range = 21 * 7,
   exposure = "2024-01-01",
   seed = 456,
@@ -275,10 +276,12 @@ The width parameter automatically adjusts based on the time unit detected.
 
 When case counts exceed a threshold (default 20), the plot automatically switches to a column chart for better readability:
 
-```{r large-outbreak, fig.height=6, fig.width=7}
-# Simulate a large continuous outbreak across multiple settings
+```{r large-outbreak, fig.height=4, fig.width=7}
+# Simulate a large continuous outbreak. With ~40 cases per day the auto-
+# switch kicks in and the plot renders as a stacked column chart instead
+# of individual squares.
 large_outbreak <- simulate_outbreak(
-  n = 400,
+  n = 600,
   pattern = "continuous",
   date_range = 14,
   exposure = "2024-01-01",
@@ -290,10 +293,9 @@ ggplot(large_outbreak, aes(x = onset_date, fill = age_group)) +
   geom_epicurve(max_stack = 20) +
   scale_fill_brewer(palette = "Set2", name = "Age group",
                     na.translate = FALSE) +
-  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
   labs(
     title = "Large Outbreak (Auto-switched to Column Chart)",
-    subtitle = "Filled by age group and faceted by setting",
+    subtitle = "Bars show daily case counts coloured by age group",
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
@@ -482,7 +484,7 @@ plot_data <- outbreak[!is.na(outbreak$sex) &
                         !is.na(outbreak$onset_date), ]
 
 ggplot(plot_data, aes(x = onset_date, colour = sex)) +
-  geom_epicurve(symbol = sex_symbols, symbol_size = 5) +
+  geom_epicurve(symbol = sex_symbols, symbol_size = 4) +
   annotate_period(
     date = as.Date("2024-04-22"),
     end_date = as.Date("2024-04-26"),

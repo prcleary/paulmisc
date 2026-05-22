@@ -317,16 +317,21 @@ detect_epicurve_width <- function(x) {
 
   # Handle Date objects. Detect calendar alignment (weekly = same weekday;
   # monthly = same day-of-month) so that one bar = one period regardless of
-  # how sparse the data are in a given panel.
+  # how sparse the data are in a given panel. We require a wide enough span
+  # so sparse panels (e.g. 2 cases on the same weekday by coincidence) are
+  # not mis-classified as weekly/monthly.
   if (inherits(x, "Date")) {
-    lt <- as.POSIXlt(x)
-    if (length(unique(lt$wday)) == 1 && length(unique(x)) > 1) {
-      # All on the same weekday -> weekly
+    ux <- unique(x)
+    span_days <- as.numeric(diff(range(x)))
+    lt <- as.POSIXlt(ux)
+    if (length(ux) >= 3 && span_days >= 14 &&
+        length(unique(lt$wday)) == 1) {
+      # ≥3 unique dates, all on the same weekday, spanning ≥2 weeks -> weekly
       return(7 * 0.9)
     }
-    if (length(unique(lt$mday)) == 1 && length(unique(x)) > 1) {
-      # All on the same day-of-month -> monthly. 28 is the worst-case bin
-      # so two adjacent month bars never overlap.
+    if (length(ux) >= 3 && span_days >= 60 &&
+        length(unique(lt$mday)) == 1) {
+      # ≥3 unique dates, all on the same day-of-month, spanning ≥2 months -> monthly
       return(28 * 0.9)
     }
     # Otherwise daily; never expand for sparse panels.
@@ -352,6 +357,17 @@ StatEpicurve <- ggplot2::ggproto(
   "StatEpicurve",
   ggplot2::Stat,
   required_aes = "x",
+
+  # Compute width ONCE from the full layer data (across all panels) so every
+  # facet panel renders bars/symbols of identical size. Without this, sparse
+  # panels run detect_epicurve_width on tiny subsets and end up with a
+  # different width from the rest of the plot.
+  setup_params = function(data, params) {
+    if (is.null(params$width)) {
+      params$width <- detect_epicurve_width(data$x)
+    }
+    params
+  },
 
   compute_panel = function(self, data, scales, na.rm = FALSE, width = NULL, height = 0.9, max_stack = 20, symbol = NULL, symbol_size = 3) {
     # Drop rows with NA in mapped aesthetics so they don't appear as a
@@ -682,10 +698,14 @@ scale_y_epicurve <- function(...) {
   }
   args$breaks <- function(limits) {
     upper <- limits[2]
-    if (is.na(upper) || upper < 1) upper <- 1
+    if (!is.finite(upper) || upper < 1) upper <- 1
     at <- pretty(c(0, upper), n = 5)
-    at <- at[at == floor(at) & at >= 0]
-    if (length(at) == 0) at <- c(0, ceiling(upper))
+    at <- at[is.finite(at) & at == floor(at) & at >= 0]
+    at <- unique(at)
+    # Guarantee at least two labelled breaks (0 and a positive integer)
+    # so every panel \u2014 including sparse facets with only one or two
+    # cases \u2014 has a visible y-axis.
+    if (length(at) < 2) at <- c(0, max(1, ceiling(upper)))
     at
   }
   do.call(ggplot2::scale_y_continuous, args)

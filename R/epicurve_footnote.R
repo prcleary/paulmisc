@@ -54,20 +54,11 @@ epicurve_footnote <- function(data,
     cols <- columns %||% setdiff(names(data), c("case_id", "id"))
     cols <- intersect(cols, names(data))
     if (length(cols) > 0 && nrow(data) > 0) {
-      na_per_col <- vapply(data[, cols, drop = FALSE],
-                           function(v) sum(is.na(v)), integer(1))
       any_missing <- rowSums(is.na(data[, cols, drop = FALSE])) > 0
       pct_rows <- round(100 * mean(any_missing), 1)
-      worst <- if (any(na_per_col > 0)) {
-        idx <- which.max(na_per_col)
-        paste0(" \u2014 worst: ", names(na_per_col)[idx],
-               " (", na_per_col[idx], "/", nrow(data), ")")
-      } else {
-        ""
-      }
       parts <- c(parts, sprintf(
-        "Missing data: %s%% of rows have \u22651 missing value%s.",
-        format(pct_rows, nsmall = 1), worst
+        "Missing data: %s%% of rows have \u22651 missing value.",
+        format(pct_rows, nsmall = 1)
       ))
     } else {
       parts <- c(parts, "Missing data: none.")
