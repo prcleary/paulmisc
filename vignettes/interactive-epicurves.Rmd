@@ -18,108 +18,96 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-The `geom_epicurve()` function works seamlessly with [plotly](https://plotly.com/r/) to create interactive epidemic curves with custom tooltips. This vignette demonstrates:
+`geom_epicurve()` plots convert cleanly to interactive plotly widgets.
+Use `epicurve_ggplotly()` instead of calling `ggplotly()` directly: it
+wraps the conversion with sensible defaults so you don't have to fight
+plotly afterwards. It:
 
-- **Basic interactivity**: Converting static plots to interactive visualisations
-- **Custom tooltips**: HTML-formatted hover information
-- **Time periods**: Hourly, daily, and weekly epidemic curves
-- **Large outbreaks**: Automatic column chart mode with tooltips
-- **Symbols**: Using Unicode symbols and emoji with interactivity
-- **Annotations**: Adding timeline context (best for static plots)
-
-Simply create your plot with ggplot2 and convert it using `ggplotly()`.
-
-## Basic Interactive Example
+* uses the auto-generated `text` aesthetic for hover labels;
+* strips the unhelpful `"trace 0"`, `"trace 1"` ... suffix from tooltips;
+* re-injects the `subtitle` that `ggplotly()` would otherwise drop;
+* suppresses plotly's placeholder `"Aa"` legend for symbol-mode plots.
 
 ```{r setup}
 library(paulmisc)
 library(ggplot2)
 library(plotly)
 
-# Generate example outbreak data
-cases <- simulate_outbreak(n = 50, seed = 123)
+cases <- simulate_outbreak(n = 50, seed = 123, prop_missing = 0)
 ```
 
-First, let's create a basic interactive epidemic curve:
+## Basic interactive plot
 
 ```{r basic-interactive, message=FALSE, warning=FALSE}
-# Create ggplot with text aesthetic for tooltips
-p <- ggplot(cases, aes(x = onset_date, text = format(onset_date, "%d %B %Y"))) +
+p <- ggplot(cases, aes(x = onset_date)) +
   geom_epicurve(fill = "steelblue") +
   labs(
     title = "Interactive Epidemic Curve",
-    x = "Date of Onset",
-    y = "Number of Cases"
-  ) +
-  theme_minimal()
-
-# Convert to interactive plotly plot
-# tooltip = "text" shows only our custom tooltip
-ggplotly(p, tooltip = "text")
-```
-
-Hover over any square to see its onset date. Each square represents one case, stacked vertically by date!
-
-## Interactive by Age Group
-
-Now let's colour by age group and add custom tooltips:
-
-```{r by-age-group, message=FALSE, warning=FALSE}
-# Add custom tooltip text (plain text format)
-cases$tooltip <- paste0(
-  "Case ", cases$case_id, "\n",
-  "Date: ", format(cases$onset_date, "%d %B %Y"), "\n",
-  "Age Group: ", cases$age_group, "\n",
-  "Sex: ", cases$sex, "\n",
-  "Setting: ", cases$setting, "\n",
-  "Outcome: ", cases$outcome
-)
-
-# Create plot with custom tooltips
-p <- ggplot(cases, aes(x = onset_date, fill = age_group, text = tooltip)) +
-  geom_epicurve() +
-  scale_fill_brewer(palette = "Set2", name = "Age Group") +
-  labs(
-    title = "Interactive Epidemic Curve by Age Group",
-    x = "Date of Onset",
-    y = "Number of Cases"
+    x = "Date of Onset", y = "Number of Cases"
   ) +
   scale_y_epicurve() +
   theme_minimal()
 
-# Convert to interactive, showing only our custom tooltip
-ggplotly(p, tooltip = "text")
+epicurve_ggplotly(p)
 ```
 
-## Faceted Interactive Plots
+Hover over any case to see the date and the case count for that day.
 
-Interactive plots work with faceting too:
+## By age group
+
+```{r by-age-group, message=FALSE, warning=FALSE}
+cases$tooltip <- with(cases, paste0(
+  "Case ", case_id, "<br>",
+  "Date: ", format(onset_date, "%d %B %Y"), "<br>",
+  "Age Group: ", age_group, "<br>",
+  "Sex: ", sex, "<br>",
+  "Setting: ", setting, "<br>",
+  "Outcome: ", outcome
+))
+
+p <- ggplot(cases, aes(x = onset_date, fill = age_group, text = tooltip)) +
+  geom_epicurve() +
+  scale_fill_brewer(palette = "Set2", name = "Age Group",
+                    na.translate = FALSE) +
+  labs(
+    title = "Interactive Epidemic Curve by Age Group",
+    x = "Date of Onset", y = "Number of Cases"
+  ) +
+  scale_y_epicurve() +
+  theme_minimal()
+
+epicurve_ggplotly(p)
+```
+
+`na.translate = FALSE` keeps unknown-age-group cases out of the legend.
+
+## Faceted by setting
 
 ```{r faceted, message=FALSE, warning=FALSE, fig.height=6}
 p <- ggplot(cases, aes(x = onset_date, fill = sex, text = tooltip)) +
   geom_epicurve() +
   scale_fill_manual(
     values = c("Female" = "#D55E00", "Male" = "#0072B2"),
-    name = "Sex"
+    name = "Sex", na.translate = FALSE
   ) +
   facet_wrap(~ setting, ncol = 1, scales = "free_y") +
   labs(
     title = "Interactive Epidemic Curves by Setting",
-    x = "Date of Onset",
-    y = "Number of Cases"
+    x = "Date of Onset", y = "Number of Cases"
   ) +
   scale_y_epicurve() +
   theme_minimal()
 
-ggplotly(p, tooltip = "text")
+epicurve_ggplotly(p)
 ```
 
-## Customising Tooltip Content
+Every panel has a labelled y-axis (even a single-case panel shows the
+`0` and `1` breaks), and the bar width is always one day &mdash; sparse
+panels can never produce a bar that spans multiple days.
 
-You have complete control over tooltip content. Use HTML formatting for rich tooltips:
+## Custom HTML tooltips
 
 ```{r custom-tooltips, message=FALSE, warning=FALSE}
-# Create formatted tooltips with HTML
 cases$tooltip <- with(cases, paste0(
   "<b>Case ", case_id, "</b><br>",
   "<b>Date:</b> ", format(onset_date, "%d %B %Y"), "<br>",
@@ -130,82 +118,75 @@ cases$tooltip <- with(cases, paste0(
 
 p <- ggplot(cases, aes(x = onset_date, fill = outcome, text = tooltip)) +
   geom_epicurve() +
-  scale_fill_brewer(palette = "Pastel1", name = "Outcome") +
+  scale_fill_brewer(palette = "Pastel1", name = "Outcome",
+                    na.translate = FALSE) +
   labs(
     title = "Interactive Epidemic Curve by Outcome",
-    x = "Date of Onset",
-    y = "Number of Cases"
+    x = "Date of Onset", y = "Number of Cases"
   ) +
   scale_y_epicurve() +
   theme_minimal()
 
-ggplotly(p, tooltip = "text")
+epicurve_ggplotly(p)
 ```
 
-## Interactive Time Period Variants
+## Hourly outbreak
 
-Epidemic curves work with different time scales. Here is a richer
-hourly outbreak with a continuous source over three days &mdash; this
-produces a curve whose bars vary in height, with proper time labels on
-the x-axis:
+For sub-daily data, the auto-detected bar width is one hour. Make the
+x-axis show hour-of-day instead of dates with `scale_x_datetime()`:
 
 ```{r hourly-interactive, message=FALSE, warning=FALSE}
 hourly_cases <- simulate_outbreak(
-  n = 80,
-  time_unit = "hourly",
-  pattern = "continuous",
-  date_range = 3,
-  exposure = "2024-06-01",
-  seed = 321,
-  prop_missing = 0
+  n = 80, time_unit = "hourly", pattern = "continuous",
+  date_range = 3, exposure = "2024-06-01",
+  seed = 321, prop_missing = 0
 )
 
 p <- ggplot(hourly_cases, aes(x = onset_time, fill = sex)) +
   geom_epicurve() +
-  scale_fill_manual(values = c(Female = "#D55E00", Male = "#0072B2")) +
+  scale_fill_manual(values = c(Female = "#D55E00", Male = "#0072B2"),
+                    na.translate = FALSE) +
+  scale_x_datetime(date_breaks = "6 hours",
+                   date_labels = "%H:%M\n%d %b") +
   labs(
     title = "Hourly Epidemic Curve (Interactive)",
-    x = "Time of Onset",
-    y = "Number of Cases",
-    fill = "Sex"
+    x = "Time of Onset", y = "Number of Cases", fill = "Sex"
   ) +
   scale_y_epicurve() +
   theme_minimal()
 
-ggplotly(p, tooltip = "text")
+epicurve_ggplotly(p)
 ```
 
-The width automatically adjusts based on the time unit detected.
+## Large outbreak: auto column-chart mode + fill + facet
 
-## Interactive Large Outbreaks
+When any time point has more than `max_stack` cases, the plot
+auto-switches to column-chart mode. Aesthetics and facets all still
+work:
 
-For large outbreaks, the plot automatically switches to column chart mode when case counts exceed the threshold. By default `geom_epicurve()` builds a sensible tooltip per case &mdash; date plus case count for that day &mdash; so you don't need to pre-aggregate the data yourself:
-
-```{r large-outbreak, message=FALSE, warning=FALSE}
+```{r large-outbreak, message=FALSE, warning=FALSE, fig.height=6}
 large_outbreak <- simulate_outbreak(
-  n = 200,
-  pattern = "continuous",
-  date_range = 10,
-  exposure = "2024-01-01",
-  seed = 456,
-  prop_missing = 0
+  n = 400, pattern = "continuous", date_range = 14,
+  exposure = "2024-01-01", seed = 456, prop_missing = 0
 )
 
-p <- ggplot(large_outbreak, aes(x = onset_date)) +
-  geom_epicurve(fill = "coral", max_stack = 20) +
+p <- ggplot(large_outbreak, aes(x = onset_date, fill = age_group)) +
+  geom_epicurve(max_stack = 20) +
+  scale_fill_brewer(palette = "Set2", name = "Age group",
+                    na.translate = FALSE) +
+  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
   labs(
     title = "Large Outbreak (Column Chart Mode)",
-    subtitle = "Auto-switched because some dates have >20 cases",
-    x = "Date of Onset",
-    y = "Number of Cases"
+    subtitle = "Auto-switched, faceted by setting and filled by age group",
+    x = "Date of Onset", y = "Number of Cases"
   ) +
   scale_y_epicurve() +
   theme_minimal()
 
-ggplotly(p, tooltip = "text")
+epicurve_ggplotly(p)
 ```
 
-If you want a richer tooltip, just map your own to `text`:
+## Per-case tooltips for big plots
 
 ```{r large-outbreak-custom, message=FALSE, warning=FALSE}
 p <- ggplot(
@@ -219,56 +200,55 @@ p <- ggplot(
   scale_y_epicurve() +
   theme_minimal()
 
-ggplotly(p, tooltip = "text")
+epicurve_ggplotly(p)
 ```
 
-## Interactive Symbols
+## Symbols
 
-Use custom symbols with interactive tooltips. Named symbol vectors map
-to categories automatically, and the legend updates without needing
-any `guides()` boilerplate:
+For symbol mode the ggplot legend renders each key as the actual
+Unicode glyph, but plotly's legend would show a generic `"Aa"`. By
+default `epicurve_ggplotly()` therefore hides the symbol legend and
+relies on the tooltip to disambiguate categories &mdash; hover any
+symbol to see the sex.
 
 ```{r symbols-interactive, message=FALSE, warning=FALSE}
 symbol_cases <- simulate_outbreak(n = 30, seed = 789, prop_missing = 0)
 
 sex_symbols <- c(Female = "\u2640", Male = "\u2642")
 
-p <- ggplot(symbol_cases, aes(x = onset_date, colour = sex)) +
+p <- ggplot(symbol_cases,
+            aes(x = onset_date, colour = sex,
+                text = paste0("Sex: ", sex, "<br>",
+                              format(onset_date, "%d %b %Y")))) +
   geom_epicurve(symbol = sex_symbols, symbol_size = 6) +
   scale_colour_manual(
     values = c("Female" = "#D55E00", "Male" = "#0072B2"),
-    name = "Sex"
+    name = "Sex", na.translate = FALSE
   ) +
   labs(
     title = "Interactive Epidemic Curve with Symbols",
-    x = "Date of Onset",
-    y = "Number of Cases"
+    x = "Date of Onset", y = "Number of Cases"
   ) +
   scale_y_epicurve() +
   theme_minimal()
 
-ggplotly(p, tooltip = "text")
+epicurve_ggplotly(p)
 ```
 
-## Timeline Annotations
+## Timeline annotations
 
-Add context to your epidemic curves with annotations. 
-
-### Interactive Annotations
-
-Timeline annotations work seamlessly with plotly using the same code as for static plots:
+`annotate_event()` and `annotate_period()` convert cleanly. Period
+labels self-clip to the visible x-range, so they never run off the
+edge of the panel.
 
 ```{r annotations-interactive, message=FALSE, warning=FALSE}
-# Create plot with annotations - same code works for both static and interactive!
-# The default tooltip already shows date and case count per day.
 p <- ggplot(cases, aes(x = onset_date)) +
   geom_epicurve(fill = "steelblue") +
   annotate_period(
     date = as.Date("2024-05-28"),
     end_date = as.Date("2024-06-02"),
     label = "Exposure period",
-    fill = "yellow",
-    alpha = 0.25
+    fill = "yellow", alpha = 0.25
   ) +
   annotate_event(
     date = as.Date("2024-06-05"),
@@ -278,36 +258,10 @@ p <- ggplot(cases, aes(x = onset_date)) +
   labs(
     title = "Interactive Outbreak Timeline",
     subtitle = "Hover over cases for details",
-    x = "Date",
-    y = "Cases"
+    x = "Date", y = "Cases"
   ) +
   scale_y_epicurve() +
   theme_minimal()
 
-# Convert to plotly - all annotations transfer automatically!
-# ggplotly() doesn't render ggplot subtitles, so re-inject the title via
-# layout() using an HTML <br> + <sup> for the subtitle.
-ggplotly(p, tooltip = "text") |>
-  layout(title = list(
-    text = paste0(
-      "Interactive Outbreak Timeline",
-      "<br><sup>Hover over cases for details</sup>"
-    )
-  ))
+epicurve_ggplotly(p)
 ```
-
-The shaded period, event line, and all labels convert to plotly automatically!
-
-## Tips for Interactive Visualisation
-
-- **Simple conversion**: Just wrap your ggplot with `ggplotly()` for basic interactivity
-- **Custom tooltips**: Add a `text` aesthetic and use `ggplotly(p, tooltip = "text")` to show only your custom tooltip
-- **Tooltip formatting**: Use `\n` for line breaks in plain text, or use HTML tags (e.g., `<br>`, `<b>`) for rich formatting
-- **Performance**: Interactive plots with many cases (>500) may be slow. Consider filtering for large datasets
-- **Mobile devices**: Interactive features work on touch devices - tap to see tooltips
-- **Export**: Use plotly's built-in export button to save static images
-- **Styling**: Default plot aesthetics work best - avoid overriding fill/colour in geom parameters when using aesthetics
-
-## More Information
-
-For more details on plotly customisation, see the [plotly for R documentation](https://plotly-r.com/).

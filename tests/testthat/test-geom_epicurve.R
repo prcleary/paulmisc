@@ -738,27 +738,23 @@ test_that("symbol mode works with colour aesthetic", {
   expect_equal(nrow(built$data[[1]]), 15)
 })
 
-test_that("symbol mode disabled when max_stack exceeded", {
+test_that("symbol mode is preserved when max_stack would be exceeded", {
   library(ggplot2)
-  
-  # Create data that exceeds max_stack
+
+  # Create data that would exceed max_stack
   cases <- data.frame(
     onset_date = as.Date("2024-01-01") + c(rep(0, 25), rep(1, 15))
   )
-  
+
   p <- ggplot(cases, aes(x = onset_date)) +
-    geom_epicurve(symbol = "●", max_stack = 20)
-  
+    geom_epicurve(symbol = "\u25CF", max_stack = 20)
+
   built <- ggplot_build(p)
-  
-  # Should switch to column mode (2 rows instead of 40)
-  expect_equal(nrow(built$data[[1]]), 2)
-  
-  # Should STILL have label column (showing counts as text labels)
+
+  # Symbol mode wins: one row per case (40), each with the supplied symbol.
+  expect_equal(nrow(built$data[[1]]), 40)
   expect_true("label" %in% names(built$data[[1]]))
-  
-  # Labels should show the counts
-  expect_equal(sort(as.numeric(built$data[[1]]$label)), c(15, 25))
+  expect_equal(unique(built$data[[1]]$label), "\u25CF")
 })
 
 test_that("symbol mode y positions are centered", {

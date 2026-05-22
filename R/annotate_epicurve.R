@@ -271,15 +271,18 @@ ggplot_add.epicurve_event_annotation <- function(object, plot, object_name, ...)
   # the snapshotted yr (not the current built scale) prevents "creep".
   use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
   if (use_top_vjust) {
-    label_y_val <- yr[2] + 0.05 * span
+    # Counts are integers, so guarantee at least a full unit of headroom
+    # regardless of how small the data range is (a one-case panel must not
+    # have its annotation label sitting on top of the bar).
+    pad_above <- max(0.05 * span, 0.5)
+    label_y_val <- yr[2] + pad_above
     effective_vjust <- 0
-    top_pad <- yr[2] + 0.11 * span
+    top_pad <- yr[2] + max(0.15 * span, 1)
   } else {
     label_y_val <- yr[1] + y_frac * span
     effective_vjust <- object$label_vjust
     top_pad <- NULL
   }
-
   # Hover text for plotly tooltips (ignored by ggplot2 but used by ggplotly).
   hover_text <- paste0(object$label, "<br>", format(object$date))
 
@@ -342,9 +345,10 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name, ...
   # period rectangle rather than overlapping its top edge.
   use_top_vjust <- y_frac >= 1 && object$label_vjust >= 0 && object$label_vjust <= 0.5
   if (use_top_vjust) {
-    label_y_val <- yr[2] + 0.05 * span
+    pad_above <- max(0.05 * span, 0.5)
+    label_y_val <- yr[2] + pad_above
     effective_vjust <- 0
-    top_pad <- yr[2] + 0.11 * span
+    top_pad <- yr[2] + max(0.15 * span, 1)
   } else {
     label_y_val <- yr[1] + y_frac * span
     effective_vjust <- object$label_vjust
@@ -357,6 +361,43 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name, ...
     object$label, "<br>",
     format(object$date), " \u2013 ", format(object$end_date)
   )
+
+  # Robust label placement: keep the label fully inside the visible x range
+  # without requiring manual nudges. If the period starts left of the plot
+  # window, anchor the label to the left edge with hjust = 0; if it ends
+  # right of the plot, anchor to the right edge with hjust = 1; otherwise
+  # centre it on the period midpoint.
+  xr <- .epicurve_x_range(plot)
+  label_x <- object$mid_date
+  label_hjust_dyn <- object$label_hjust
+  if (!is.null(xr) && length(xr) == 2 && all(is.finite(as.numeric(xr)))) {
+    # `xr` is numeric (scale units); convert it back to the original
+    # x-axis type so passing it to a Date/POSIXct scale doesn't trigger
+    # ggplot2's "<numeric> passed to a Date scale" warning.
+    to_x_type <- function(v) {
+      if (inherits(object$mid_date, "POSIXt")) {
+        as.POSIXct(v, origin = "1970-01-01",
+                   tz = attr(object$mid_date, "tzone") %||% "UTC")
+      } else if (inherits(object$mid_date, "Date")) {
+        as.Date(v, origin = "1970-01-01")
+      } else {
+        v
+      }
+    }
+    span_x <- as.numeric(xr[2]) - as.numeric(xr[1])
+    pad <- 0.005 * span_x
+    period_start <- as.numeric(object$date)
+    period_end   <- as.numeric(object$end_date)
+    left_edge    <- as.numeric(xr[1])
+    right_edge   <- as.numeric(xr[2])
+    if (period_start <= left_edge) {
+      label_x <- to_x_type(left_edge + pad)
+      label_hjust_dyn <- 0
+    } else if (period_end >= right_edge) {
+      label_x <- to_x_type(right_edge - pad)
+      label_hjust_dyn <- 1
+    }
+  }
 
   layers <- .silence_text_aes(list(
     ggplot2::geom_rect(
@@ -372,12 +413,13 @@ ggplot_add.epicurve_period_annotation <- function(object, plot, object_name, ...
       na.rm = TRUE
     ),
     ggplot2::geom_text(
-      data = data.frame(x = object$mid_date, y = label_y_val,
-                        label = object$label, text = hover_text),
-      mapping = ggplot2::aes(x = x, y = y, label = label, text = text),
+      data = data.frame(x = label_x, y = label_y_val,
+                        label = object$label, text = hover_text,
+                        hjust_dyn = label_hjust_dyn),
+      mapping = ggplot2::aes(x = x, y = y, label = label, text = text,
+                             hjust = hjust_dyn),
       inherit.aes = FALSE,
       show.legend = FALSE,
-      hjust = object$label_hjust,
       vjust = effective_vjust,
       colour = label_colour,
       size = object$label_size,

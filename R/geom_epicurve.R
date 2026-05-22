@@ -287,63 +287,56 @@ stat_epicurve <- function(mapping = NULL,
 detect_epicurve_width <- function(x) {
   # Remove NAs for analysis
   x <- x[!is.na(x)]
-  
+
   if (length(x) < 2) {
-    # Not enough data to detect - use default
+    # Not enough data to detect - use sensible default per type.
+    if (inherits(x, "POSIXt")) return(3600 * 0.9)
     return(0.9)
   }
-  
-  # Handle POSIXct/POSIXlt (datetime)
+
+  # Handle POSIXct/POSIXlt (datetime). We *infer the bin* from how timestamps
+  # are aligned, not from the median spacing — sparse panels in a facet must
+  # not produce huge bars covering multiple time periods.
   if (inherits(x, "POSIXt")) {
-    # Calculate median time difference in seconds
-    x_sorted <- sort(x)
-    diffs <- as.numeric(diff(x_sorted), units = "secs")
-    median_diff <- stats::median(diffs, na.rm = TRUE)
-    
-    # Determine time unit based on typical difference
-    if (median_diff <= 90) {
-      # Minute-level data (≤1.5 minutes)
-      return(60 * 0.9)  # 54 seconds
-    } else if (median_diff <= 5400) {
-      # Hourly data (≤1.5 hours)
-      return(3600 * 0.9)  # 54 minutes in seconds
-    } else if (median_diff <= 129600) {
-      # Daily data (≤1.5 days)
-      return(86400 * 0.9)  # ~21.6 hours in seconds
-    } else {
-      # Weekly or longer - use median difference * 0.9
-      return(median_diff * 0.9)
+    x_num <- as.numeric(x)
+    # Seconds past the hour and past the minute
+    sec_past_hour <- x_num %% 3600
+    sec_past_min  <- x_num %% 60
+    if (all(sec_past_hour == 0, na.rm = TRUE)) {
+      return(3600 * 0.9)            # hourly bins
     }
+    if (all(sec_past_min == 0, na.rm = TRUE)) {
+      return(60 * 0.9)              # minute bins
+    }
+    # Sub-minute granularity: fall back to median spacing but cap at 1 hour
+    # so that a sparse panel cannot produce a multi-hour bar.
+    diffs <- as.numeric(diff(sort(x)), units = "secs")
+    md <- stats::median(diffs, na.rm = TRUE)
+    return(min(max(md * 0.9, 60), 3600 * 0.9))
   }
-  
-  # Handle Date objects
+
+  # Handle Date objects. Detect calendar alignment (weekly = same weekday;
+  # monthly = same day-of-month) so that one bar = one period regardless of
+  # how sparse the data are in a given panel.
   if (inherits(x, "Date")) {
-    # Calculate median difference in days
-    x_sorted <- sort(x)
-    diffs <- as.numeric(diff(x_sorted))
-    median_diff <- stats::median(diffs, na.rm = TRUE)
-    
-    if (median_diff <= 1.5) {
-      # Daily data
-      return(0.9)
-    } else if (median_diff <= 10) {
-      # Weekly-ish data (2-10 days between points)
-      return(median_diff * 0.9)
-    } else if (median_diff <= 45) {
-      # Monthly-ish data (10-45 days between points)
-      return(median_diff * 0.9)
-    } else {
-      # Longer periods
-      return(median_diff * 0.9)
+    lt <- as.POSIXlt(x)
+    if (length(unique(lt$wday)) == 1 && length(unique(x)) > 1) {
+      # All on the same weekday -> weekly
+      return(7 * 0.9)
     }
+    if (length(unique(lt$mday)) == 1 && length(unique(x)) > 1) {
+      # All on the same day-of-month -> monthly. 28 is the worst-case bin
+      # so two adjacent month bars never overlap.
+      return(28 * 0.9)
+    }
+    # Otherwise daily; never expand for sparse panels.
+    return(0.9)
   }
-  
+
   # Handle numeric x-axis (generic fallback)
   x_sorted <- sort(x)
   diffs <- diff(x_sorted)
   median_diff <- stats::median(diffs, na.rm = TRUE)
-  
-  # For numeric, use 90% of median difference or 0.9 as minimum
   return(max(median_diff * 0.9, 0.9))
 }
 
@@ -361,18 +354,30 @@ StatEpicurve <- ggplot2::ggproto(
   required_aes = "x",
 
   compute_panel = function(self, data, scales, na.rm = FALSE, width = NULL, height = 0.9, max_stack = 20, symbol = NULL, symbol_size = 3) {
+    # Drop rows with NA in mapped aesthetics so they don't appear as a
+    # bogus "NA" legend entry and don't render anywhere on the plot.
+    if (isTRUE(na.rm)) {
+      for (col in intersect(c("x", "fill", "colour", "color"), names(data))) {
+        keep <- !is.na(data[[col]])
+        if (!all(keep)) data <- data[keep, , drop = FALSE]
+      }
+    }
+
     # Auto-detect appropriate width if not specified
     if (is.null(width)) {
       width <- detect_epicurve_width(data$x)
     }
-    
+
     data <- data[order(data$x, data$group), , drop = FALSE]
     data$y <- stats::ave(seq_len(nrow(data)), data$x, FUN = seq_along)
-    
-    # Check if we should switch to column chart mode
+
+    # Check if we should switch to column chart mode. Never auto-switch when
+    # the user has explicitly requested symbols: forcing a count-label looks
+    # nothing like the squares/symbols they asked for.
     max_count <- max(data$y, na.rm = TRUE)
-    use_column_mode <- !is.null(max_stack) && max_count > max_stack
-    
+    use_column_mode <- !is.null(max_stack) && max_count > max_stack &&
+                       is.null(symbol)
+
     # Determine if we're using symbols (only if NOT in column mode)
     use_symbol_mode <- !is.null(symbol) && !use_column_mode
     
@@ -417,12 +422,11 @@ StatEpicurve <- ggplot2::ggproto(
       data$ymin <- 0
       data$ymax <- data$y
       
-      # If symbol was requested but we're in column mode, show count as label instead
-      # This ensures geom_text has the required label aesthetic
-      if (!is.null(symbol)) {
-        data$label <- as.character(data$y)
-        data$size <- symbol_size
-      }
+      # In column mode we always regenerate the tooltip text using the
+      # post-aggregation counts so plotly hovers show the per-bar count
+      # (and so any per-case `text` carried over from the first row of a
+      # group doesn't lie about what the bar represents).
+      data$text <- NULL
     } else if (use_symbol_mode) {
       # Symbol mode - prepare data for geom_text
       # Use center positions instead of rectangle boundaries
@@ -589,9 +593,9 @@ GeomEpicurveRect <- ggplot2::ggproto(
   "GeomEpicurveRect",
   ggplot2::GeomRect,
   default_aes = ggplot2::aes(
-    colour    = NA,
+    colour    = "white",
     fill      = "grey35",
-    linewidth = 0.5,
+    linewidth = 0.3,
     linetype  = 1,
     alpha     = NA,
     text      = NULL
@@ -666,13 +670,23 @@ GeomEpicurveText <- ggplot2::ggproto(
 #' @importFrom ggplot2 scale_y_continuous
 #' @export
 scale_y_epicurve <- function(...) {
-  ggplot2::scale_y_continuous(
-    breaks = function(limits) {
-      # Generate pretty integer breaks
-      at_values <- pretty(limits, n = 5)
-      # Keep only integers
-      at_values[at_values == floor(at_values) & at_values >= 0]
-    },
-    ...
-  )
+  args <- list(...)
+  # Always anchor the axis at 0 unless the user has supplied limits, so even a
+  # "tiny cluster" panel (max y = 1) still shows a labelled 0 and 1 break.
+  if (is.null(args$limits)) args$limits <- c(0, NA)
+  if (is.null(args$expand)) {
+    # Tiny bottom padding so symbol-mode glyphs (centred at y = 0.5) and rect
+    # bottom edges aren't clipped by the x-axis line; generous top padding so
+    # annotation labels have visible headroom.
+    args$expand <- ggplot2::expansion(mult = c(0.02, 0.1))
+  }
+  args$breaks <- function(limits) {
+    upper <- limits[2]
+    if (is.na(upper) || upper < 1) upper <- 1
+    at <- pretty(c(0, upper), n = 5)
+    at <- at[at == floor(at) & at >= 0]
+    if (length(at) == 0) at <- c(0, ceiling(upper))
+    at
+  }
+  do.call(ggplot2::scale_y_continuous, args)
 }
