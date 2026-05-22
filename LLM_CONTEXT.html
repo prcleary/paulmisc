@@ -41,28 +41,28 @@
 <p>This file is written for an LLM (or a human stepping in fresh) who needs to make changes to this package. It captures the architecture, the non-obvious design decisions, the common pitfalls, and the repo workflow. Read this before editing anything in <code>R/</code>.</p>
 <div class="section level2">
 <h2 id="what-this-package-is">What this package is<a class="anchor" aria-label="anchor" href="#what-this-package-is"></a></h2>
-<p><code>paulmisc</code> is a personal R package whose flagship feature is a set of <code>ggplot2</code>-native helpers for <strong>epidemic curves</strong>: stacked-square (case chart) and bar-mode epicurves, custom Unicode/emoji symbols, timeline annotations (events and periods), and helpers for interactive (<code>plotly</code>) versions of the same plots. It also contains some Nextcloud calendar utilities (<code>R/get_nextcloud_tasks.R</code> and friends) which are unrelated to the epicurve code.</p>
-<p>The user values <strong>API ergonomics</strong>: helpers should “just work” without the user having to wire up <code>guides()</code>, manual aggregation for tooltips, etc.</p>
+<p><code>paulmisc</code> is a personal R package whose flagship feature is a set of <code>ggplot2</code>-native helpers for <strong>epidemic curves</strong>: stacked-square (case chart) and bar-mode epicurves, custom Unicode/emoji symbols, timeline annotations (events and periods), and helpers for interactive (<code>plotly</code>) versions of the same plots. It also contains a thin shiny launcher (<code><a href="reference/run_redshift_query_builder.html">run_redshift_query_builder()</a></code>) for an app under <code>inst/apps/</code>.</p>
+<p>The user values <strong>API ergonomics</strong>: helpers should “just work” without the user having to wire up <code>guides()</code>, manual aggregation for tooltips, plotly hover templates, custom widget heights, etc.</p>
 </div>
 <div class="section level2">
 <h2 id="file-map">File map<a class="anchor" aria-label="anchor" href="#file-map"></a></h2>
 <pre><code>R/
   geom_epicurve.R            Main geom + StatEpicurve + ggproto subclasses
-  scale_y_epicurve.R         Integer-only y scale wrapper
+                             + scale_y_epicurve() + coord_epicurve()
   annotate_epicurve.R        annotate_event / annotate_period via S3 ggplot_add
   simulate_outbreak.R        Random outbreak data generator
   epicurve_footnote.R        labs(caption=) helper summarising missing+timestamp
-  rand_cb_tasks.R            (calendar helpers, separate domain)
-  get_nextcloud_tasks.R      (calendar helpers)
-  fetch_calendar_tasks.R     (calendar helpers)
-  parse_icalendar*.R         (calendar helpers)
-  discover_calendars.R       (calendar helpers)
-  run_app.R                  Wrappers for inst/apps shiny apps
-tests/testthat/              testthat edition 3
+  epicurve_ggplotly.R        plotly wrapper: hover fixup, symbol legend, height
+  zzz.R                      .onLoad: registers plotly S3 methods for our Geoms
+  run_redshift_query_builder.R  Wrapper for the shiny app
+  paulmisc-package.R         Package-level roxygen
+tests/testthat/              testthat edition 3 (212 PASS, 1 pre-existing WARN)
 vignettes/
   interactive-epicurves.Rmd  Plotly + annotations
-inst/apps/                   Two small shiny apps
-README.Rmd                   Main docs (README.md is built from this)</code></pre>
+  realistic-epicurves.Rmd    Larger-scale realistic outbreak walkthrough
+inst/apps/                   Shiny app(s)
+README.Rmd                   Main docs (README.md is built from this)
+LLM_CONTEXT.md               THIS FILE</code></pre>
 </div>
 <div class="section level2">
 <h2 id="critical-design-decisions">Critical design decisions<a class="anchor" aria-label="anchor" href="#critical-design-decisions"></a></h2>
@@ -109,11 +109,37 @@ README.Rmd                   Main docs (README.md is built from this)</code></pr
 <a class="anchor" aria-label="anchor" href="#id_7-epicurve_footnote"></a></h3>
 <p>Returns a <code>ggplot2::labs(caption = ...)</code> object. Class is <code>"ggplot2::labels"</code> in newer ggplot2 (S7-backed) — old <code>"labels"</code> test strings won’t match. The footnote summarises missingness and a timestamp; both are toggleable.</p>
 </div>
+<div class="section level3">
+<h3 id="id_8-coord_epicurve-for-static-aspect-ratio">8. <code>coord_epicurve()</code> for static aspect ratio<a class="anchor" aria-label="anchor" href="#id_8-coord_epicurve-for-static-aspect-ratio"></a></h3>
+<p><code><a href="reference/coord_epicurve.html">coord_epicurve()</a></code> is a named ggproto subclass of <code>CoordCartesian</code> (class <strong><code>"CoordEpicurve"</code></strong> — first class matters, <code><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits()</a></code> is used downstream). It overrides <code>aspect()</code> to return a sensible ratio <strong>only for datetime axes</strong> (when <code>x_min &gt; 1e7</code>, i.e. POSIXct seconds-since-epoch) so hourly / sub-daily epicurves render with near-square cases without manual <code>theme(aspect.ratio = ...)</code>. Returning <code>NULL</code> for date / numeric axes leaves panel sizing alone.</p>
+<p><code><a href="reference/geom_epicurve.html">geom_epicurve()</a></code> returns <code>list(layer, coord_epicurve())</code> by default (controlled by <code>auto_aspect = TRUE</code>) so users get the right aspect automatically.</p>
+</div>
+<div class="section level3">
+<h3 id="id_9-plotly-wrapper-architecture-repicurve_ggplotlyr--rzzzr">9. plotly wrapper architecture (<code>R/epicurve_ggplotly.R</code> + <code>R/zzz.R</code>)<a class="anchor" aria-label="anchor" href="#id_9-plotly-wrapper-architecture-repicurve_ggplotlyr--rzzzr"></a></h3>
+<p><code>epicurve_ggplotly(p)</code> is the <strong>only</strong> supported entry point for interactive epicurves; do not tell users to call <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html" class="external-link">plotly::ggplotly()</a></code> directly. The wrapper:</p>
+<ol style="list-style-type: decimal"><li>Detects symbol layers (walking <code>p$layers</code>) to drive a custom top-right annotation legend (plotly’s auto legend renders symbol keys as the placeholder <code>"Aa"</code> glyph).</li>
+<li>If <code>inherits(p$coordinates, "CoordEpicurve")</code> <strong>and</strong> the x axis is datetime, computes a widget <code>height</code> that matches the static aspect, then swaps <code>p$coordinates &lt;- coord_cartesian()</code> because plotly cannot honour a custom <code>Coord</code>.</li>
+<li>Calls <code>plotly::ggplotly(p, tooltip = "text", ...)</code>.</li>
+<li>Post-processes every trace via <code>.epicurve_fix_hover()</code>:
+<ul><li>traces with non-empty <code>text</code> get <code>hovertemplate = "%{text}&lt;extra&gt;&lt;/extra&gt;"</code>, <code>hoverinfo = "text"</code>;</li>
+<li>traces without useful text get <code>hoverinfo = "skip"</code> so the user never sees <code>"trace 0"</code>, <code>"trace 1"</code>, … or a literal <code>%{text}</code> (which plotly prints when the referenced field is missing).</li>
+</ul></li>
+<li>Re-injects the dropped <code>subtitle</code> into the title via <code>&lt;br&gt;&lt;sup&gt;...&lt;/sup&gt;</code>.</li>
+<li>Adds the custom symbol-legend annotation block if needed.</li>
+</ol><p><code>R/zzz.R</code> registers two plotly S3 methods so ggplotly() actually renders our subclasses:</p>
+<ul><li>
+<code>to_basic.GeomEpicurveRect</code> → delegates to <code>plotly:::to_basic.GeomRect</code>
+</li>
+<li>
+<code>geom2trace.GeomEpicurveText</code> → delegates to <code>plotly:::geom2trace.GeomText</code>
+</li>
+</ul><p><strong>DO NOT register a custom <code>geom2trace.GeomEpicurveRect</code>.</strong> A previous attempt that emitted plotly <code>bar</code> traces per fill group produced layout-correct basic plots but broke stacked column mode (all fills rendered at <code>base = 0</code> and overlapped under any <code>barmode</code>). The stock polygon renderer handles stacking, faceting, fills and date axes correctly out of the box; per-bar tooltips on basic plots are the accepted trade-off (the polygon trace merges rectangles, so hover on the fill returns nothing — <code>hoverinfo = "skip"</code> keeps it clean rather than mislabelled).</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="common-pitfalls">Common pitfalls<a class="anchor" aria-label="anchor" href="#common-pitfalls"></a></h2>
-<ol style="list-style-type: decimal"><li><p><strong><code>ggplotly()</code> drops the ggplot <code>subtitle</code>.</strong> Re-inject via <code>layout(title = list(text = "title&lt;br&gt;&lt;sup&gt;subtitle&lt;/sup&gt;"))</code>.</p></li>
-<li><p><strong><code>data$x</code> in <code>compute_panel</code> is numeric</strong> — see (2) above.</p></li>
+<ol style="list-style-type: decimal"><li><p><strong><code>ggplotly()</code> drops the ggplot <code>subtitle</code>.</strong> <code><a href="reference/epicurve_ggplotly.html">epicurve_ggplotly()</a></code> already re-injects it; if you write your own plotly path do the same with <code>layout(title = list(text = "title&lt;br&gt;&lt;sup&gt;sub&lt;/sup&gt;"))</code>.</p></li>
+<li><p><strong><code>data$x</code> in <code>compute_panel</code> is numeric</strong> — see Design Decision 2.</p></li>
 <li>
 <p><strong><code>render-readme.yaml</code> workflow auto-rebuilds README.md</strong> on every push to <code>R/</code>, <code>DESCRIPTION</code>, <code>README.Rmd</code>, or the workflow file itself. <strong>Never commit README.md by hand</strong>; always edit README.Rmd and let CI rebuild. Because CI pushes a commit, the local push pattern is:</p>
 <pre><code>git add -A
@@ -124,6 +150,19 @@ git push</code></pre>
 <li><p><strong><code>man/*.Rd</code> and <code>NAMESPACE</code></strong> are generated by <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code>. Run it after editing roxygen comments; never hand-edit those files.</p></li>
 <li><p>The <code>%||%</code> operator is defined locally at the top of <code>R/geom_epicurve.R</code> for portability — do not assume it’s exported by rlang.</p></li>
 <li><p><code>vapply</code> checks for <code>Guides</code>/<code>Layer</code> ggproto inheritance are case-sensitive: <code>"Guides"</code> (capital G), <code>"Layer"</code>.</p></li>
+<li><p><strong>plotly groups traces by aesthetic at layer setup, not by the <code>group</code> column emitted from <code>compute_panel</code>.</strong> Subdividing <code>data$group</code> in <code>compute_panel</code> does NOT cause plotly to split the polygon trace per row. Don’t waste cycles trying.</p></li>
+<li><p><strong>PowerShell <code>Rscript</code> always returns exit code 1</strong> when R writes to stderr (e.g. “package was built under R version X.Y.Z”). Treat <code>NativeCommandError</code> as informational unless the output itself shows a real failure.</p></li>
+<li><p><strong><code>vignettes/*.html</code> is tracked</strong> in this repo. <code><a href="https://devtools.r-lib.org/reference/build_vignettes.html" class="external-link">devtools::build_vignettes()</a></code> moves output to <code>doc/</code> (gitignored) and <strong>deletes</strong> the tracked <code>vignettes/*.html</code>. Re-render in place with <code>devtools::load_all('.'); rmarkdown::render('vignettes/&lt;name&gt;.Rmd')</code> to restore them before committing.</p></li>
+<li>
+<p><strong>Date / POSIXct axis numeric magnitudes</strong> (useful for detecting axis kind from numeric <code>data$x</code>):</p>
+<ul><li>POSIXct: seconds since epoch, <code>&gt; 1e7</code>
+</li>
+<li>Date: days since epoch, <code>&gt; 1000</code> and <code>&lt; 1e5</code>
+</li>
+<li>numeric counts: typically <code>&lt; 1000</code>
+</li>
+</ul></li>
+<li><p><strong>During <code>git rebase</code>, <code>--theirs</code> means the commits being replayed (your local work)</strong> and <code>--ours</code> means the upstream branch. This is the opposite of <code>git merge</code>. README PNG conflicts after <code>git pull --rebase</code>: <code>git checkout --theirs man/figures/*.png</code> keeps your freshly built versions.</p></li>
 </ol></div>
 <div class="section level2">
 <h2 id="test-conventions">Test conventions<a class="anchor" aria-label="anchor" href="#test-conventions"></a></h2>
@@ -160,6 +199,16 @@ git push</code></pre>
 <strong>No date axis formatting</strong> inside the geom — the user controls it via <code>scale_x_date()</code>.</li>
 <li>
 <strong>No data validation</strong> beyond what <code>aes()</code> already does — the geom trusts that <code>x</code> is a date, datetime, or numeric.</li>
+<li>
+<strong>No custom <code>geom2trace.GeomEpicurveRect</code>.</strong> See Design Decision 9 — this was tried and reverted; it broke stacked column layouts. If the trade-off (no per-rect hover on basic stacked plots) becomes unacceptable, prefer a user-facing solution (let users map a <code>tooltip</code> aesthetic) over overriding plotly internals.</li>
+<li>
+<strong>No automatic per-case tooltip on basic plotly plots.</strong> The polygon trace plotly emits for stacked rectangles cannot carry per-row text without breaking layout. Custom tooltips work fine when the user maps the <code>text</code> aesthetic explicitly.</li>
+</ul></div>
+<div class="section level2">
+<h2 id="recent-regression-lessons-keep">Recent regression lessons (keep!)<a class="anchor" aria-label="anchor" href="#recent-regression-lessons-keep"></a></h2>
+<ul><li>Verify visual rendering (open the HTML widget or inspect the built <code>htmlwidget</code> in detail), not just trace metadata, before claiming a plotly fix works. Trace counts and <code>text</code> vectors look fine even when the widget renders blank/overlapped.</li>
+<li>When a fix risks introducing a regression, prefer <strong>disabling the broken bit cleanly</strong> (e.g. <code>hoverinfo = "skip"</code>) over inventing a parallel trace structure.</li>
+<li>Once <code><a href="reference/coord_epicurve.html">coord_epicurve()</a></code> was added, <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html" class="external-link">plotly::ggplotly()</a></code> started silently falling back when it saw a non-cartesian coord. Always strip back to <code>coord_cartesian()</code> before handing a ggplot to plotly.</li>
 </ul></div>
 <div class="section level2">
 <h2 id="quick-mental-model-for-the-geom-pipeline">Quick mental model for the geom pipeline<a class="anchor" aria-label="anchor" href="#quick-mental-model-for-the-geom-pipeline"></a></h2>
