@@ -103,11 +103,6 @@ epicurve_ggplotly <- function(p, tooltip = "text",
 
   pl <- plotly::ggplotly(p, tooltip = tooltip, ...)
 
-  # Each stacked case is its own bar; without overlay mode plotly would
-  # try to group bars side-by-side or stack-add them and the visual
-  # layout would no longer match the static ggplot.
-  pl <- plotly::layout(pl, barmode = "overlay", bargap = 0)
-
   # ---- 5. Per-trace hovertemplate: only where text is meaningful ----
   pl <- .epicurve_fix_hover(pl)
 
