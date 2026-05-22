@@ -294,55 +294,46 @@ detect_epicurve_width <- function(x) {
     return(0.9)
   }
 
-  # Handle POSIXct/POSIXlt (datetime). We *infer the bin* from how timestamps
-  # are aligned, not from the median spacing — sparse panels in a facet must
-  # not produce huge bars covering multiple time periods.
-  if (inherits(x, "POSIXt")) {
-    x_num <- as.numeric(x)
-    # Seconds past the hour and past the minute
-    sec_past_hour <- x_num %% 3600
-    sec_past_min  <- x_num %% 60
-    if (all(sec_past_hour == 0, na.rm = TRUE)) {
-      return(3600 * 0.9)            # hourly bins
-    }
-    if (all(sec_past_min == 0, na.rm = TRUE)) {
-      return(60 * 0.9)              # minute bins
-    }
-    # Sub-minute granularity: fall back to median spacing but cap at 1 hour
-    # so that a sparse panel cannot produce a multi-hour bar.
-    diffs <- as.numeric(diff(sort(x)), units = "secs")
-    md <- stats::median(diffs, na.rm = TRUE)
+  # ggplot2 strips Date / POSIXct classes from `data$x` before passing it
+  # through Stat$setup_params / compute_panel — by the time width detection
+  # runs the vector is plain numeric (days-since-epoch for Date,
+  # seconds-since-epoch for POSIXct). Recognise both the class-preserved
+  # case and the stripped-numeric case via the magnitude of the values.
+  is_posix <- inherits(x, "POSIXt") ||
+    (is.numeric(x) && all(x >= 1e8, na.rm = TRUE))
+  is_date  <- !is_posix &&
+    (inherits(x, "Date") ||
+       (is.numeric(x) && all(x >= 1000 & x <= 1e5, na.rm = TRUE)))
+
+  # Use *distinct* sorted x values to detect bin spacing — duplicates from
+  # stacked cases at the same time point would otherwise drag the median
+  # difference down to 0 and collapse the width to the fallback default.
+  ux <- sort(unique(as.numeric(x)))
+  if (length(ux) < 2) {
+    if (is_posix) return(3600 * 0.9)
+    return(0.9)
+  }
+  md <- stats::median(diff(ux))
+
+  if (is_posix) {
+    # POSIXt seconds: snap to the nearest sensible bin so sparse hourly
+    # panels (e.g. one case every six hours) still render as one-hour
+    # bars rather than multi-hour blobs.
+    if (md >= 3600) return(3600 * 0.9)
+    if (md >= 60)   return(60 * 0.9)
     return(min(max(md * 0.9, 60), 3600 * 0.9))
   }
 
-  # Handle Date objects. Detect calendar alignment (weekly = same weekday;
-  # monthly = same day-of-month) so that one bar = one period regardless of
-  # how sparse the data are in a given panel. We require a wide enough span
-  # so sparse panels (e.g. 2 cases on the same weekday by coincidence) are
-  # not mis-classified as weekly/monthly.
-  if (inherits(x, "Date")) {
-    ux <- unique(x)
-    span_days <- as.numeric(diff(range(x)))
-    lt <- as.POSIXlt(ux)
-    if (length(ux) >= 3 && span_days >= 14 &&
-        length(unique(lt$wday)) == 1) {
-      # ≥3 unique dates, all on the same weekday, spanning ≥2 weeks -> weekly
-      return(7 * 0.9)
-    }
-    if (length(ux) >= 3 && span_days >= 60 &&
-        length(unique(lt$mday)) == 1) {
-      # ≥3 unique dates, all on the same day-of-month, spanning ≥2 months -> monthly
-      return(28 * 0.9)
-    }
-    # Otherwise daily; never expand for sparse panels.
+  if (is_date) {
+    # Date days: snap to monthly / weekly / daily based on the typical
+    # distinct-date spacing.
+    if (md >= 28) return(28 * 0.9)
+    if (md >= 7)  return(7 * 0.9)
     return(0.9)
   }
 
-  # Handle numeric x-axis (generic fallback)
-  x_sorted <- sort(x)
-  diffs <- diff(x_sorted)
-  median_diff <- stats::median(diffs, na.rm = TRUE)
-  return(max(median_diff * 0.9, 0.9))
+  # Generic numeric x-axis fallback
+  return(max(md * 0.9, 0.9))
 }
 
 #' StatEpicurve: ggproto for stacking individual cases
