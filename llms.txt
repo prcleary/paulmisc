@@ -381,18 +381,20 @@ p1 / p2
 
 ![](reference/figures/README-symbols-1.png)
 
-Emoji work too (requires appropriate font support), with a different
-emoji for each category:
+Emoji and other Unicode glyphs work too. Rendering depends on the
+graphics device’s font support; the example below uses widely-supported
+geometric shapes so the per-category mapping is unambiguous:
 
 ``` r
 
-age_emojis <- c(Child = "\U0001F476", Adult = "\U0001F468",
-                Elderly = "\U0001F474")
+age_symbols <- c(Child = "\u25B2",   # ▲ triangle
+                 Adult = "\u25CF",   # ● circle
+                 Elderly = "\u25A0") # ■ square
 ggplot(cases, aes(x = onset_date, colour = age_group)) +
-  geom_epicurve(symbol = age_emojis, symbol_size = 7) +
+  geom_epicurve(symbol = age_symbols, symbol_size = 6) +
   scale_colour_manual(values = c(Child = "#D55E00", Adult = "#0072B2",
                                  Elderly = "#009E73")) +
-  labs(title = "Cases by age group (one emoji per category)",
+  labs(title = "Cases by age group (one symbol per category)",
        x = "Date", y = "Cases") +
   scale_y_epicurve() +
   theme_minimal()
@@ -525,7 +527,7 @@ ggplot(plot_data, aes(x = onset_date, colour = sex)) +
     subtitle = "Symbols per sex, exposure shaded, intervention marked",
     x = "Date of onset", y = "Cases"
   ) +
-  scale_y_epicurve() +
+  scale_y_epicurve(expand = ggplot2::expansion(mult = c(0, 0.25))) +
   theme_minimal() +
   epicurve_footnote(outbreak)
 ```
