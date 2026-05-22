@@ -148,7 +148,7 @@ plot_data <- outbreak[!is.na(outbreak$sex) &
                         !is.na(outbreak$onset_date), ]
 
 ggplot(plot_data, aes(x = onset_date, colour = sex)) +
-  geom_epicurve(symbol = sex_symbols, symbol_size = 5) +
+  geom_epicurve(symbol = sex_symbols, symbol_size = 4) +
   annotate_period(
     date = as.Date("2024-04-22"),
     end_date = as.Date("2024-04-26"),

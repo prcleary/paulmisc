@@ -230,31 +230,44 @@ data:
 
 ``` r
 
-# Hourly data for rapid outbreak investigation
+# Hourly data for rapid outbreak investigation. With sub-daily
+# timestamps the auto-detected width is one hour; we use
+# `scale_x_datetime()` so the x-axis labels hours-of-day rather than
+# whole dates.
 hourly_cases <- simulate_outbreak(
-  n = 15,
+  n = 40,
   time_unit = "hourly",
+  pattern = "continuous",
+  date_range = 2,
   exposure = "2024-06-01",
-  seed = 123
+  seed = 123,
+  prop_missing = 0
 )
 
 p1 <- ggplot(hourly_cases, aes(x = onset_time)) +
   geom_epicurve(fill = "darkred") +
+  scale_x_datetime(date_breaks = "6 hours",
+                   date_labels = "%H:%M\n%d %b") +
   labs(title = "Hourly Epidemic Curve", x = "Time", y = "Cases") +
   scale_y_epicurve() +
   theme_minimal()
 
-# Weekly aggregated data for surveillance
+# Weekly aggregated data for surveillance — 21 weeks of continuous
+# transmission gives a realistically long surveillance window.
 weekly_cases <- simulate_outbreak(
-  n = 20,
+  n = 120,
   time_unit = "weekly",
+  pattern = "continuous",
+  date_range = 21 * 7,
   exposure = "2024-01-01",
-  seed = 456
+  seed = 456,
+  prop_missing = 0
 )
 
 p2 <- ggplot(weekly_cases, aes(x = onset_date)) +
   geom_epicurve(fill = "forestgreen") +
-  labs(title = "Weekly Epidemic Curve", x = "Week", y = "Cases") +
+  labs(title = "Weekly Epidemic Curve (21 weeks)",
+       x = "Week", y = "Cases") +
   scale_y_epicurve() +
   theme_minimal()
 
@@ -273,20 +286,25 @@ switches to a column chart for better readability:
 
 ``` r
 
-# Simulate a large continuous outbreak
+# Simulate a large continuous outbreak. With ~40 cases per day the auto-
+# switch kicks in and the plot renders as a stacked column chart instead
+# of individual squares.
 large_outbreak <- simulate_outbreak(
-  n = 300,
+  n = 600,
   pattern = "continuous",
   date_range = 14,
   exposure = "2024-01-01",
-  seed = 789
+  seed = 789,
+  prop_missing = 0
 )
 
-ggplot(large_outbreak, aes(x = onset_date)) +
-  geom_epicurve(fill = "coral", max_stack = 20) +
+ggplot(large_outbreak, aes(x = onset_date, fill = age_group)) +
+  geom_epicurve(max_stack = 20) +
+  scale_fill_brewer(palette = "Set2", name = "Age group",
+                    na.translate = FALSE) +
   labs(
     title = "Large Outbreak (Auto-switched to Column Chart)",
-    subtitle = "Automatically switches when any date has >20 cases",
+    subtitle = "Bars show daily case counts coloured by age group",
     x = "Date of Onset",
     y = "Number of Cases"
   ) +
@@ -505,7 +523,7 @@ plot_data <- outbreak[!is.na(outbreak$sex) &
                         !is.na(outbreak$onset_date), ]
 
 ggplot(plot_data, aes(x = onset_date, colour = sex)) +
-  geom_epicurve(symbol = sex_symbols, symbol_size = 5) +
+  geom_epicurve(symbol = sex_symbols, symbol_size = 4) +
   annotate_period(
     date = as.Date("2024-04-22"),
     end_date = as.Date("2024-04-26"),

@@ -272,31 +272,44 @@
 </h3>
 <p>Epidemic curves automatically adapt to hourly, daily, weekly, or monthly data:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Hourly data for rapid outbreak investigation</span></span>
+<code class="sourceCode R"><span><span class="co"># Hourly data for rapid outbreak investigation. With sub-daily</span></span>
+<span><span class="co"># timestamps the auto-detected width is one hour; we use</span></span>
+<span><span class="co"># `scale_x_datetime()` so the x-axis labels hours-of-day rather than</span></span>
+<span><span class="co"># whole dates.</span></span>
 <span><span class="va">hourly_cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span></span>
-<span>  n <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">40</span>,</span>
 <span>  time_unit <span class="op">=</span> <span class="st">"hourly"</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="st">"continuous"</span>,</span>
+<span>  date_range <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  exposure <span class="op">=</span> <span class="st">"2024-06-01"</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">123</span></span>
+<span>  seed <span class="op">=</span> <span class="fl">123</span>,</span>
+<span>  prop_missing <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">hourly_cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_time</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"darkred"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html" class="external-link">scale_x_datetime</a></span><span class="op">(</span>date_breaks <span class="op">=</span> <span class="st">"6 hours"</span>,</span>
+<span>                   date_labels <span class="op">=</span> <span class="st">"%H:%M\n%d %b"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Hourly Epidemic Curve"</span>, x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Cases"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/scale_y_epicurve.html">scale_y_epicurve</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Weekly aggregated data for surveillance</span></span>
+<span><span class="co"># Weekly aggregated data for surveillance — 21 weeks of continuous</span></span>
+<span><span class="co"># transmission gives a realistically long surveillance window.</span></span>
 <span><span class="va">weekly_cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span></span>
-<span>  n <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">120</span>,</span>
 <span>  time_unit <span class="op">=</span> <span class="st">"weekly"</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="st">"continuous"</span>,</span>
+<span>  date_range <span class="op">=</span> <span class="fl">21</span> <span class="op">*</span> <span class="fl">7</span>,</span>
 <span>  exposure <span class="op">=</span> <span class="st">"2024-01-01"</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">456</span></span>
+<span>  seed <span class="op">=</span> <span class="fl">456</span>,</span>
+<span>  prop_missing <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">weekly_cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"forestgreen"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Weekly Epidemic Curve"</span>, x <span class="op">=</span> <span class="st">"Week"</span>, y <span class="op">=</span> <span class="st">"Cases"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Weekly Epidemic Curve (21 weeks)"</span>,</span>
+<span>       x <span class="op">=</span> <span class="st">"Week"</span>, y <span class="op">=</span> <span class="st">"Cases"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/scale_y_epicurve.html">scale_y_epicurve</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -309,20 +322,25 @@
 </h3>
 <p>When case counts exceed a threshold (default 20), the plot automatically switches to a column chart for better readability:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Simulate a large continuous outbreak</span></span>
+<code class="sourceCode R"><span><span class="co"># Simulate a large continuous outbreak. With ~40 cases per day the auto-</span></span>
+<span><span class="co"># switch kicks in and the plot renders as a stacked column chart instead</span></span>
+<span><span class="co"># of individual squares.</span></span>
 <span><span class="va">large_outbreak</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_outbreak.html">simulate_outbreak</a></span><span class="op">(</span></span>
-<span>  n <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">600</span>,</span>
 <span>  pattern <span class="op">=</span> <span class="st">"continuous"</span>,</span>
 <span>  date_range <span class="op">=</span> <span class="fl">14</span>,</span>
 <span>  exposure <span class="op">=</span> <span class="st">"2024-01-01"</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">789</span></span>
+<span>  seed <span class="op">=</span> <span class="fl">789</span>,</span>
+<span>  prop_missing <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">large_outbreak</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"coral"</span>, max_stack <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">large_outbreak</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span>, fill <span class="op">=</span> <span class="va">age_group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>max_stack <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set2"</span>, name <span class="op">=</span> <span class="st">"Age group"</span>,</span>
+<span>                    na.translate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Large Outbreak (Auto-switched to Column Chart)"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Automatically switches when any date has &gt;20 cases"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Bars show daily case counts coloured by age group"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Date of Onset"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Number of Cases"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
@@ -489,7 +507,7 @@
 <span>                        <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">outbreak</span><span class="op">$</span><span class="va">onset_date</span><span class="op">)</span>, <span class="op">]</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plot_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span>, colour <span class="op">=</span> <span class="va">sex</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>symbol <span class="op">=</span> <span class="va">sex_symbols</span>, symbol_size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>symbol <span class="op">=</span> <span class="va">sex_symbols</span>, symbol_size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/annotate_epicurve.html">annotate_period</a></span><span class="op">(</span></span>
 <span>    date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2024-04-22"</span><span class="op">)</span>,</span>
 <span>    end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2024-04-26"</span><span class="op">)</span>,</span>

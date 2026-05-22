@@ -174,7 +174,7 @@ work:
 ``` r
 
 large_outbreak <- simulate_outbreak(
-  n = 400, pattern = "continuous", date_range = 14,
+  n = 600, pattern = "continuous", date_range = 14,
   exposure = "2024-01-01", seed = 456, prop_missing = 0
 )
 
@@ -182,10 +182,9 @@ p <- ggplot(large_outbreak, aes(x = onset_date, fill = age_group)) +
   geom_epicurve(max_stack = 20) +
   scale_fill_brewer(palette = "Set2", name = "Age group",
                     na.translate = FALSE) +
-  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
   labs(
     title = "Large Outbreak (Column Chart Mode)",
-    subtitle = "Auto-switched, faceted by setting and filled by age group",
+    subtitle = "Auto-switched, coloured by age group",
     x = "Date of Onset", y = "Number of Cases"
   ) +
   scale_y_epicurve() +
