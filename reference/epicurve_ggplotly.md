@@ -7,7 +7,14 @@ that fixes the rough edges you get when converting an epicurve plot:
 ## Usage
 
 ``` r
-epicurve_ggplotly(p, tooltip = "text", keep_symbol_legend = FALSE, ...)
+epicurve_ggplotly(
+  p,
+  tooltip = "text",
+  keep_symbol_legend = FALSE,
+  width = NULL,
+  height = NULL,
+  ...
+)
 ```
 
 ## Arguments
@@ -25,8 +32,17 @@ epicurve_ggplotly(p, tooltip = "text", keep_symbol_legend = FALSE, ...)
 
 - keep_symbol_legend:
 
-  If `FALSE` (the default), hide the legend for layers that use a custom
-  symbol because plotly renders those keys as `"Aa"`.
+  If `FALSE` (the default), replace plotly's auto-generated legend for
+  symbol layers with a custom annotation legend that shows the actual
+  symbols (the auto legend would render keys as the placeholder `"Aa"`
+  glyph). Set to `TRUE` to keep plotly's default behaviour.
+
+- width, height:
+
+  Optional widget dimensions in pixels. When `height` is `NULL` (the
+  default) the wrapper picks a height that matches the static-plot
+  aspect for datetime axes; for date / numeric axes the htmlwidgets
+  default is left alone.
 
 - ...:
 
@@ -43,19 +59,31 @@ A plotly htmlwidget.
   [`geom_epicurve()`](https://prcleary.github.io/paulmisc/reference/geom_epicurve.md))
   as the sole tooltip source.
 
-- Strips the default `"trace 0"`, `"trace 1"`, ... suffix from hover
-  labels so tooltips show only the case/period information.
+- Sets a per-trace hovertemplate so the default `"trace 0"`,
+  `"trace 1"`, ... suffix never appears, and silences hover entirely for
+  traces that carry no useful tooltip (the geom_segment used by
+  [`annotate_event()`](https://prcleary.github.io/paulmisc/reference/annotate_epicurve.md),
+  for example).
 
 - Re-injects the ggplot `subtitle` into the plotly title (plotly
   silently drops `subtitle`).
 
+- Swaps the auto-added
+  [`coord_epicurve()`](https://prcleary.github.io/paulmisc/reference/coord_epicurve.md)
+  for
+  [`coord_cartesian()`](https://ggplot2.tidyverse.org/reference/coord_cartesian.html)
+  before conversion (plotly does not honour custom coords) and instead
+  applies the equivalent aspect by setting the widget height, so hourly
+  / sub-daily plots get the same shorter panel they get in static
+  ggplot2 output.
+
 - For
   [`geom_epicurve()`](https://prcleary.github.io/paulmisc/reference/geom_epicurve.md)
-  symbol mode, the ggplot legend keys are drawn with the actual Unicode
-  symbol; plotly cannot honour that custom `draw_key`, so the legend is
-  suppressed by default and the symbol meaning is communicated via the
-  hover tooltip instead. Pass `keep_symbol_legend = TRUE` to keep
-  plotly's default (ambiguous) `"Aa"` legend.
+  symbol mode, plotly cannot render the custom `draw_key` so the default
+  legend swatch is the unhelpful `"Aa"` glyph. The wrapper hides
+  plotly's auto-legend and replaces it with a small annotation block in
+  the top-right of the panel that lists each `symbol category` mapping
+  so the symbol-to-category meaning is preserved.
 
 ## Examples
 
