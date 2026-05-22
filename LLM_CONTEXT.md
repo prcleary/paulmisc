@@ -11,34 +11,34 @@ workflow. Read this before editing anything in `R/`.
 `ggplot2`-native helpers for **epidemic curves**: stacked-square (case
 chart) and bar-mode epicurves, custom Unicode/emoji symbols, timeline
 annotations (events and periods), and helpers for interactive
-(`plotly`) versions of the same plots. It also contains some Nextcloud
-calendar utilities (`R/get_nextcloud_tasks.R` and friends) which are
-unrelated to the epicurve code.
+(`plotly`) versions of the same plots. It also contains a thin shiny
+launcher (`run_redshift_query_builder()`) for an app under
+`inst/apps/`.
 
 The user values **API ergonomics**: helpers should "just work" without
 the user having to wire up `guides()`, manual aggregation for
-tooltips, etc.
+tooltips, plotly hover templates, custom widget heights, etc.
 
 ## File map
 
 ```
 R/
   geom_epicurve.R            Main geom + StatEpicurve + ggproto subclasses
-  scale_y_epicurve.R         Integer-only y scale wrapper
+                             + scale_y_epicurve() + coord_epicurve()
   annotate_epicurve.R        annotate_event / annotate_period via S3 ggplot_add
   simulate_outbreak.R        Random outbreak data generator
   epicurve_footnote.R        labs(caption=) helper summarising missing+timestamp
-  rand_cb_tasks.R            (calendar helpers, separate domain)
-  get_nextcloud_tasks.R      (calendar helpers)
-  fetch_calendar_tasks.R     (calendar helpers)
-  parse_icalendar*.R         (calendar helpers)
-  discover_calendars.R       (calendar helpers)
-  run_app.R                  Wrappers for inst/apps shiny apps
-tests/testthat/              testthat edition 3
+  epicurve_ggplotly.R        plotly wrapper: hover fixup, symbol legend, height
+  zzz.R                      .onLoad: registers plotly S3 methods for our Geoms
+  run_redshift_query_builder.R  Wrapper for the shiny app
+  paulmisc-package.R         Package-level roxygen
+tests/testthat/              testthat edition 3 (212 PASS, 1 pre-existing WARN)
 vignettes/
   interactive-epicurves.Rmd  Plotly + annotations
-inst/apps/                   Two small shiny apps
+  realistic-epicurves.Rmd    Larger-scale realistic outbreak walkthrough
+inst/apps/                   Shiny app(s)
 README.Rmd                   Main docs (README.md is built from this)
+LLM_CONTEXT.md               THIS FILE
 ```
 
 ## Critical design decisions
@@ -124,11 +124,67 @@ Returns a `ggplot2::labs(caption = ...)` object. Class is
 test strings won't match. The footnote summarises missingness and a
 timestamp; both are toggleable.
 
+### 8. `coord_epicurve()` for static aspect ratio
+
+`coord_epicurve()` is a named ggproto subclass of `CoordCartesian`
+(class **`"CoordEpicurve"`** — first class matters, `inherits()` is
+used downstream). It overrides `aspect()` to return a sensible
+ratio **only for datetime axes** (when `x_min > 1e7`, i.e. POSIXct
+seconds-since-epoch) so hourly / sub-daily epicurves render with
+near-square cases without manual `theme(aspect.ratio = ...)`.
+Returning `NULL` for date / numeric axes leaves panel sizing alone.
+
+`geom_epicurve()` returns `list(layer, coord_epicurve())` by default
+(controlled by `auto_aspect = TRUE`) so users get the right aspect
+automatically.
+
+### 9. plotly wrapper architecture (`R/epicurve_ggplotly.R` + `R/zzz.R`)
+
+`epicurve_ggplotly(p)` is the **only** supported entry point for
+interactive epicurves; do not tell users to call `plotly::ggplotly()`
+directly. The wrapper:
+
+1. Detects symbol layers (walking `p$layers`) to drive a custom
+   top-right annotation legend (plotly's auto legend renders symbol
+   keys as the placeholder `"Aa"` glyph).
+2. If `inherits(p$coordinates, "CoordEpicurve")` **and** the x axis is
+   datetime, computes a widget `height` that matches the static
+   aspect, then swaps `p$coordinates <- coord_cartesian()` because
+   plotly cannot honour a custom `Coord`.
+3. Calls `plotly::ggplotly(p, tooltip = "text", ...)`.
+4. Post-processes every trace via `.epicurve_fix_hover()`:
+   * traces with non-empty `text` get
+     `hovertemplate = "%{text}<extra></extra>"`, `hoverinfo = "text"`;
+   * traces without useful text get `hoverinfo = "skip"` so the user
+     never sees `"trace 0"`, `"trace 1"`, ... or a literal
+     `%{text}` (which plotly prints when the referenced field is
+     missing).
+5. Re-injects the dropped `subtitle` into the title via
+   `<br><sup>...</sup>`.
+6. Adds the custom symbol-legend annotation block if needed.
+
+`R/zzz.R` registers two plotly S3 methods so ggplotly() actually
+renders our subclasses:
+
+* `to_basic.GeomEpicurveRect` → delegates to `plotly:::to_basic.GeomRect`
+* `geom2trace.GeomEpicurveText` → delegates to `plotly:::geom2trace.GeomText`
+
+**DO NOT register a custom `geom2trace.GeomEpicurveRect`.** A previous
+attempt that emitted plotly `bar` traces per fill group produced
+layout-correct basic plots but broke stacked column mode (all fills
+rendered at `base = 0` and overlapped under any `barmode`). The
+stock polygon renderer handles stacking, faceting, fills and date
+axes correctly out of the box; per-bar tooltips on basic plots are
+the accepted trade-off (the polygon trace merges rectangles, so
+hover on the fill returns nothing — `hoverinfo = "skip"` keeps it
+clean rather than mislabelled).
+
 ## Common pitfalls
 
-1. **`ggplotly()` drops the ggplot `subtitle`.** Re-inject via
-   `layout(title = list(text = "title<br><sup>subtitle</sup>"))`.
-2. **`data$x` in `compute_panel` is numeric** — see (2) above.
+1. **`ggplotly()` drops the ggplot `subtitle`.** `epicurve_ggplotly()`
+   already re-injects it; if you write your own plotly path do the
+   same with `layout(title = list(text = "title<br><sup>sub</sup>"))`.
+2. **`data$x` in `compute_panel` is numeric** — see Design Decision 2.
 3. **`render-readme.yaml` workflow auto-rebuilds README.md** on every
    push to `R/`, `DESCRIPTION`, `README.Rmd`, or the workflow file
    itself. **Never commit README.md by hand**; always edit README.Rmd
@@ -148,6 +204,29 @@ timestamp; both are toggleable.
    by rlang.
 6. `vapply` checks for `Guides`/`Layer` ggproto inheritance are
    case-sensitive: `"Guides"` (capital G), `"Layer"`.
+7. **plotly groups traces by aesthetic at layer setup, not by the
+   `group` column emitted from `compute_panel`.** Subdividing
+   `data$group` in `compute_panel` does NOT cause plotly to split
+   the polygon trace per row. Don't waste cycles trying.
+8. **PowerShell `Rscript` always returns exit code 1** when R writes
+   to stderr (e.g. "package was built under R version X.Y.Z"). Treat
+   `NativeCommandError` as informational unless the output itself
+   shows a real failure.
+9. **`vignettes/*.html` is tracked** in this repo. `devtools::build_vignettes()`
+   moves output to `doc/` (gitignored) and **deletes** the tracked
+   `vignettes/*.html`. Re-render in place with
+   `devtools::load_all('.'); rmarkdown::render('vignettes/<name>.Rmd')`
+   to restore them before committing.
+10. **Date / POSIXct axis numeric magnitudes** (useful for detecting
+    axis kind from numeric `data$x`):
+    * POSIXct: seconds since epoch, `> 1e7`
+    * Date: days since epoch, `> 1000` and `< 1e5`
+    * numeric counts: typically `< 1000`
+11. **During `git rebase`, `--theirs` means the commits being
+    replayed (your local work)** and `--ours` means the upstream
+    branch. This is the opposite of `git merge`. README PNG
+    conflicts after `git pull --rebase`: `git checkout --theirs
+    man/figures/*.png` keeps your freshly built versions.
 
 ## Test conventions
 
@@ -189,6 +268,29 @@ the rebase handles that.
   via `scale_x_date()`.
 - **No data validation** beyond what `aes()` already does — the geom
   trusts that `x` is a date, datetime, or numeric.
+- **No custom `geom2trace.GeomEpicurveRect`.** See Design Decision 9 —
+  this was tried and reverted; it broke stacked column layouts. If
+  the trade-off (no per-rect hover on basic stacked plots) becomes
+  unacceptable, prefer a user-facing solution (let users map a
+  `tooltip` aesthetic) over overriding plotly internals.
+- **No automatic per-case tooltip on basic plotly plots.** The
+  polygon trace plotly emits for stacked rectangles cannot carry
+  per-row text without breaking layout. Custom tooltips work fine
+  when the user maps the `text` aesthetic explicitly.
+
+## Recent regression lessons (keep!)
+
+- Verify visual rendering (open the HTML widget or inspect the
+  built `htmlwidget` in detail), not just trace metadata, before
+  claiming a plotly fix works. Trace counts and `text` vectors look
+  fine even when the widget renders blank/overlapped.
+- When a fix risks introducing a regression, prefer **disabling
+  the broken bit cleanly** (e.g. `hoverinfo = "skip"`) over
+  inventing a parallel trace structure.
+- Once `coord_epicurve()` was added, `plotly::ggplotly()` started
+  silently falling back when it saw a non-cartesian coord. Always
+  strip back to `coord_cartesian()` before handing a ggplot to
+  plotly.
 
 ## Quick mental model for the geom pipeline
 
