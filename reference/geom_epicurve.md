@@ -20,7 +20,6 @@ geom_epicurve(
   max_stack = 20,
   symbol = NULL,
   symbol_size = 3,
-  square_size = 3,
   na.rm = TRUE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -103,17 +102,8 @@ stat_epicurve(
 
 - symbol_size:
 
-  Size of symbols when `symbol` is used (default: `3`).
-
-- square_size:
-
-  Visual size of each case square in millimetres (default: `3`). Cases
-  are drawn as fixed-size square markers via
-  `grid::pointsGrob(pch = 22)` so they look square regardless of whether
-  the x-axis is hourly, daily, weekly or monthly. Only applies to the
-  default rectangular mode; ignored in column-chart (`max_stack`) and
-  `symbol` modes. Adjust if symbols appear too large or small relative
-  to the plot.
+  Size of symbols when `symbol` is used (default: `3`). Adjust if
+  symbols appear too large or small relative to the plot.
 
 - na.rm:
 
