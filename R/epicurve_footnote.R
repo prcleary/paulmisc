@@ -84,6 +84,6 @@ epicurve_footnote <- function(data,
     parts <- c(parts, as.character(extra))
   }
 
-  caption <- paste(parts, collapse = " \u00b7 ")
+  caption <- paste(parts, collapse = "\n")
   ggplot2::labs(caption = caption, ...)
 }
