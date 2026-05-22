@@ -158,10 +158,13 @@ ggplot(cases, aes(x = onset_date, fill = age_group)) +
 Compare outbreaks across different settings or groups:
 
 ```{r faceted-epicurve, fig.height=6, fig.width=7}
-# Facet by setting and colour by outcome
+# Facet by setting and colour by outcome. Use the default `scales =
+# "fixed"` so every case square has the same visual size across panels
+# — with `scales = "free_y"` a sparse panel renders fewer cases as
+# disproportionately tall blocks.
 ggplot(cases, aes(x = onset_date, fill = outcome)) +
   geom_epicurve(height = 0.85) +
-  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
+  facet_wrap(~ setting, ncol = 1) +
   scale_fill_manual(
     values = c("Recovered" = "steelblue", "Hospitalised" = "tomato")
   ) +
@@ -500,7 +503,10 @@ ggplot(plot_data, aes(x = onset_date, colour = sex)) +
     values = c(Female = "#D55E00", Male = "#0072B2"),
     name = "Sex"
   ) +
-  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
+  # Use the default fixed y-axis across panels so symbols remain the
+  # same visual size in every setting — `scales = "free_y"` would
+  # rescale each panel and visually stretch symbols in sparse panels.
+  facet_wrap(~ setting, ncol = 1) +
   labs(
     title = "Multi-setting outbreak with missing data",
     subtitle = "Symbols per sex, exposure shaded, intervention marked",

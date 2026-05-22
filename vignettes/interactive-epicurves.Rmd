@@ -90,7 +90,7 @@ p <- ggplot(cases, aes(x = onset_date, fill = sex, text = tooltip)) +
     values = c("Female" = "#D55E00", "Male" = "#0072B2"),
     name = "Sex", na.translate = FALSE
   ) +
-  facet_wrap(~ setting, ncol = 1, scales = "free_y") +
+  facet_wrap(~ setting, ncol = 1) +
   labs(
     title = "Interactive Epidemic Curves by Setting",
     x = "Date of Onset", y = "Number of Cases"
