@@ -264,7 +264,7 @@ geom_epicurve <- function(mapping = NULL,
 #' @return A ggproto [ggplot2::CoordCartesian] subclass.
 #' @export
 coord_epicurve <- function(clip = "on") {
-  ggplot2::ggproto(NULL, ggplot2::CoordCartesian,
+  ggplot2::ggproto("CoordEpicurve", ggplot2::CoordCartesian,
     limits = list(x = NULL, y = NULL),
     expand = TRUE,
     default = FALSE,
@@ -571,8 +571,15 @@ StatEpicurve <- ggplot2::ggproto(
     # has already mapped x to its scale's internal numeric representation,
     # so we look at `scales$x` to decide how to format it.
     if (nrow(data) > 0 && !("text" %in% names(data))) {
-      x_key <- as.character(data$x)
-      counts <- as.integer(table(x_key)[x_key])
+      # In column mode each row IS an aggregated bar with `y` already
+      # equal to the count. In other modes there is one row per case so
+      # we tally rows per x value.
+      counts <- if (use_column_mode) {
+        as.integer(data$y)
+      } else {
+        x_key <- as.character(data$x)
+        as.integer(table(x_key)[x_key])
+      }
       fmt_x <- tryCatch({
         if (!is.null(scales) && !is.null(scales$x) &&
             inherits(scales$x, "ScaleContinuousDatetime")) {
@@ -593,6 +600,20 @@ StatEpicurve <- ggplot2::ggproto(
         "<b>", fmt_x, "</b><br>",
         counts, " case", ifelse(counts == 1, "", "s")
       )
+    }
+
+    # Force plotly to split into one trace per unique tooltip value.
+    # plotly's geom_rect -> polygon converter merges every rectangle
+    # into a single filled polygon trace and drops per-row text, so we
+    # subdivide `group` here. Each unique (existing group, text) pair
+    # gets its own trace, which preserves both colour/fill grouping AND
+    # makes plotly attach the correct hover text per bar.
+    if (nrow(data) > 0 && "text" %in% names(data) &&
+        length(unique(data$text)) > 1) {
+      base_group <- if ("group" %in% names(data)) data$group else rep(1L, nrow(data))
+      data$group <- as.integer(interaction(
+        base_group, factor(data$text), drop = TRUE
+      ))
     }
 
     data
