@@ -66,6 +66,7 @@ stacking position within its x-value bin.</p>
 <span>  max_stack <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  symbol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  symbol_size <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  square_size <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -146,7 +147,16 @@ discrete aesthetic mapping (typically <code>colour</code> or <code>fill</code>).
 
 
 <dt id="arg-symbol-size">symbol_size<a class="anchor" aria-label="anchor" href="#arg-symbol-size"></a></dt>
-<dd><p>Size of symbols when <code>symbol</code> is used (default: <code>3</code>).
+<dd><p>Size of symbols when <code>symbol</code> is used (default: <code>3</code>).</p></dd>
+
+
+<dt id="arg-square-size">square_size<a class="anchor" aria-label="anchor" href="#arg-square-size"></a></dt>
+<dd><p>Visual size of each case square in millimetres
+(default: <code>3</code>). Cases are drawn as fixed-size square markers via
+<code>grid::pointsGrob(pch = 22)</code> so they look square regardless of
+whether the x-axis is hourly, daily, weekly or monthly. Only
+applies to the default rectangular mode; ignored in column-chart
+(<code>max_stack</code>) and <code>symbol</code> modes.
 Adjust if symbols appear too large or small relative to the plot.</p></dd>
 
 

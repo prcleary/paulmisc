@@ -207,10 +207,13 @@
 </h3>
 <p>Compare outbreaks across different settings or groups:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Facet by setting and colour by outcome</span></span>
+<code class="sourceCode R"><span><span class="co"># Facet by setting and colour by outcome. Use the default `scales =</span></span>
+<span><span class="co"># "fixed"` so every case square has the same visual size across panels</span></span>
+<span><span class="co"># — with `scales = "free_y"` a sparse panel renders fewer cases as</span></span>
+<span><span class="co"># disproportionately tall blocks.</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cases</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">onset_date</span>, fill <span class="op">=</span> <span class="va">outcome</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_epicurve.html">geom_epicurve</a></span><span class="op">(</span>height <span class="op">=</span> <span class="fl">0.85</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">setting</span>, ncol <span class="op">=</span> <span class="fl">1</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">setting</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span></span>
 <span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Recovered"</span> <span class="op">=</span> <span class="st">"steelblue"</span>, <span class="st">"Hospitalised"</span> <span class="op">=</span> <span class="st">"tomato"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
@@ -523,7 +526,10 @@
 <span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Female <span class="op">=</span> <span class="st">"#D55E00"</span>, Male <span class="op">=</span> <span class="st">"#0072B2"</span><span class="op">)</span>,</span>
 <span>    name <span class="op">=</span> <span class="st">"Sex"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">setting</span>, ncol <span class="op">=</span> <span class="fl">1</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Use the default fixed y-axis across panels so symbols remain the</span></span>
+<span>  <span class="co"># same visual size in every setting — `scales = "free_y"` would</span></span>
+<span>  <span class="co"># rescale each panel and visually stretch symbols in sparse panels.</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">setting</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Multi-setting outbreak with missing data"</span>,</span>
 <span>    subtitle <span class="op">=</span> <span class="st">"Symbols per sex, exposure shaded, intervention marked"</span>,</span>
