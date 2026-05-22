@@ -66,6 +66,7 @@ stacking position within its x-value bin.</p>
 <span>  max_stack <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  symbol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  symbol_size <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  auto_aspect <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -146,7 +147,16 @@ discrete aesthetic mapping (typically <code>colour</code> or <code>fill</code>).
 
 
 <dt id="arg-symbol-size">symbol_size<a class="anchor" aria-label="anchor" href="#arg-symbol-size"></a></dt>
-<dd><p>Size of symbols when <code>symbol</code> is used (default: <code>3</code>).
+<dd><p>Size of symbols when <code>symbol</code> is used (default: <code>3</code>).</p></dd>
+
+
+<dt id="arg-auto-aspect">auto_aspect<a class="anchor" aria-label="anchor" href="#arg-auto-aspect"></a></dt>
+<dd><p>Logical. When <code>TRUE</code> (the default), <code><a href="coord_epicurve.html">coord_epicurve()</a></code>
+is added automatically so datetime (hourly / sub-daily) plots get a
+shorter panel that makes each case rectangle look approximately
+square instead of a tall, narrow stick. For Date / numeric x axes
+no aspect ratio is imposed. Set to <code>FALSE</code> to manage the
+coordinate system yourself.
 Adjust if symbols appear too large or small relative to the plot.</p></dd>
 
 

@@ -9,6 +9,8 @@ Functions for creating epidemic curves and simulating outbreak data
   : Epicurve geom: one square per case
 - [`scale_y_epicurve()`](https://prcleary.github.io/paulmisc/reference/scale_y_epicurve.md)
   : Y-axis scale with integer breaks for epidemic curves
+- [`coord_epicurve()`](https://prcleary.github.io/paulmisc/reference/coord_epicurve.md)
+  : Coordinate system for epidemic curves
 - [`GeomEpicurve`](https://prcleary.github.io/paulmisc/reference/GeomEpicurve.md)
   : GeomEpicurve: ggproto for drawing case squares
 - [`StatEpicurve`](https://prcleary.github.io/paulmisc/reference/StatEpicurve.md)

@@ -20,6 +20,7 @@ geom_epicurve(
   max_stack = 20,
   symbol = NULL,
   symbol_size = 3,
+  auto_aspect = TRUE,
   na.rm = TRUE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -102,8 +103,18 @@ stat_epicurve(
 
 - symbol_size:
 
-  Size of symbols when `symbol` is used (default: `3`). Adjust if
-  symbols appear too large or small relative to the plot.
+  Size of symbols when `symbol` is used (default: `3`).
+
+- auto_aspect:
+
+  Logical. When `TRUE` (the default),
+  [`coord_epicurve()`](https://prcleary.github.io/paulmisc/reference/coord_epicurve.md)
+  is added automatically so datetime (hourly / sub-daily) plots get a
+  shorter panel that makes each case rectangle look approximately square
+  instead of a tall, narrow stick. For Date / numeric x axes no aspect
+  ratio is imposed. Set to `FALSE` to manage the coordinate system
+  yourself. Adjust if symbols appear too large or small relative to the
+  plot.
 
 - na.rm:
 
